@@ -15,56 +15,55 @@ class Church(models.Model):
     address = models.CharField(max_length=32)
     status = models.IntegerField(
         choices=STATUS_CHOICES,
-        defautl=STATUS_INITED
+        default=STATUS_INITED
     )
 
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True) 
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
 class Speaker(models.Model):
-    church = models.ForeignKey("Church")
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     title = models.CharField(max_length=32)
     introduction = models.CharField(max_length=255)
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True) 
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
 class Meeting(models.Model):
-    church = models.ForeignKey("Church")
-    speaker = models.ForeignKey("Speaker")
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
+    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     time = models.DateTimeField
     description = models.CharField(max_length=255)
     content = models.TextField
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
 class BibleStudy(models.Model):
-    church = models.ForeignKey("Church")
-    speaker = models.ForeignKey("Speaker")
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
+    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=255)
     content = models.TextField
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
 class BibleStudyComment(models.Model):
-    church = models.ForeignKey("Church")
-    user = models.ForeignKey("User")
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
     content = models.TextField
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
 class Course(models.Model):
-    church = models.ForeignKey("Church")
-    speaker = models.ForeignKey("Speaker")
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
+    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=255)
     content = models.TextField
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
-
 class Team(models.Model):
     STATUS_INITED = 1
     STATUS_OFFLINE = 2
@@ -74,39 +73,29 @@ class Team(models.Model):
         (STATUS_OFFLINE, '下线')
     )
     
-    church = models.ForeignKey("Church")
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=255)
     status = models.IntegerField(
         choices=STATUS_CHOICES,
-        defautl=STATUS_INITED
+        default=STATUS_INITED
     )
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
-
-class Course(models.Model):
-    church = models.ForeignKey("Church")
-    speaker = models.ForeignKey("Speaker")
-    name = models.CharField(max_length=32)
-    description = models.CharField(max_length=255)
-    content = models.TextField
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
-    
-class Donation(models,Model):
-    church = models.ForeignKey("Church")
-    user = models.ForeignKey("User")
-    amount = models.DecimalField(decimal_places=10, max_digits=2)
+class Donation(models.Model):
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
+    amount = models.DecimalField(decimal_places=10, max_digits=12)
     pay_type = models.IntegerField()
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
-    pay_time = models.DateTimeField()
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    pay_time = models.DateTimeField(null=True)
     
 
 class User(models.Model):
     email = models.EmailField(max_length=64)
     phone = models.CharField(max_length=16)
     password = models.CharField(max_length=256)
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
