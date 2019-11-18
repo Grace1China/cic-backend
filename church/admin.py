@@ -2,10 +2,12 @@ from django.contrib import admin
 
 from . import models
 
-# class ChurchAdmin(admin.ModelAdmin):
-#     fields = ('name', 'description', 'time_desc', 'address', 'status')
+class ChurchAdmin(admin.ModelAdmin):
+    list_display = ('name', 'status') 
+    search_fields = ('name',)
+    fields = ('name', 'description', 'time_desc', 'address', 'status')
 
-admin.site.register(models.Church)
+admin.site.register(models.Church, ChurchAdmin)
 admin.site.register(models.Speaker)
 admin.site.register(models.Meeting)
 admin.site.register(models.BibleStudy)
