@@ -13,16 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from rest_framework_swagger.views import get_swagger_view
+from . import view
 
 schema_view = get_swagger_view(title='Pastebin API')
-
-from . import view
 
 urlpatterns = [
     path('hello', view.hello),
     path('admin/', admin.site.urls),
     path('swagger/', schema_view),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
