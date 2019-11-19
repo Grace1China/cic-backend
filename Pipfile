@@ -15,6 +15,7 @@ django-simpleui = "*"
 django-debug-toolbar = "*"
 django-allauth = "*"
 django-rest-auth = "*"
+django-cors-headers = "*"
 
 [requires]
 python_version = "3.7.5"
