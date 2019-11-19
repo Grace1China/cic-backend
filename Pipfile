@@ -13,6 +13,8 @@ django-filter = "*"
 mysqlclient = "*"
 django-simpleui = "*"
 django-debug-toolbar = "*"
+django-allauth = "*"
+django-rest-auth = "*"
 
 [requires]
 python_version = "3.7.5"

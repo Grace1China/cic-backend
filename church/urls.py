@@ -25,6 +25,9 @@ urlpatterns = [
     path('hello', view.hello),
     path('admin/', admin.site.urls),
     path('swagger/', schema_view),
+    re_path(r'^api/auth/', include('rest_auth.urls')),
+    re_path(r'^api/auth/registration/', include('rest_auth.registration.urls')),
+    re_path(r'^api/accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

@@ -32,15 +32,24 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'simpleui',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework_swagger',
+    'django.contrib.sites',
+    
     'church',
-    'debug_toolbar'
+    'debug_toolbar',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_swagger',
+    'rest_auth',
+    'rest_auth.registration',
+    'allauth',
+    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -155,3 +164,18 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.redirects.RedirectsPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+REST_AUTH_SERIALIZERS = [
+    # 'LOGIN_SERIALIZER': 'path.to.custom.LoginSerializer',
+    # 'TOKEN_SERIALIZER': 'path.to.custom.TokenSerializer',
+]
+
+SITE_ID = 1
