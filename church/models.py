@@ -22,7 +22,7 @@ class Church(models.Model):
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
 
 class Speaker(models.Model):
-    church = models.ForeignKey("Church", on_delete=models.CASCADE)
+    church = models.ForeignKey("Church", on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=32)
     title = models.CharField(max_length=32)
     introduction = models.CharField(max_length=255)
