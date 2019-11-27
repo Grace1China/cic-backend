@@ -58,7 +58,7 @@ class BibleStudyComment(models.Model):
 class Course(models.Model):
     speaker = models.ForeignKey('Speaker', on_delete=models.CASCADE)
     title = models.CharField(u'标题', max_length=32)
-    image = models.ImageField(u'图片', upload_to='uploadImages', null=True, blank=True)
+    image = models.ImageField(u'图片', upload_to='images', null=Trsue, blank=True)
     description = models.CharField(u'描述', max_length=255)
     # content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
