@@ -12,12 +12,17 @@ class SpeakerAdmin(admin.ModelAdmin):
     search_fields = ('name', 'title')
     fields = ('name', 'title', 'introduction')
 
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('title', 'speaker') 
+    search_fields = ('speaker', 'title')
+    fields = ('title', 'speaker', 'image', 'description')
+
 admin.site.register(models.Church, ChurchAdmin)
 admin.site.register(models.Speaker, SpeakerAdmin)
 admin.site.register(models.Meeting)
 admin.site.register(models.BibleStudy)
 admin.site.register(models.BibleStudyComment)
-admin.site.register(models.Course)
+admin.site.register(models.Course, CourseAdmin)
 admin.site.register(models.Team)
 admin.site.register(models.Donation)
 admin.site.register(models.User)

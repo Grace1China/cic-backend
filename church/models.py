@@ -35,7 +35,7 @@ class Meeting(models.Model):
     name = models.CharField(max_length=32)
     time = models.DateTimeField
     description = models.CharField(max_length=255)
-    content = models.TextField
+    content = models.TextField()
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
@@ -44,23 +44,23 @@ class BibleStudy(models.Model):
     speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=255)
-    content = models.TextField
+    # content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
 class BibleStudyComment(models.Model):
     church = models.ForeignKey("Church", on_delete=models.CASCADE)
     user = models.ForeignKey("User", on_delete=models.CASCADE)
-    content = models.TextField
+    # content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
 class Course(models.Model):
-    church = models.ForeignKey("Church", on_delete=models.CASCADE)
-    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
-    name = models.CharField(max_length=32)
-    description = models.CharField(max_length=255)
-    content = models.TextField
+    speaker = models.ForeignKey('Speaker', on_delete=models.CASCADE)
+    title = models.CharField(u'标题', max_length=32)
+    image = models.ImageField(u'图片', upload_to='uploadImages', null=True, blank=True)
+    description = models.CharField(u'描述', max_length=255)
+    # content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
