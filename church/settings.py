@@ -94,10 +94,10 @@ WSGI_APPLICATION = 'church.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
-        'NAME': 'church',  # 数据库名，先前创建的
-        'USER': 'root',     # 用户名，可以自己创建用户
-        'PASSWORD': 'root',  # 密码
-        'HOST': '127.0.0.1',  # mysql服务所在的主机ip
+        'NAME': 'cic',  # 数据库名，先前创建的
+        'USER': 'backend_user',     # 用户名，可以自己创建用户
+        'PASSWORD': '11/28/2019',  # 密码
+        'HOST': '3.1.5.111',  # mysql服务所在的主机ip
         'PORT': '3306',         # mysql服务端口
     }
 }

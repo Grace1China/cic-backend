@@ -1,1 +1,26 @@
 This is for the church platform content management page.
+
+
+module install
+
+pip install django
+pip install simpleui
+pip install django-cors-headers
+pip install django-debug-toolbar
+pip install djangorestframework
+pip install django-rest-swagger
+pip install django-rest-auth
+pip install django-allauth
+pip install mysqlclient pymysql
+pip install Pillow
+
+--------------------------------------------
+db user
+user:backend_user  
+pass:11/28/2019
+
+--------------------------------------------
+django super user
+IT 
+IT@BICF.ORG
+JesusDie4Me
