@@ -35,7 +35,7 @@ class Meeting(models.Model):
     name = models.CharField(max_length=32)
     time = models.DateTimeField
     description = models.CharField(max_length=255)
-    content = models.TextField()
+    # content = models.TextField()
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
@@ -91,6 +91,15 @@ class Donation(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pay_time = models.DateTimeField(null=True)
+
+class WeeklyReport(models.Model):
+    church = models.ForeignKey("Church", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
+    title = models.CharField(u'标题', max_length=32, default='')
+    image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
 
 class User(models.Model):

@@ -16,6 +16,12 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'speaker') 
     search_fields = ('speaker', 'title')
     fields = ('title', 'speaker', 'image', 'description')
+    
+
+class WeeklyReportAdmin(admin.ModelAdmin):
+    list_display = ('church', 'user', 'title') 
+    search_fields = ('church', 'user', 'title')
+    fields = ('church', 'user', 'title', 'image', 'content')
 
 admin.site.register(models.Church, ChurchAdmin)
 admin.site.register(models.Speaker, SpeakerAdmin)
@@ -23,6 +29,7 @@ admin.site.register(models.Meeting)
 admin.site.register(models.BibleStudy)
 admin.site.register(models.BibleStudyComment)
 admin.site.register(models.Course, CourseAdmin)
+admin.site.register(models.WeeklyReport, WeeklyReportAdmin)
 admin.site.register(models.Team)
 admin.site.register(models.Donation)
 admin.site.register(models.User)
