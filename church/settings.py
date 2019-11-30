@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'allauth',
     'allauth.account',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -99,6 +100,12 @@ DATABASES = {
         'PASSWORD': '11/28/2019',  # 密码
         'HOST': '3.1.5.111',  # mysql服务所在的主机ip
         'PORT': '3306',         # mysql服务端口
+        
+        # 'NAME': 'church',  # 数据库名，先前创建的
+        # 'USER': 'root',     # 用户名，可以自己创建用户
+        # 'PASSWORD': 'root',  # 密码
+        # 'HOST': '127.0.0.1',  # mysql服务所在的主机ip
+        # 'PORT': '3306',         # mysql服务端口
     }
 }
 
@@ -139,7 +146,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/' 
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
@@ -190,3 +197,16 @@ SITE_ID = 1
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = []
 CORS_ALLOW_HEADERS = []
+
+
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = 'AKIA5YH7P4SOQO6ZMJHM'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'sermon-ims'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'static'

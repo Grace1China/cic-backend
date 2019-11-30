@@ -17,6 +17,8 @@ django-allauth = "*"
 django-rest-auth = "*"
 django-cors-headers = "*"
 Pillow = "*"
+django-storages = "*"
+boto3 = "*"
 
 [requires]
 python_version = "3.7.5"
