@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+# import storage_backends
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = 'zkt!bwt)@1jx3#a&9d@65+3aqm^rru32s+-qamngqi8)8gn^-s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -148,7 +149,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/' 
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "/static/")
 
 MEDIA_ROOT = 'uploads/'
 MEDIA_URL = '/uploads/'
@@ -199,14 +200,32 @@ CORS_ORIGIN_WHITELIST = []
 CORS_ALLOW_HEADERS = []
 
 
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# AWS_ACCESS_KEY_ID = 'AKIA5YH7P4SOQO6ZMJHM'
+# AWS_SECRET_ACCESS_KEY = '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'
+# AWS_STORAGE_BUCKET_NAME = 'sermon-ims'
+# AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+# AWS_S3_OBJECT_PARAMETERS = {
+#     'CacheControl': 'max-age=86400',
+# }
+# AWS_LOCATION = 'static'
+
 
 AWS_ACCESS_KEY_ID = 'AKIA5YH7P4SOQO6ZMJHM'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'sermon-ims'
+AWS_STORAGE_BUCKET_NAME = 'cic-bankend'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_DEFAULT_ACL = None
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 AWS_LOCATION = 'static'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'church.storage_backends.MediaStorage'

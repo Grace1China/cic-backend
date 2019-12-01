@@ -13,6 +13,7 @@ pip install django-rest-auth
 pip install django-allauth
 pip install mysqlclient pymysql
 pip install Pillow
+pip install django-storages
 
 --------------------------------------------
 db user
@@ -23,4 +24,4 @@ pass:11/28/2019
 django super user
 IT 
 IT@BICF.ORG
-JesusDie4Me
+11/30/2019
