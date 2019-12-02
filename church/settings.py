@@ -204,10 +204,9 @@ CORS_ALLOW_HEADERS = []
 AWS_ACCESS_KEY_ID = 'AKIA5YH7P4SOQO6ZMJHM'
 AWS_SECRET_ACCESS_KEY = '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'
 AWS_STORAGE_BUCKET_NAME = 'cic-bankend'
-AWS_DEFAULT_ACL = 'public-read'
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 # AWS_DEFAULT_ACL = None
-AWS_DEFAULT_ACL = 'public-read'
+# AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
@@ -223,10 +222,10 @@ AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
 DEFAULT_FILE_STORAGE = 'church.storage_backends.PublicMediaStorage'
 
 AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
-PRIVATE_FILE_STORAGE = 'mysite.storage_backends.PrivateMediaStorage'
+PRIVATE_FILE_STORAGE = 'church.storage_backends.PrivateMediaStorage'
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
-AWS_QUERYSTRING_AUTH = False
+# AWS_QUERYSTRING_AUTH = False
 
 CKEDITOR_CONFIGS = {
     'default': {
