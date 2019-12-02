@@ -125,23 +125,3 @@ class User(models.Model):
     password = models.CharField(max_length=256)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-
-class Document(models.Model):
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    upload = models.FileField()
-
-# from django.db import models
-# from django.conf import settings
-# from django.contrib.auth.models import User
-
-
-
-class Document(models.Model):
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    upload = models.FileField()
-
-
-class PrivateDocument(models.Model):
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    upload = models.FileField(storage=PrivateMediaStorage())
-    user = models.ForeignKey(User, models.SET_NULL,related_name='documents',blank=True,null=True)

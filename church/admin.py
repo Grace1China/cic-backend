@@ -38,7 +38,4 @@ admin.site.register(models.WeeklyReport, WeeklyReportAdmin)
 admin.site.register(models.Team)
 admin.site.register(models.Donation)
 admin.site.register(models.User)
-admin.site.register(models.Document)
-admin.site.register(models.PrivateDocument)
-
 
