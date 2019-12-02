@@ -14,6 +14,8 @@ pip install django-allauth
 pip install mysqlclient pymysql
 pip install Pillow
 pip install django-storages
+pip install boto3
+pip install django-ckeditor
 
 --------------------------------------------
 db user

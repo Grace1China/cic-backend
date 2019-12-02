@@ -1,4 +1,8 @@
 from django.db import models
+from church.storage_backends import PrivateMediaStorage
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
+
 
 class Church(models.Model):
     STATUS_INITED = 1
@@ -93,13 +97,26 @@ class Donation(models.Model):
     pay_time = models.DateTimeField(null=True)
 
 class WeeklyReport(models.Model):
+    STATUS_DRAFT = 1
+    STATUS_PUBLISHED = 2
+
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, '草稿'),
+        (STATUS_PUBLISHED, '发布')
+    )
     church = models.ForeignKey("Church", on_delete=models.CASCADE)
     user = models.ForeignKey("User", on_delete=models.CASCADE)
     title = models.CharField(u'标题', max_length=32, default='')
-    image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
-    content = models.TextField(null=True, blank=True)
+    image = models.ImageField(u'图片', storage=PrivateMediaStorage(), null=True, blank=True)
+    content = RichTextUploadingField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    pub_time = models.DateTimeField(auto_now_add=True,null=True, blank=True,editable=True)
+    status = models.IntegerField(
+        choices=STATUS_CHOICES,
+        default=STATUS_DRAFT
+    )
+    
     
 
 class User(models.Model):
@@ -112,3 +129,19 @@ class User(models.Model):
 class Document(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     upload = models.FileField()
+
+# from django.db import models
+# from django.conf import settings
+# from django.contrib.auth.models import User
+
+
+
+class Document(models.Model):
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    upload = models.FileField()
+
+
+class PrivateDocument(models.Model):
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    upload = models.FileField(storage=PrivateMediaStorage())
+    user = models.ForeignKey(User, models.SET_NULL,related_name='documents',blank=True,null=True)

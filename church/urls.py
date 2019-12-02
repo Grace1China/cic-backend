@@ -28,6 +28,7 @@ urlpatterns = [
     re_path(r'^api/auth/', include('rest_auth.urls')),
     re_path(r'^api/auth/registration/', include('rest_auth.registration.urls')),
     re_path(r'^api/accounts/', include('allauth.urls')),
+    re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
 if settings.DEBUG:

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from . import models
+from ckeditor.widgets import CKEditorWidget
 
 class ChurchAdmin(admin.ModelAdmin):
     list_display = ('name', 'status') 
@@ -19,9 +20,13 @@ class CourseAdmin(admin.ModelAdmin):
     
 
 class WeeklyReportAdmin(admin.ModelAdmin):
-    list_display = ('church', 'user', 'title') 
-    search_fields = ('church', 'user', 'title')
-    fields = ('church', 'user', 'title', 'image', 'content')
+    list_display = ('title','image', 'pub_time') 
+    search_fields = ('pub_time', 'title')
+    fields = ('title','image', 'status','content')
+    readonly_fields = ['pub_time']
+    formfield_overrides = {
+        models.WeeklyReport.content: {'widget': CKEditorWidget()},
+    }
 
 admin.site.register(models.Church, ChurchAdmin)
 admin.site.register(models.Speaker, SpeakerAdmin)
@@ -34,4 +39,6 @@ admin.site.register(models.Team)
 admin.site.register(models.Donation)
 admin.site.register(models.User)
 admin.site.register(models.Document)
+admin.site.register(models.PrivateDocument)
+
 
