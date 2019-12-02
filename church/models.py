@@ -104,8 +104,8 @@ class WeeklyReport(models.Model):
         (STATUS_DRAFT, '草稿'),
         (STATUS_PUBLISHED, '发布')
     )
-    church = models.ForeignKey("Church", on_delete=models.CASCADE)
-    user = models.ForeignKey("User", on_delete=models.CASCADE)
+    # church = models.ForeignKey("Church", on_delete=models.CASCADE,default=None)
+    # user = models.ForeignKey("User", on_delete=models.CASCADE)
     title = models.CharField(u'标题', max_length=32, default='')
     image = models.ImageField(u'图片', storage=PrivateMediaStorage(), null=True, blank=True)
     content = RichTextUploadingField(null=True, blank=True)
