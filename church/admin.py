@@ -56,10 +56,8 @@ admin.site.register(churchs_md.Member)
 admin.site.register(churchs_md.Team)
 admin.site.register(churchs_md.Donation)
 admin.site.register(churchs_md.Venue)
-
-
-
-
+admin.site.register(churchs_md.Sermon)
+admin.site.register(churchs_md.SermonSeries)
 admin.site.register(models.Speaker, SpeakerAdmin)
 admin.site.register(models.Meeting)
 admin.site.register(models.BibleStudy)
