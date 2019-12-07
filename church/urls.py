@@ -17,7 +17,11 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path, include
 from rest_framework_swagger.views import get_swagger_view
+from django.conf.urls import url, include
 from . import view
+from api import urls as apiusrls
+# from api
+import logging
 
 schema_view = get_swagger_view(title='Church API')
 
@@ -25,11 +29,20 @@ urlpatterns = [
     path('hello', view.hello),
     path('admin/', admin.site.urls),
     path('swagger/', schema_view),
-    re_path(r'^api/auth/', include('rest_auth.urls')),
-    re_path(r'^api/auth/registration/', include('rest_auth.registration.urls')),
-    re_path(r'^api/accounts/', include('allauth.urls')),
-    re_path(r'^admin/ckeditor/', include('ckeditor_uploader.urls')),
+    # re_path(r'^api/auth/', include('rest_auth.urls')),
+    # re_path(r'^api/auth/registration/', include('rest_auth.registration.urls')),
+    # re_path(r'^api/accounts/', include('allauth.urls')),
+    # re_path(r'^admin/ckeditor/', include('ckeditor_uploader.urls')),
+    #path to djoser end points
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
+	
+	#path to our account's app endpoints
+    re_path(r'^rapi/accounts/',include('api.urls'))
+    # path('', include('foodticket.urls')),
 ]
+print(apiusrls.urlpatterns)
+logging.debug(apiusrls)
 
 if settings.DEBUG:
     import debug_toolbar

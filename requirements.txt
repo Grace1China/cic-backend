@@ -1,0 +1,16 @@
+django
+simpleui
+django-cors-headers
+django-debug-toolbar
+djangorestframework
+django-rest-swagger
+django-rest-auth
+django-allauth
+mysqlclient 
+pymysql
+Pillow
+django-storages
+boto3
+django-ckeditor
+djangorestframework_simplejwt
+djoser

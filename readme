@@ -27,3 +27,13 @@ django super user
 IT 
 IT@BICF.ORG
 11/30/2019
+
+
+curl -X GET http://127.0.0.1:8000/api/auth/ -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b'
+
+api做用户注册，登录，改密码
+api和以后的官网是什么区别
+api和后台的用户是什么区别
+后台的平台账户是通过设置产生，而教会的账户是通过注册产生，注册产生后，教会级别的超级管理员应该也有相应的账号管理。
+
+用目前这个auth库，但测试框架不是很好用。另外要对字段进行验证。
