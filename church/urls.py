@@ -34,11 +34,11 @@ urlpatterns = [
     # re_path(r'^api/accounts/', include('allauth.urls')),
     # re_path(r'^admin/ckeditor/', include('ckeditor_uploader.urls')),
     #path to djoser end points
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.jwt')),
+    path('rapi/auth/', include('djoser.urls')),
+    path('rapi/auth/', include('djoser.urls.jwt')),
 	
 	#path to our account's app endpoints
-    re_path(r'^rapi/accounts/',include('api.urls'))
+    re_path(r'^rapi/',include('api.urls'))
     # path('', include('foodticket.urls')),
 ]
 print(apiusrls.urlpatterns)
