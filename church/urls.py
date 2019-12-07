@@ -28,21 +28,19 @@ schema_view = get_swagger_view(title='Church API')
 urlpatterns = [
     path('hello', view.hello),
     path('admin/', admin.site.urls),
-    path('swagger/', schema_view),
+    re_path('swagger/', schema_view),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # re_path(r'^api/auth/', include('rest_auth.urls')),
     # re_path(r'^api/auth/registration/', include('rest_auth.registration.urls')),
     # re_path(r'^api/accounts/', include('allauth.urls')),
     # re_path(r'^admin/ckeditor/', include('ckeditor_uploader.urls')),
     #path to djoser end points
-    path('rapi/auth/', include('djoser.urls')),
-    path('rapi/auth/', include('djoser.urls.jwt')),
-	
-	#path to our account's app endpoints
+    re_path('rapi/auth/', include('djoser.urls')),
+    re_path('rapi/auth/', include('djoser.urls.jwt')),
     re_path(r'^rapi/',include('api.urls'))
-    # path('', include('foodticket.urls')),
 ]
-print(apiusrls.urlpatterns)
-logging.debug(apiusrls)
+# print(apiusrls.urlpatterns)
+# logging.debug(apiusrls)
 
 if settings.DEBUG:
     import debug_toolbar

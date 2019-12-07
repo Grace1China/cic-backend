@@ -15,8 +15,8 @@ from .models import *
 
 
 # Create your tests here.
-class userProfileTestCase(APITestCase):
-    profile_list_url='/rapi/accounts/all-profiles'
+class ApiTestCase(APITestCase):
+    profile_list_url='/rapi/all-profiles'
     def setUp(self):
         # create a new user making a post request to djoser endpoint
         self.user=self.client.post('/auth/users/',data={'username':'mario','password':'i-keep-jumping'})
@@ -75,3 +75,8 @@ class userProfileTestCase(APITestCase):
         response=self.client.put('/rapi/accounts/profile/'+str(jsonrt[0]['id']),data=profile_data)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         print(response.content)
+
+    def test_sermon(self):
+
+
+    

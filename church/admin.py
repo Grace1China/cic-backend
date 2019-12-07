@@ -7,7 +7,7 @@ from ckeditor.widgets import CKEditorWidget
 class ChurchAdmin(admin.ModelAdmin):
     list_display = ('name','promot_cover', 'status') 
     search_fields = ('name','status')
-    fields = ('name', 'description', 'address', 'promot_cover', 'promot_video','status','vunue')
+    fields = ('name', 'code','description', 'address', 'promot_cover', 'promot_video','status','vunue')
     
 class SpeakerAdmin(admin.ModelAdmin):
     list_display = ('church', 'name', 'title') 
