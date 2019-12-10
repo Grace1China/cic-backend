@@ -104,7 +104,7 @@
                     <el-submenu v-else :index="item.eid+''">
                         <template slot="title">
                             <i :class="item.icon"></i>
-                            <span v-if="menuTextShow" slot="title" v-text="item.name"></span>
+                            <span v-if="menuTextShow" slot="title" v-text="item.name" @click="console.log(item)"></span>
                         </template>
 
                         <el-menu-item-group v-for="(sub,j) in item.models" :title="sub.name" :key="sub.name">

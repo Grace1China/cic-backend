@@ -11,6 +11,9 @@ class Venue(models.Model):
     time = models.TimeField()
     address = models.CharField(max_length=255)
     addressUrl =  models.CharField(max_length=255)
+    class Meta:
+        verbose_name = "场地"
+        verbose_name_plural = "场地"
     
 
 
@@ -34,7 +37,11 @@ class Church(models.Model):
         default=STATUS_INITED
     )
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    class Meta:
+        verbose_name = "教会"
+        verbose_name_plural = "教会"
+     
 
 class SermonSeries(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None)
@@ -55,6 +62,9 @@ class SermonSeries(models.Model):
         default=STATUS_CLOSE
     )
 
+    class Meta:
+        verbose_name = "讲道系列"
+        verbose_name_plural = "讲道系列"
     
 
 class Sermon(models.Model):
@@ -88,6 +98,9 @@ class Sermon(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_DRAFT
     )
+    class Meta:
+        verbose_name = "主日信息"
+        verbose_name_plural = "主日信息"
 
 
 class WeeklyReport(models.Model):
@@ -110,6 +123,9 @@ class WeeklyReport(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_DRAFT
     )
+    class Meta:
+        verbose_name = "周报"
+        verbose_name_plural = "周报"
 
 class Member(models.Model):
     email = models.EmailField(max_length=64)
@@ -117,6 +133,9 @@ class Member(models.Model):
     password = models.CharField(max_length=256)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    class Meta:
+        verbose_name = "会友"
+        verbose_name_plural = "会友"
 
 
 class Team(models.Model):
@@ -137,6 +156,10 @@ class Team(models.Model):
     )
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    class Meta:
+        verbose_name = "小组"
+        verbose_name_plural = "小组"
+
     
 class Donation(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE)
@@ -146,3 +169,7 @@ class Donation(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pay_time = models.DateTimeField(null=True)
+    class Meta:
+        verbose_name = "奉献"
+        verbose_name_plural = "奉献"
+

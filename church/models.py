@@ -13,6 +13,9 @@ class Speaker(models.Model):
     introduction = models.CharField(max_length=255)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
+    class Meta:
+        verbose_name = "讲员"
+        verbose_name_plural = "讲员"
 
 class Meeting(models.Model):
     church = models.ForeignKey("churchs.Church", on_delete=models.CASCADE)
@@ -23,6 +26,9 @@ class Meeting(models.Model):
     # content = models.TextField()
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    class Meta:
+        verbose_name = "聚会"
+        verbose_name_plural = "聚会"
     
 class BibleStudy(models.Model):
     church = models.ForeignKey("churchs.Church", on_delete=models.CASCADE)
@@ -32,6 +38,11 @@ class BibleStudy(models.Model):
     # content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    class Meta:
+        verbose_name = "灵修"
+        verbose_name_plural = "灵修"
+
+    
     
 class BibleStudyComment(models.Model):
     church = models.ForeignKey("churchs.Church", on_delete=models.CASCADE)
@@ -39,6 +50,10 @@ class BibleStudyComment(models.Model):
     # content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    class Meta:
+        verbose_name = "灵修评论"
+        verbose_name_plural = "灵修评论"
+
     
 class Course(models.Model):
     speaker = models.ForeignKey('Speaker', on_delete=models.CASCADE)
@@ -49,7 +64,10 @@ class Course(models.Model):
     video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    
+    class Meta:
+        verbose_name = "课程"
+        verbose_name_plural = "课程"
+
 
 
     
