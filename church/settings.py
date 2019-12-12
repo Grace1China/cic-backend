@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH = False
 
+X_FRAME_OPTIONS = 'ALLOW-FROM *'
+
 
 # Application definition
 
@@ -187,7 +189,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/' 
 
-STATIC_ROOT = os.path.join(BASE_DIR, "/static/")
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
+# STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 MEDIA_ROOT = 'uploads/'
 MEDIA_URL = '/uploads/'
@@ -252,12 +260,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 AWS_LOCATION = 'static'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# DEFAULT_FILE_STORAGE = 'church.storage_backends.MediaStorage'
+
+DEFAULT_FILE_STORAGE = 'church.storage_backends.MediaStorage'
 AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
 DEFAULT_FILE_STORAGE = 'church.storage_backends.PublicMediaStorage'
 
