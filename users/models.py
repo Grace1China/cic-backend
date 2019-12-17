@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, AbstractUser
 from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -7,7 +7,7 @@ from django.utils import timezone
 from .managers import CustomUserManager
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractUser):
     email = models.EmailField(unique=True,verbose_name='电子邮件')
     username = models.CharField(max_length=30,db_index=True,blank=True,verbose_name='用户呢称')
     is_staff = models.BooleanField(default=False,verbose_name='是否管理者')

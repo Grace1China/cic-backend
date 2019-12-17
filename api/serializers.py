@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from users.models import CustomUser
+from django.contrib.auth.hashers import make_password
+
 class CustomUserSerializer(serializers.ModelSerializer):
     user=serializers.StringRelatedField(read_only=True)
     # church=serializers.StringRelatedField(read_only=True)
@@ -20,6 +22,15 @@ class CustomUser4APISerializer(serializers.ModelSerializer):
     # creator = serializers.ForeignKey('CustomUser', on_delete=models.CASCADE,blank=True,null=True,verbose_name='创建者')
 
     # church=serializers.StringRelatedField(read_only=True)
+
+    def validate_password(self, value: str) -> str:
+        """
+        Hash value passed by user.
+
+        :param value: password of a user
+        :return: a hashed version of the password
+        """
+        return make_password(value)
     class Meta:
         model=CustomUser
         fields=['id','email','username','password','church_code']

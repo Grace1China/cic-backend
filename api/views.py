@@ -47,7 +47,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             theChurch = Church.objects.get(Q(code=church_code))
             serializer = self.get_serializer(data=data)
             if serializer.is_valid():
-                serializer.save(church=theChurch)
+                serializer.save(church=theChurch,is_active=True)
             return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
         except Exception as e:
