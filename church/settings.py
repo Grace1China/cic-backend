@@ -30,9 +30,9 @@ ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH = False
 
-X_FRAME_OPTIONS = 'ALLOW-FROM *'
+# X_FRAME_OPTIONS = 'ALLOW-FROM https://cdn.jsdelivr.net'
 
-
+AUTH_USER_MODEL = 'users.CustomUser'
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "church.apps.ChurchConfig",
     'churchs.apps.ChurchsConfig',
     'api.apps.ApiConfig',
+    'users.apps.UsersConfig',
+    'photos.apps.PhotosConfig',
     'debug_toolbar',
     'rest_framework',
     'rest_framework.authtoken',
@@ -200,12 +202,20 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesSto
 MEDIA_ROOT = 'uploads/'
 MEDIA_URL = '/uploads/'
 
+
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.AutoSchema',
-     'DEFAULT_AUTHENTICATION_CLASSES' : (
+    'DEFAULT_AUTHENTICATION_CLASSES' : (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication'
     ),
+    'DEFAULT_METADATA_CLASS': 'api.metadata.MinimalMetadata',
+    # 'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata'
+     'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'api.utill.BrowsableAPIRendererWithoutForms',
+    ),
+    
 }
 
 INTERNAL_IPS = [

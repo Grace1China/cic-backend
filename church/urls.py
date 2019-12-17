@@ -38,7 +38,9 @@ urlpatterns = [
     #path to djoser end points
     re_path('rapi/auth/', include('djoser.urls')),
     re_path('rapi/auth/', include('djoser.urls.jwt')),
-    re_path(r'^rapi/',include('api.urls'))
+    re_path(r'^rapi/',include('api.urls')),
+    url(r'^admin/',include(('photos.urls','photos'), namespace='photos')),
+
 ]
 # print(apiusrls.urlpatterns)
 # logging.debug(apiusrls)

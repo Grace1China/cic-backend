@@ -1,8 +1,8 @@
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView,)
 from rest_framework.permissions import IsAuthenticated
-from .models import userProfile
+from users.models import CustomUser
 from .permissions import IsOwnerProfileOrReadOnly
-from .serializers import userProfileSerializer
+from .serializers import CustomUser4APISerializer
 from churchs.models import Sermon, WeeklyReport
 from churchs.serializers import SermonSerializer, EweeklySerializer
 import boto3
@@ -18,29 +18,40 @@ from churchs.models import Church
 import pprint
 from django.db.models import Q
 from django.db import transaction
+from rest_framework.decorators import action
+
 
 
 # Create your views here.
-class UserProfileViewSet(viewsets.ModelViewSet):
+class CustomUserViewSet(viewsets.ModelViewSet):
     '''
-    我现在是要加一个注册，返回一个用户信息，并且加入教会码。如何生成教会码呢？在教会对像的后台，加入一个码就可以了。
-    请使用这个json做例子
-    {  
-    "church_code": "086-010-0010",
-    "description": "aa3",
-    "email": "aa1@bicf.org",
-    "location": "aa3",
-    "password": "aa1_123456",
-    "role": "2",
-    "username": "aa3"
-    }
-    这个码是一人一个码。（小组同）
-    有了这个码，我就可以在这里反查教会了。现在过来的信息，有名称，邮箱，教会邀请码
+    "email": "daniel_2@bicf.org",
+    "username": "d2",
+    "password": "2wsx3edc",
+    "church_code": "086-010-0001" 同时加入教会。要做一个二维码，有app的用户扫码出现注册页。码就自动填入
     '''
-    queryset=userProfile.objects.all()
-    serializer_class=userProfileSerializer
+    queryset=CustomUser.objects.all()
+    serializer_class=CustomUser4APISerializer
     # permission_classes=[IsAuthenticated]
+    @action(detail=True,methods=['POST'], format="json")
+    def register(self,request):
+        '''
+        1 注册用户
+        2 同时加入教会。要做一个二维码，有app的用户扫码出现注册页。码就自动填入教会
+        '''
+        try:
+            data = self.request.data
+            church_code = data.get('church_code', '-1')
+            # pp.pprint(church_code)
 
+            theChurch = Church.objects.get(Q(code=church_code))
+            serializer = self.get_serializer(data=data)
+            if serializer.is_valid():
+                serializer.save(church=theChurch)
+            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+
+        except Exception as e:
+            return JsonResponse({'errCode': '1001','msg': str(e), 'data':{}}, safe=False)
 
     @transaction.atomic
     def perform_create(self, serializer):
@@ -48,27 +59,22 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         这个方法，可能有来自，djoser创建系统用户时，signal通知生成的。
         2 有可能又是前端发过来注册信息
         '''
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(self.request.data)
-        # self.request.POST
-        # print(self.request)
-        data = self.request.data
-        church_code = data.get('church_code', '-1')
-        pp.pprint(church_code)
+        try:
+            data = self.request.data
+            church_code = data.get('church_code', '-1')
+            pp.pprint(church_code)
 
-        theChurch = Church.objects.get(Q(code=church_code))
+            theChurch = Church.objects.get(Q(code=church_code))
+            
+            serializer.save(church=theChurch)
+            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+
+        except Exception as e:
+            return JsonResponse({'errCode': '1001','msg': str(e), 'data': serializer.data}, safe=False)
+            
         
-
-
-        user=self.request.user
-        if isinstance(self.request.user,AnonymousUser):
-            user = User.objects.create_user(username=data.get('username', ''),email=data.get('email',''),password=data.get("password",''))
-
-        pp.pprint(theChurch)
-        pp.pprint(user)
-        serializer.save(user=user,church=theChurch)
-        return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
-
+        
+    
 
 
 # class userProfileDetailView(APIView):
@@ -150,4 +156,4 @@ class EweeklyView(APIView):
             
         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
-    
+

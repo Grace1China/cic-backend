@@ -2,11 +2,11 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
-from .views import SermonDetailView,UserProfileViewSet,EweeklyView
-user_create = UserProfileViewSet.as_view({
-    'post': 'create'
+from .views import SermonDetailView,CustomUserViewSet,EweeklyView
+user_create = CustomUserViewSet.as_view({
+    'post': 'register'
 })
-user_list = UserProfileViewSet.as_view({
+user_list = CustomUserViewSet.as_view({
     'get': 'list'
 })
 

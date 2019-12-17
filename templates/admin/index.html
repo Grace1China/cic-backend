@@ -322,10 +322,17 @@
     {% if "SIMPLEUI_STATIC_OFFLINE"|get_config %}
         <script type="text/javascript" src="{% static 'admin/simpleui-x/js/vue.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'admin/simpleui-x/elementui/index.js' %}"></script>
+        
     {% else %}
         <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     {% endif %}
+            
+        <script type="text/javascript" src="{% static 'photos/js/jquery-3.1.1.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'photos/js/bootstrap.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'photos/js/jquery-file-upload/vendor/jquery.ui.widget.js' %}"></script>
+        <script type="text/javascript" src="{% static 'photos/js/jquery-file-upload/jquery.iframe-transport.js' %}"></script>
+        <script type="text/javascript" src="{% static 'photos/js/jquery-file-upload/jquery.fileupload.js' %}"></script>
 
     <script type="text/javascript">
         __simpleui_version = '{% simple_version %}';

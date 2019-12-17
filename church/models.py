@@ -2,72 +2,35 @@ from django.db import models
 from church.storage_backends import PrivateMediaStorage
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
+from users.models import CustomUser
 
+class Church(models.Model):
+    STATUS_INITED = 1
+    STATUS_OFFLINE = 2
+    STATUS_CHOICES = (
+        (STATUS_INITED, '正常'),
+        (STATUS_OFFLINE, '下线')
+    )
+    # id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=32,blank=False,verbose_name='名称')
+    code = models.CharField(max_length=32,unique=True,blank=False,default='086-010-0001',verbose_name='代码')
+    description = models.CharField(max_length=255,verbose_name='描叙')
+    address = models.CharField(max_length=32,verbose_name='地址')
+    promot_cover =  models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报封面')
+    promot_video =  models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报短片')
+    vunue = models.ManyToManyField(to="churchs.Venue",default=None, null=True, blank=True,verbose_name='场地')
+    status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_INITED,verbose_name='状态')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
+    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE,blank=True,null=True,related_name='creatoruser',verbose_name='创建者')
+    manager = models.ForeignKey(CustomUser, on_delete=models.CASCADE,blank=True,null=True,related_name='manageruser',verbose_name='管理者')
 
-
-
-class Speaker(models.Model):
-    church = models.ForeignKey("churchs.Church", on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=32)
-    title = models.CharField(max_length=32)
-    introduction = models.CharField(max_length=255)
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
     class Meta:
-        verbose_name = "讲员"
-        verbose_name_plural = "讲员"
+        verbose_name = "教会"
+        verbose_name_plural = "教会"
 
-class Meeting(models.Model):
-    church = models.ForeignKey("churchs.Church", on_delete=models.CASCADE)
-    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
-    name = models.CharField(max_length=32)
-    time = models.DateTimeField
-    description = models.CharField(max_length=255)
-    # content = models.TextField()
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    class Meta:
-        verbose_name = "聚会"
-        verbose_name_plural = "聚会"
-    
-class BibleStudy(models.Model):
-    church = models.ForeignKey("churchs.Church", on_delete=models.CASCADE)
-    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
-    name = models.CharField(max_length=32)
-    description = models.CharField(max_length=255)
-    # content = models.TextField(null=True, blank=True)
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    class Meta:
-        verbose_name = "灵修"
-        verbose_name_plural = "灵修"
-
-    
-    
-class BibleStudyComment(models.Model):
-    church = models.ForeignKey("churchs.Church", on_delete=models.CASCADE)
-    user = models.ForeignKey("churchs.Member", on_delete=models.CASCADE)
-    # content = models.TextField(null=True, blank=True)
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    class Meta:
-        verbose_name = "灵修评论"
-        verbose_name_plural = "灵修评论"
-
-    
-class Course(models.Model):
-    speaker = models.ForeignKey('Speaker', on_delete=models.CASCADE)
-    title = models.CharField(u'标题', max_length=32)
-    image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
-    description = models.CharField(u'描述', max_length=255)
-    # content = models.TextField(null=True, blank=True)
-    video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    class Meta:
-        verbose_name = "课程"
-        verbose_name_plural = "课程"
-
+    def __str__(self):
+        return '%s' % (self.name)
 
 
     
