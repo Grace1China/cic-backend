@@ -164,7 +164,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     from churchs.models import WeeklyReport
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     @action(detail=True,methods=['POST'], format="json")
     def GetChurchEweekly(self,request,pk):
         '''
@@ -214,7 +214,7 @@ class ChurchViewSet(viewsets.ModelViewSet):
     from .serializers import ChurchSerializer4API
     queryset=Church.objects.all()
     serializer_class=ChurchSerializer4API
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     @action(detail=True,methods=['POST'], format="json")
     def GetUserChurch(self,request):
         '''
