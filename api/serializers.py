@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from users.models import CustomUser
+from church.models import Church
+from churchs.models import Venue 
 from django.contrib.auth.hashers import make_password
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -35,5 +37,17 @@ class CustomUser4APISerializer(serializers.ModelSerializer):
         model=CustomUser
         fields=['id','email','username','password','church_code']
         # extra_kwargs = {'church_code': True}
+
+class venueSerializer4API(serializers.ModelSerializer):
+    class Meta:
+        model = Venue
+        fields = '__all__'
+
+class ChurchSerializer4API(serializers.ModelSerializer):
+    venue = venueSerializer4API(required=False,many=True)
+
+    class Meta:
+        model = Church
+        fields = ['id','name','code','venue','description','promot_cover','promot_video']
         
         

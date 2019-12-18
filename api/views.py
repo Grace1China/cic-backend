@@ -156,4 +156,20 @@ class EweeklyView(APIView):
             
         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
+class ChurchViewSet(viewsets.ModelViewSet):
+    '''
+    取教会信息，根据用户所属的教会，查找教会。
+    '''
+    from .serializers import ChurchSerializer4API
+    queryset=Church.objects.all()
+    serializer_class=ChurchSerializer4API
+    # permission_classes=[IsAuthenticated]
+    @action(detail=True,methods=['POST'], format="json")
+    def GetUserChurch(self,request):
+        '''
+        查找用户所属教会
+        '''
+        serializer = self.get_serializer(request.user.church)
+        return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+
 

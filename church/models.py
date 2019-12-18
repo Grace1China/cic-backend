@@ -18,7 +18,7 @@ class Church(models.Model):
     address = models.CharField(max_length=32,verbose_name='地址')
     promot_cover =  models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报封面')
     promot_video =  models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报短片')
-    vunue = models.ManyToManyField(to="churchs.Venue",default=None, null=True, blank=True,verbose_name='场地')
+    venue = models.ManyToManyField(to="churchs.Venue",default=None, null=True, blank=True,verbose_name='场地')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_INITED,verbose_name='状态')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
