@@ -97,10 +97,12 @@ class file2s3(models.Model):
 class WeeklyReport(models.Model):
     STATUS_DRAFT = 1
     STATUS_PUBLISHED = 2
+    STATUS_TEST = 3
 
     STATUS_CHOICES = (
         (STATUS_DRAFT, '草稿'),
-        (STATUS_PUBLISHED, '发布')
+        (STATUS_PUBLISHED, '发布'),
+        (STATUS_TEST, '测试')
     )
     church = models.ForeignKey(Church, on_delete=models.CASCADE,null=True, blank=True,default=None,verbose_name='教会')
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='作者')

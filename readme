@@ -61,7 +61,7 @@ http://l3.community/rapi/user_create 现在在接口层面显示的参数form有
 
 
 
-
+一、后台管理系统
 1  建组  （IT）
 平台管理组
 教会管理组
@@ -86,6 +86,18 @@ http://l3.community/rapi/user_create 现在在接口层面显示的参数form有
     发布周报【用户，教会要默认】
     发布主日信息【要有一个定时发布功能，一个预览功能，发消息功能】
     小组
+
+
+
+二、API
+用户注册:/rapi/user_create
+用户登录:/rapi/auth/jwt/create/
+【用户激活】
+教会信息:/rapi/getmychurch
+平台周报:L3周报
+教会周报:
+预置主日信息
+
 
 
 

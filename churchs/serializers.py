@@ -8,4 +8,4 @@ class SermonSerializer(serializers.ModelSerializer):
 class EweeklySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.WeeklyReport
-        fields = ['id', 'church', 'user', 'title', 'image','content','status','pub_time','create_time','update_time']
+        fields = ['id', 'church', 'creator', 'title', 'image','content','status','pub_time','create_time','update_time']

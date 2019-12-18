@@ -156,6 +156,57 @@ class EweeklyView(APIView):
             
         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
+
+class EweeklyViewSet(viewsets.ModelViewSet):
+    '''
+    查找平台周报和教会周报
+    '''
+    from churchs.models import WeeklyReport
+    queryset=WeeklyReport.objects.all()
+    serializer_class=EweeklySerializer
+    # permission_classes=[IsAuthenticated]
+    @action(detail=True,methods=['POST'], format="json")
+    def GetChurchEweekly(self,request,pk):
+        '''
+        查找用户所属教会的最新周报 or 根据pk查找
+        '''
+        try:
+            if pk == None or int(pk) <= 0:
+                pprint.PrettyPrinter(indent=4).pprint(request.user)
+
+                wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
+            else: 
+                wr = self.get_object(pk)
+
+            serializer = self.get_serializer(wr)
+            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+
+        except Exception as e:
+            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': {},'sysErrMsg':e.__str__()}, safe=False)
+
+    @action(detail=True,methods=['POST'], format="json")
+    def GetL3Eweekly(self,request):
+        '''
+        查找L3平台最新周报
+        '''
+        # data = self.request.data
+        ch = Church.objects.filter(Q(code__iexact='l3'))[0]
+        pprint.PrettyPrinter(indent=4).pprint(ch)
+        
+        try:
+            wr = self.get_queryset().filter(church=ch, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')
+            # pprint.PrettyPrinter(indent=4).pprint(wr)
+            wr = wr[0]
+            serializer = self.get_serializer(wr)
+            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+
+        except Exception as e:
+            # pprint.PrettyPrinter(indent=4).pprint(IndexError)
+            return JsonResponse({'errCode': '1001', 'msg':'L3没有最新的周报','data': {},'sysErrMsg':e.__str__()}, safe=False)
+            
+
+
+
 class ChurchViewSet(viewsets.ModelViewSet):
     '''
     取教会信息，根据用户所属的教会，查找教会。

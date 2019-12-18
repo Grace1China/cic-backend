@@ -68,12 +68,12 @@ class CustomUserAdmin(UserAdmin):
         user = request.user
         if user.is_superuser:
             self.fieldsets = (
-                (None, {'fields': ('email', 'username','password','creator')}),
+                (None, {'fields': ('email', 'username','password','creator','church')}),
                 ('Permissions', {'fields': ('is_active','is_superuser','is_staff','groups')}),)
             self.add_fieldsets = (
                 (None, {
                     'classes': ('wide',),
-                    'fields': ('email', 'username','password1', 'password2','creator','is_superuser','is_active','is_staff','groups')}
+                    'fields': ('email', 'username','password1', 'password2','creator','church','is_superuser','is_active','is_staff','groups')}
                 ),)
         else:
             self.fieldsets = (
