@@ -42,7 +42,55 @@ class SermonSeries(models.Model):
 
     def __str__(self):
         return '%s' % (self.title)
+
+from .widget import S3DirectField
+
+class Media(models.Model):
+    '''
+    媒体可以用来表示不同各类的媒体，每个媒体上传到s3后，会被自动的转码。
+    '''
+    MEDIA_WORSHIP = 1
+    MEDIA_MC = 2
+    MEDIA_SERMON = 3
+    MEDIA_GIVING = 4
+    MEDIA_OTHER = 5
+
+
+    MEDIA_KIND = (
+    (MEDIA_WORSHIP,'敬拜'),
+    (MEDIA_MC,'主持'),
+    (MEDIA_SERMON,'讲道'),
+    (MEDIA_GIVING,'奉献'),
+    (MEDIA_OTHER,'其它'),
+    )
+    STATUS_NONE = 1
+    STATUS_UPLOADED = 2
+    STATUS_DISTRIBUTED = 3
+    MEDIA_STATUS = (
+        (STATUS_NONE,'还没上传媒体'),
+        (STATUS_UPLOADED,'媒体已上传'),
+        (STATUS_DISTRIBUTED,'媒体已转码发布')
+    )
+    owner = models.ForeignKey('Sermon',null=True, blank=True,related_name='medias', on_delete=models.CASCADE)
+    kind = models.IntegerField(choices=MEDIA_KIND,default=MEDIA_SERMON,verbose_name='媒体种类')
+    title = models.CharField(max_length=120, blank=True,verbose_name='标题')  
+    video = S3DirectField(dest='videos', blank=True,verbose_name='视频')
+    video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='媒体状态')
+    SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='超高清链接')
+    HD_URL = models.CharField(max_length=400, blank=True,verbose_name='高清链接')
+    SD_URL = models.CharField(max_length=400, blank=True,verbose_name='标清链接')
+    audio = S3DirectField(dest='audios', blank=True,verbose_name='音频')
+    image = S3DirectField(dest='images', blank=True,verbose_name='封面')
+    pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='讲义')
+    content = models.TextField(blank=True,verbose_name='摘要')  
     
+
+    class Meta:
+        verbose_name = "视听媒体"
+        verbose_name_plural = "视听媒体"
+
+    def __str__(self):
+        return '%s' % (self.title)
 
 class Sermon(models.Model):
     STATUS_DRAFT = 1
@@ -52,24 +100,26 @@ class Sermon(models.Model):
         (STATUS_DRAFT, '草稿'),
         (STATUS_PUBLISHED, '发布')
     )
+    id = models.AutoField(primary_key=True)
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
     title = models.CharField(max_length=32, default='',verbose_name='标题')
-    date = models.DateField(verbose_name='日期')
-    description = models.TextField(null=True, blank=True,verbose_name='敬拜')
-    pdf = models.FileField(storage=PrivateMediaStorage(),null=True, blank=True,verbose_name='讲义')
+    # date = models.DateField(verbose_name='日期')
+   
+    # description = models.TextField(null=True, blank=True,verbose_name='敬拜')
+    # pdf = models.FileField(storage=PrivateMediaStorage(),null=True, blank=True,verbose_name='讲义')
     speaker = models.ForeignKey("Speaker",on_delete=models.CASCADE,default=None,verbose_name='讲员')
     scripture = models.CharField(max_length=100, default='',verbose_name='经文')
     series = models.ForeignKey(SermonSeries, on_delete=models.CASCADE,null=True,default=None,verbose_name='讲道系列')
-    cover = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
-    worshipvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='敬拜')
-    worshipnote = models.TextField(null=True, blank=True,verbose_name='敬拜歌单')
-    mcvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='主持')
-    mcnote = models.TextField(null=True, blank=True,verbose_name='主持摘要')
-    sermonvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='讲道')
-    sermonvnote = models.TextField(null=True, blank=True,verbose_name='讲道摘要')
-    givingvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='奉献')
-    givingnote = models.TextField(null=True, blank=True,verbose_name='奉献摘要')
+    # cover = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
+    # worshipvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='敬拜')
+    # worshipnote = models.TextField(null=True, blank=True,verbose_name='敬拜歌单')
+    # mcvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='主持')
+    # mcnote = models.TextField(null=True, blank=True,verbose_name='主持摘要')
+    # sermonvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='讲道')
+    # sermonvnote = models.TextField(null=True, blank=True,verbose_name='讲道摘要')
+    # givingvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='奉献')
+    # givingnote = models.TextField(null=True, blank=True,verbose_name='奉献摘要')
     # worshiptext = models.TextField(u'敬拜', null=True, blank=True)
     # content = RichTextUploadingField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -77,7 +127,7 @@ class Sermon(models.Model):
     pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
 
-    sermonfile = models.ForeignKey("file2s3",on_delete=models.CASCADE,default=None,related_name="sermon2s3",verbose_name='讲道')
+    # sermonfile = models.ForeignKey("file2s3",on_delete=models.CASCADE,default=None,related_name="sermon2s3",verbose_name='讲道')
 
 
     class Meta:
@@ -87,11 +137,11 @@ class Sermon(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
-class file2s3(models.Model):
-    summary = models.TextField(max_length=255, blank=True,verbose_name='摘要')
-    file = models.FileField(storage=PrivateMediaStorage(),null=True, blank=True,verbose_name='文件')
-    cover = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+# class file2s3(models.Model):
+#     summary = models.TextField(max_length=255, blank=True,verbose_name='摘要')
+#     file = models.FileField(storage=PrivateMediaStorage(),null=True, blank=True,verbose_name='文件')
+#     cover = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
+#     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
 class WeeklyReport(models.Model):

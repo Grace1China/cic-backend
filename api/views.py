@@ -19,8 +19,8 @@ import pprint
 from django.db.models import Q
 from django.db import transaction
 from rest_framework.decorators import action
-
-
+import datetime
+from datetime import timedelta
 
 # Create your views here.
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -121,40 +121,40 @@ class SermonDetailView(APIView):
         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
 
-class EweeklyView(APIView):
-    '''
-    取eweekly 
-    '''
-    def get_object(self, pk):
-        try:
-            return WeeklyReport.objects.get(pk=pk)
-        except WeeklyReport.DoesNotExist:
-            raise Http404
+# class EweeklyView(APIView):
+#     '''
+#     取eweekly 
+#     '''
+#     def get_object(self, pk):
+#         try:
+#             return WeeklyReport.objects.get(pk=pk)
+#         except WeeklyReport.DoesNotExist:
+#             raise Http404
 
-    def get(self, request, pk, format=None):
-        '''
-        retrieve sermon data
-        '''
-        eweekly = None
-        print('----------------->'+str(pk))
-        if pk == None or int(pk) <= 0:
-            #选一个最近的sermon
-            eweeklyQry = WeeklyReport.objects.all()
-            eweekly = eweeklyQry.reverse()[:1]
-            if len(eweekly) != 1:
-                return JsonResponse({'errCode': '1001', msg:'database has no record.','data':None}, safe=False)
-            else:
-                eweekly = eweekly[0]
+#     def get(self, request, pk, format=None):
+#         '''
+#         retrieve sermon data
+#         '''
+#         eweekly = None
+#         print('----------------->'+str(pk))
+#         if pk == None or int(pk) <= 0:
+#             #选一个最近的sermon
+#             eweeklyQry = WeeklyReport.objects.all()
+#             eweekly = eweeklyQry.reverse()[:1]
+#             if len(eweekly) != 1:
+#                 return JsonResponse({'errCode': '1001', msg:'database has no record.','data':None}, safe=False)
+#             else:
+#                 eweekly = eweekly[0]
 
-            print('---------pk <=0------------')
-            print(eweekly)
-            serializer = EweeklySerializer(eweekly)
-        else: 
-            eweekly = self.get_object(pk)
-            print('---------pk >0------------')
-            serializer = EweeklySerializer(eweekly)
+#             print('---------pk <=0------------')
+#             print(eweekly)
+#             serializer = EweeklySerializer(eweekly)
+#         else: 
+#             eweekly = self.get_object(pk)
+#             print('---------pk >0------------')
+#             serializer = EweeklySerializer(eweekly)
             
-        return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+#         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
 
 class EweeklyViewSet(viewsets.ModelViewSet):
@@ -223,4 +223,107 @@ class ChurchViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(request.user.church)
         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
+
+class SermonViewSet(viewsets.ModelViewSet):
+    '''
+    讲道视图，功能：1 按教会取主日讲道; 2 取平台讲道
+    
+    '''
+    from .serializers import SermonSerializer4API, MediaSerializer4API
+    queryset=Sermon.objects.all()
+    serializer_class=SermonSerializer4API
+    permission_classes=[IsAuthenticated]
+
+    @action(detail=True,methods=['POST'], format="json")
+    def GetCurrentLordsDayInfo(self,request):
+        '''
+        查找当前用户所在教会主日信息
+        '''
+        try:
+            if (request.user.church == None):
+                return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有教会信息','sysErrMsg':''}, safe=False)
+            now = datetime.datetime.now()
+            last_sunday = now - timedelta(days=now.weekday()+1)
+            last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+
+            this_saturday = now + timedelta(days=6-now.weekday())
+            this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
+
+            theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday).order_by('-pub_time')[0]
+            slzSermon = self.get_serializer(theSermon)
+            # from churchs.models import Media
+            # from .serializers import MediaSerializer4API
+
+            # slzSermon.data['medias'] =  MediaSerializer4API(Media.objects.all().filter(owner=theSermon))
+            # print(Media.objects.all().filter(owner=theSermon))
+            # print(slzSermon.medias)
+            return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
+        except Exception as e:
+            return JsonResponse({'errCode': '1001', 'data': {},'msg':'教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
+
+    @action(detail=True,methods=['POST'], format="json")
+    def GetDefaultLordsDayInfo(self,request):
+        '''
+        查找当前用户所在教会主日信息
+        '''
+        try:
+            from django.conf import settings
+            theCh = Church.objects.all().get(code = settings.DEFAULT_CHURCH_CODE)
+            if (theCh == None):
+                return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有平台教会信息','sysErrMsg':''}, safe=False)
+            now = datetime.datetime.now()
+            last_sunday = now - timedelta(days=now.weekday()+1)
+            last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+
+            this_saturday = now + timedelta(days=6-now.weekday())
+            this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
+
+            theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday).order_by('-pub_time')[0]
+            slzSermon = self.get_serializer(theSermon)
+            return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
+        except Exception as e:
+            return JsonResponse({'errCode': '1001', 'data': {},'msg':'平台教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
+
+    # @action(detail=True,methods=['POST'], format="json")
+    # def GetChurchLordsDayInfo(self,request,pk):
+    #     '''
+    #     查找用户所属教会的主日信息.1 根据教会查找主日信息 2 在主日信息里面充实媒体信息
+    #     选根据pk查找，如果pk小于等于0 查当前最新讲道；
+    #     如果pk>0 查当前教会指定讲道
+    #     如果pk不是数字报错 "主键必须是整数"
+    #     '''
+    #     try:
+    #         if pk == None or int(pk) <= 0:
+    #             return JsonResponse({'errCode': '1002', 'data': {},'msg':'讲道id不正确','sysErrMsg':e.__str__()}, safe=False)
+    #             theSermon = self.get_queryset().filter(church=request.user.church).order_by('-pub_time')[0]
+    #         else:
+    #             theSermon = self.get_object(pk)
+            
+    #         #
+    #         slzSermon = self.get_serializer(theSermon)
+    #         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+    #     except Exception as e:
+    #         return JsonResponse({'errCode': '1001', 'data': {},'msg':'教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
+
+    # @action(detail=True,methods=['POST'], format="json")
+    # def GetDefaultLordsDayInfo(self,request,pk):
+    #     '''
+    #     查找平台默认讲道
+    #     根据setting中的教会编码查找教会，如果不存在教会，报错默认教会不存在
+    #     根据默认教会查找讲道，不存在报错，默认教会不存在讲道
+        
+    #     '''
+    #     try:
+    #         if pk == None or int(pk) <= 0:
+    #             pprint.PrettyPrinter(indent=4).pprint(request.user)
+
+    #             wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
+    #         else: 
+    #             wr = self.get_object(pk)
+
+    #         serializer = self.get_serializer(wr)
+    #         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+
+    #     except Exception as e:
+    #         return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': {},'sysErrMsg':e.__str__()}, safe=False)
 

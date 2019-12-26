@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from users.models import CustomUser
 from church.models import Church
-from churchs.models import Venue 
+from churchs.models import Venue, Sermon, Media, Speaker
 from django.contrib.auth.hashers import make_password
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     user=serializers.StringRelatedField(read_only=True)
@@ -49,5 +50,57 @@ class ChurchSerializer4API(serializers.ModelSerializer):
     class Meta:
         model = Church
         fields = ['id','name','code','venue','description','promot_cover','promot_video']
+
+class SpeakerSerializer4API(serializers.ModelSerializer):
+
+    class Meta:
+        model = Speaker
+        fields = '__all__'
+
+
+# media:
+# ----------------------
+# owner
+# kind 
+# title
+# video
+# video_status 
+# SHD_URL
+# HD_URL
+# SD_URL
+# audio
+# image
+# pdf
+# content
+class MediaSerializer4API(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = ['owner','kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','content']
         
+class SermonSerializer4API(serializers.ModelSerializer):
+    medias = MediaSerializer4API(many=True, read_only=True)
+    church = ChurchSerializer4API(read_only=True)
+    speaker = SpeakerSerializer4API(read_only=True)
+
+
+    class Meta:
+        model = Sermon
+        fields = ['id','church','user','title','speaker','scripture','series','medias','create_time','update_time','pub_time','status']
+
+
+# sermon:
+# -------------------
+# id 
+# church
+# user
+# title
+# speaker
+# scripture
+# series
+# create_time
+# update_time
+# pub_time
+# status
+
+
         

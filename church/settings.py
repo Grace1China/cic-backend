@@ -30,7 +30,7 @@ ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH = False
 
-# X_FRAME_OPTIONS = 'ALLOW-FROM https://cdn.jsdelivr.net'
+X_FRAME_OPTIONS = 'ALLOW-FROM *'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 # Application definition
@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'churchs.apps.ChurchsConfig',
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
-    'photos.apps.PhotosConfig',
+    # 'photos.apps.PhotosConfig',
+    's3direct',
     'debug_toolbar',
     'rest_framework',
     'rest_framework.authtoken',
@@ -245,6 +246,9 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
 }
 
+SIMPLEUI_STATIC_OFFLINE =True
+
+
 INTERNAL_IPS = [
     # ...
     '127.0.0.1',
@@ -275,20 +279,87 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+
+def create_filename(filename):
+    import uuid
+    ext = filename.split('.')[-1]
+    filename = '%s.%s' % (uuid.uuid4().hex, ext)
+    return os.path.join('custom', filename)
+
+
+S3DIRECT_DESTINATIONS = {
+    # Allow anybody to upload any MIME type
+    'misc': {
+        'key': '/'
+    },
+
+    # Allow staff users to upload any MIME type
+    'pdfs': {
+        'key': 'uploads/pdfs',
+        'auth': lambda u: u.is_staff,
+        'acl': 'private',
+
+    },
+
+    # Allow anybody to upload jpeg's and png's. Limit sizes to 5kb - 20mb
+    'images': {
+        'key': 'uploads/images',
+        'auth': lambda u: True,
+        'acl': 'private',
+        'allowed': [
+            'image/jpeg',
+            'image/png'
+        ],
+        'content_length_range': (5000, 20000000),
+        'allow_existence_optimization': True
+    },
+
+    # Allow authenticated users to upload mp4's
+    'videos': {
+        'key': 'uploads/videos',
+        'auth': lambda u: u.is_authenticated,
+        'acl': 'private',
+        'allowed': ['video/mp4']
+    },
+    # Allow authenticated users to upload mp3's
+    'audios': {
+        'key': 'uploads/audios',
+        'auth': lambda u: u.is_authenticated,
+        'acl': 'private',
+        'allowed': ['audio/mp3']
+    },
+    
+    # "acl" [optional] Custom ACL for object, default is 'public-read'
+    #       String: ACL
+    'acl': 'private',
+
+
+    # Allow anybody to upload any MIME type with a custom name function
+    'custom_filename': {
+        'key': create_filename
+    },
+}
+
 # REST_AUTH_SERIALIZERS = [
     # 'LOGIN_SERIALIZER': 'path.to.custom.LoginSerializer',
     # 'TOKEN_SERIALIZER': 'path.to.custom.TokenSerializer',
 # ]
 
 SITE_ID = 1
+DEFAULT_CHURCH_CODE = '086-010-0001'
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = []
 CORS_ALLOW_HEADERS = []
 
-AWS_ACCESS_KEY_ID = 'AKIA5YH7P4SOQO6ZMJHM'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'cic-bankend'
+
+
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', 'AKIA5YH7P4SOQO6ZMJHM')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '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')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', 'video-transcoding-061-source-9bbsedar323y')
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', 'https://s3.ap-northeast-1.amazonaws.com')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'ap-northeast-1')
+
 AWS_DEFAULT_ACL = None
 # AWS_DEFAULT_ACL = 'public-read'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME

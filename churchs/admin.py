@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import WeeklyReport
+from .models import WeeklyReport, Sermon, Media
 from ckeditor.widgets import CKEditorWidget
 
 
@@ -38,3 +38,37 @@ class WeeklyReportAdmin(admin.ModelAdmin):
         obj.save()
 
 admin.site.register(WeeklyReport, WeeklyReportAdmin)
+
+
+# class SermonAdmin(admin.ModelAdmin):
+#     list_display = ('title','user','cover','pub_time','status')
+#     search_fields = ('pub_time', 'title','status','user')
+#     fields = ('title','creator','church','image', 'status','content','pub_time')
+
+class MediaAdmin(admin.StackedInline):
+    model = Media
+    # form = S3DirectUploadForm
+    list_display = ('kind','title','video', 'image','pdf', 'content')
+    extra = 4
+    fields = ('kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio', 'image','pdf', 'content')
+
+    
+ 
+ 
+# admin.site.register(Media, MediaAdmin)
+
+   
+# class pdfstoreInline(admin.StackedInline):
+#     model = pdfstore
+#     extra = 1
+
+class SermonAdmin(admin.ModelAdmin):
+    model = Sermon
+    list_display = ('title','user','pub_time','status')
+    search_fields = ('pub_time', 'title','status','user')
+    fields = ('title','speaker','scripture','series','church','pub_time','status','user')
+
+    inlines = [MediaAdmin]
+    
+admin.site.register(Sermon, SermonAdmin)
+

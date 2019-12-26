@@ -94,10 +94,13 @@ http://l3.community/rapi/user_create 现在在接口层面显示的参数form有
 用户登录:/rapi/auth/jwt/create/
 【用户激活】
 教会信息:/rapi/getmychurch
-平台周报:L3周报
-教会周报:
-预置主日信息
-
+平台周报:/rapi/eweekly/l3  L3周报
+教会周报:/rapi/eweekly/0
+预置主日信息:如果教会有内容（有自己的内容是说本周信息是有的），就取自己的内容，没有就取预置信息（预置信息就把讲道设置为l3教会）
+1先让photos页面能够只剩下一个progressupload页
+2把这个upload页整合成一个名称，cover和视频的对像
+3再把这个model inline连接到主日信息里面
+4重新定制接口
 
 
 

@@ -7,7 +7,7 @@ from users import models as users_md
 
 from api import models as api_md
 from ckeditor.widgets import CKEditorWidget
-from photos.views import ProgressBarUploadView
+# from photos.views import ProgressBarUploadView
 
 class ChurchAdmin(admin.ModelAdmin):
     list_display = ('name','promot_cover', 'status') 
@@ -30,9 +30,6 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 
-class SermonAdmin(admin.ModelAdmin):
-    list_display = ('title','user','cover','pub_time','status')
-    search_fields = ('pub_time', 'title','status','user')
 
     
 
@@ -42,7 +39,7 @@ admin.site.register(church_md.Church, ChurchAdmin)
 admin.site.register(churchs_md.Team)
 admin.site.register(churchs_md.Donation)
 admin.site.register(churchs_md.Venue)
-admin.site.register(churchs_md.Sermon,SermonAdmin)
+# admin.site.register(churchs_md.Sermon,SermonAdmin)
 admin.site.register(churchs_md.SermonSeries)
 # admin.site.register(churchs_md.userProfile,userProfileAdmin)
 # admin.site.register(users_md.CustomUser)

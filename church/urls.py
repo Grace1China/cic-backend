@@ -39,7 +39,8 @@ urlpatterns = [
     re_path('rapi/auth/', include('djoser.urls')),
     re_path('rapi/auth/', include('djoser.urls.jwt')),
     re_path(r'^rapi/',include('api.urls')),
-    url(r'^admin/',include(('photos.urls','photos'), namespace='photos')),
+    # url(r'^admin/',include(('photos.urls','photos'), namespace='photos')),
+    url(r'^admin/s3direct/', include('s3direct.urls')),
 
 ]
 # print(apiusrls.urlpatterns)
