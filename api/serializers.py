@@ -3,6 +3,8 @@ from users.models import CustomUser
 from church.models import Church
 from churchs.models import Venue, Sermon, Media, Speaker
 from django.contrib.auth.hashers import make_password
+from django.conf import settings
+import boto3
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -73,10 +75,49 @@ class SpeakerSerializer4API(serializers.ModelSerializer):
 # pdf
 # content
 class MediaSerializer4API(serializers.ModelSerializer):
+    image_presigned_url = serializers.SerializerMethodField()
+    pdf_presigned_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Media
-        fields = ['owner','kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','content']
+        fields = ['owner','kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','image_presigned_url','pdf_presigned_url','pdf','content']
+    def get_image_presigned_url(self, obj):
+        url = obj.image
+        if url == None or len(url) == 0:
+            return obj.image
+        # import logging
+        # logging.debug(url)
+        # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
+        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
+            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
+            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            try:
+                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
+            except Exception as e:
+                return str(e)
+            return response
+        else:
+            return url
         
+    def get_pdf_presigned_url(self, obj):
+        url = obj.image
+        if url == None or len(url) == 0:
+            return obj.image
+        # import logging
+        # logging.debug(url)
+        # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
+        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
+            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
+            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            try:
+                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
+            except Exception as e:
+                return str(e)
+            return response
+        else:
+            return url
+
+
 class SermonSerializer4API(serializers.ModelSerializer):
     medias = MediaSerializer4API(many=True, read_only=True)
     church = ChurchSerializer4API(read_only=True)
