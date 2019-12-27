@@ -230,7 +230,11 @@ class SermonViewSet(viewsets.ModelViewSet):
     
     '''
     from .serializers import SermonSerializer4API, MediaSerializer4API
-    queryset=Sermon.objects.all()
+    from churchs.models import Media
+    from django.db.models import Prefetch
+    # queryset=Sermon.objects.all()
+    queryset = Sermon.objects.prefetch_related(Prefetch('medias',
+        queryset=Media.objects.order_by('kind')))
     serializer_class=SermonSerializer4API
     permission_classes=[IsAuthenticated]
 

@@ -12,7 +12,7 @@ def pre_signed_url(url):
     print(url)
     if url == None or len(url) == 0:
         return url
-    url = url.split('cic-bankend/')[1]
+    url = url.split('%s/'.format(settings.AWS_STORAGE_BUCKET_NAME))[1]
     print(url)
     s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
     
