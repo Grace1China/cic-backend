@@ -48,9 +48,10 @@ admin.site.register(WeeklyReport, WeeklyReportAdmin)
 class MediaAdmin(admin.StackedInline):
     model = Media
     # form = S3DirectUploadForm
-    list_display = ('kind','title','video', 'image','pdf', 'content')
-    extra = 4
-    fields = ('kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio', 'image','pdf', 'content')
+    list_display = ('kind','title','s3_video_status', 'alioss_video_status','content')
+    extra = 1
+    max_num = 4
+    fields = ('kind','title','s3_video','s3_video_status','s3_SHD_URL','s3_HD_URL','s3_SD_URL','s3_audio','s3_image','s3_pdf','alioss_video','alioss_video_status','alioss_SHD_URL','alioss_HD_URL','alioss_SD_URL','alioss_audio','alioss_image','alioss_pdf','content')
 
     
  
@@ -69,6 +70,8 @@ class SermonAdmin(admin.ModelAdmin):
     fields = ('title','speaker','scripture','series','church','pub_time','status','user')
 
     inlines = [MediaAdmin]
+
+    change_form_template ="admin/churchs/sermon_change_form.html"
     
 admin.site.register(Sermon, SermonAdmin)
 

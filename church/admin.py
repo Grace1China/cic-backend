@@ -49,4 +49,7 @@ admin.site.register(churchs_md.Meeting)
 admin.site.register(churchs_md.BibleStudy)
 admin.site.register(churchs_md.BibleStudyComment)
 admin.site.register(churchs_md.Course, CourseAdmin)
+admin.AdminSite.site_header = '教会平台'
+admin.AdminSite.site_title = '教会平台'
+
 

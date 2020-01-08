@@ -5,6 +5,9 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth.models import User
 from church.models import Church
 from users.models import CustomUser
+from django.conf import settings
+import boto3
+import pprint
 
 # Create your models here.
 
@@ -43,7 +46,7 @@ class SermonSeries(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
-from .widget import S3DirectField
+from .widget import S3DirectField,AliOssDirectField
 
 class Media(models.Model):
     '''
@@ -74,15 +77,136 @@ class Media(models.Model):
     owner = models.ForeignKey('Sermon',null=True, blank=True,related_name='medias', on_delete=models.CASCADE)
     kind = models.IntegerField(choices=MEDIA_KIND,default=MEDIA_SERMON,verbose_name='媒体种类')
     title = models.CharField(max_length=120, blank=True,verbose_name='标题')  
-    video = S3DirectField(dest='videos', blank=True,verbose_name='视频')
-    video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='媒体状态')
-    SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='超高清链接')
-    HD_URL = models.CharField(max_length=400, blank=True,verbose_name='高清链接')
-    SD_URL = models.CharField(max_length=400, blank=True,verbose_name='标清链接')
-    audio = S3DirectField(dest='audios', blank=True,verbose_name='音频')
-    image = S3DirectField(dest='images', blank=True,verbose_name='封面')
-    pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='讲义')
-    content = models.TextField(blank=True,verbose_name='摘要')  
+
+    s3_video = S3DirectField(dest='videos', blank=True,verbose_name='视频')
+    s3_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='S3媒体状态')
+    s3_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='AWS S3 超高清链接')
+    s3_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='AWS S3 高清链接')
+    s3_SD_URL = models.CharField(max_length=400, blank=True,verbose_name='AWS S3 标清链接')
+    s3_audio = S3DirectField(dest='audios', blank=True,verbose_name='AWS S3 音频')
+    s3_image = S3DirectField(dest='images', blank=True,verbose_name='AWS S3 封面')
+    s3_pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='AWS S3 讲义')
+
+    alioss_video = AliOssDirectField(dest='videos',fieldname='alioss_video', blank=True,verbose_name='阿里云视频')
+    alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='Aliyun媒体状态')
+    alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 超高清链接')
+    alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 高清链接')
+    alioss_SD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 标清链接')
+    alioss_audio = AliOssDirectField(dest='audios', fieldname='alioss_audio',blank=True,verbose_name='Aliyun oss 音频')
+    alioss_image = AliOssDirectField(dest='images',fieldname='alioss_image', blank=True,verbose_name='Aliyun oss 封面')
+    alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='Aliyun oss 讲义')
+    
+    content = models.TextField(blank=True,verbose_name='摘要') 
+    def isS3(self):
+        if self.s3_video is not None and self.s3_video!='' :
+            return True
+        return False
+    @property
+    def dist_video(self):
+        if self.s3_video is not None and self.s3_video!='' :
+            return self.s3_video
+        elif self.alioss_video is not None and self.alioss_video != '':
+            return self.alioss_video
+        else:
+            return ''
+    @property
+    def dist_video_status(self):
+        if self.s3_video_status is not None:
+            return self.s3_video_status
+        elif self.alioss_video_status is not None:
+            return self.alioss_video_status
+        else:
+            return ''
+    @property
+    def dist_SHD_URL(self):
+        if self.s3_SHD_URL is not None and self.s3_SHD_URL != '':
+            return self.s3_SHD_URL
+        elif self.alioss_SHD_URL is not None and self.s3_SHD_URL != '':
+            return self.alioss_SHD_URL
+        else:
+            return ''
+    @property
+    def dist_HD_URL(self):
+        if self.s3_HD_URL is not None and self.s3_HD_URL != '':
+            return self.s3_HD_URL
+        elif self.alioss_HD_URL is not None and self.alioss_HD_URL != '':
+            return self.alioss_HD_URL
+        else:
+            return ''
+    @property
+    def dist_SD_URL(self):
+        pprint.PrettyPrinter(4).pprint('----------------dist_SD_URL----------------------')
+        pprint.PrettyPrinter(4).pprint(self.s3_SD_URL)
+        pprint.PrettyPrinter(4).pprint(self.alioss_SD_URL)
+        if self.s3_SD_URL is not None and self.s3_SD_URL != '':
+            return self.s3_SD_URL
+        elif self.alioss_SD_URL is not None and self.alioss_SD_URL != '':
+            return self.alioss_SD_URL
+        else:
+            return ''
+    @property
+    def dist_audio(self):
+        if self.s3_audio is not None and self.s3_audio != '':
+            return self.s3_audio
+        elif self.alioss_audio is not None and self.alioss_audio != '':
+            return self.alioss_audio
+        else:
+            return ''
+    @property
+    def dist_image(self):
+        if self.s3_image is not None and self.s3_image != '':
+            return self.s3_image
+        elif self.alioss_image is not None and self.alioss_image != '':
+            return self.alioss_image
+        else:
+            return ''
+    @property
+    def dist_pdf(self):
+        if self.s3_pdf is not None and self.s3_pdf != '':
+            return self.s3_pdf
+        elif self.alioss_pdf is not None and self.alioss_pdf !='':
+            return self.alioss_pdf
+        else:
+            return ''
+    @property
+    def image_presigned_url(self):
+        url = str(self.dist_image)
+        if url == None or len(url) == 0:
+            return ''
+        # import logging
+        # logging.debug(url)
+        pprint.PrettyPrinter(indent=4).pprint(url)
+        # pprint.pre
+        import logging
+        logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
+        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
+            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
+            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            try:
+                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
+            except Exception as e:
+                return str(e)
+            return response
+        else:
+            return url
+    @property    
+    def pdf_presigned_url(self):
+        url = str(self.dist_image)
+        if url == None or len(url) == 0:
+            return ''
+        # import logging
+        # logging.debug(url)
+        # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
+        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
+            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
+            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+            try:
+                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
+            except Exception as e:
+                return str(e)
+            return response
+        else:
+            return url
     
 
     class Meta:
@@ -91,6 +215,13 @@ class Media(models.Model):
 
     def __str__(self):
         return '%s' % (self.title)
+
+class ossMedia(models.Model):
+    '''
+    存储oss相关信息，可能是s3,可能是alioss,有原文件信息，也有发布以后的媒体信息
+    '''
+
+
 
 class Sermon(models.Model):
     STATUS_DRAFT = 1
@@ -158,6 +289,7 @@ class WeeklyReport(models.Model):
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='作者')
     title = models.CharField(max_length=32,default='',verbose_name='标题')
     image = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
+    #todo 
     content = RichTextUploadingField(null=True, blank=True,verbose_name='内容')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)

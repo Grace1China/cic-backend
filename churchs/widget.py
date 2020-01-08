@@ -35,7 +35,7 @@ class S3DirectWidgetExt(TextInput):
         }
 
         return mark_safe(
-            render_to_string( 's3direct-widget.tpl',
+            render_to_string( 'admin/s3direct-widget.tpl',
                              ctx))
 
 
@@ -52,3 +52,60 @@ class S3DirectField(Field):
         kwargs['widget'] = self.widget
         return super(S3DirectField, self).formfield(*args, **kwargs)
 
+
+
+
+class AliOssDirectWidgetExt(TextInput):
+    class Media:
+        # js = ('/static/lib/plupload-2.1.2/js/plupload.full.min.js','/static/upload.js' )
+        css = {'all': ('/static/ossstyle.css', )}
+
+    def __init__(self, *args, **kwargs):
+        self.dest = kwargs.pop('dest', None)
+        self.fieldname = kwargs.pop('fieldname', None)
+        super(AliOssDirectWidgetExt, self).__init__(*args, **kwargs)
+
+
+    def render(self, name, value, **kwargs):
+        file_url = value or ''
+        csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
+
+        pprint.PrettyPrinter(4).pprint(self)
+        pprint.PrettyPrinter(4).pprint(name)
+        pprint.PrettyPrinter(4).pprint(value)
+        pprint.PrettyPrinter(4).pprint(kwargs)
+
+
+
+
+        ctx = {
+            # 'policy_url': reverse('s3direct'),
+            # 'signing_url': reverse('s3direct-signing'),
+            # 'dest': self.dest,
+            # 'name': name,
+            # 'csrf_cookie_name': csrf_cookie_name,
+            # 'file_url': file_url,
+            # 'file_name': os.path.basename(urlunquote_plus(file_url)),
+            # 'test':'test_1',
+            'name':name,
+            'fieldname':self.fieldname
+        }
+
+        return mark_safe(
+            render_to_string( 'admin/aliossdirect-widget.tpl',
+                             ctx))
+
+
+class AliOssDirectField(Field):
+    def __init__(self, *args, **kwargs):
+        dest = kwargs.pop('dest', None)
+        fn = kwargs.pop('fieldname', None)
+        self.widget = AliOssDirectWidgetExt(dest=dest,fieldname=fn)
+        super(AliOssDirectField, self).__init__(*args, **kwargs)
+
+    def get_internal_type(self):
+        return 'TextField'
+
+    def formfield(self, *args, **kwargs):
+        kwargs['widget'] = self.widget
+        return super(AliOssDirectField, self).formfield(*args, **kwargs)

@@ -253,7 +253,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             this_saturday = now + timedelta(days=6-now.weekday())
             this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
 
-            theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday).order_by('-pub_time')[0]
+            theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday,status=Sermon.STATUS_PUBLISHED).order_by('-pub_time')[0]
             slzSermon = self.get_serializer(theSermon)
             # from churchs.models import Media
             # from .serializers import MediaSerializer4API
@@ -263,6 +263,10 @@ class SermonViewSet(viewsets.ModelViewSet):
             # print(slzSermon.medias)
             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
         except Exception as e:
+            # pprint.PrettyPrinter(4).pprint(e.__traceback__)
+            import traceback
+            import sys
+            traceback.print_exc(file=sys.stdout)
             return JsonResponse({'errCode': '1001', 'data': {},'msg':'教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
@@ -282,7 +286,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             this_saturday = now + timedelta(days=6-now.weekday())
             this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
 
-            theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday).order_by('-pub_time')[0]
+            theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday,status=Sermon.STATUS_PUBLISHED).order_by('-pub_time')[0]
             slzSermon = self.get_serializer(theSermon)
             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
         except Exception as e:

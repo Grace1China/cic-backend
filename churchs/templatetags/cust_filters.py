@@ -25,4 +25,14 @@ def pre_signed_url(url):
         return response
     else:
         return url
+# @register.filter()
+def str2varname(astr):
+    '''
+    '''
+    if astr == None or len(astr) == 0:
+        return astr
+    else:
+        return astr.replace('-','_')
+    
+register.filter('str2varname', str2varname)
 register.filter('pre_signed_url', pre_signed_url)

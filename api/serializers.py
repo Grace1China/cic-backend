@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from users.models import CustomUser
 from church.models import Church
-from churchs.models import Venue, Sermon, Media, Speaker
+from churchs.models import Venue, Sermon, Media, Speaker, SermonSeries
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 import boto3
-
+from django.db import models
+from rest_framework import serializers
 
 class CustomUserSerializer(serializers.ModelSerializer):
     user=serializers.StringRelatedField(read_only=True)
@@ -59,6 +60,12 @@ class SpeakerSerializer4API(serializers.ModelSerializer):
         model = Speaker
         fields = '__all__'
 
+class SermonSeriesSerializer4API(serializers.ModelSerializer):
+
+    class Meta:
+        model = SermonSeries
+        fields = '__all__'
+
 
 # media:
 # ----------------------
@@ -75,58 +82,34 @@ class SpeakerSerializer4API(serializers.ModelSerializer):
 # pdf
 # content
 class MediaSerializer4API(serializers.ModelSerializer):
-    image_presigned_url = serializers.SerializerMethodField()
-    pdf_presigned_url = serializers.SerializerMethodField()
+    # image_presigned_url = serializers.SerializerMethodField()
+    # pdf_presigned_url = serializers.SerializerMethodField()
+    video = serializers.CharField(source='dist_video', max_length=400)
+    video_status = serializers.CharField(source='dist_video_status', max_length=400)
+    SHD_URL = serializers.CharField(source='dist_SHD_URL', max_length=400)
+    HD_URL = serializers.CharField(source='dist_HD_URL', max_length=400)
+    SD_URL = serializers.CharField(source='dist_SD_URL', max_length=400)
+    audio = serializers.CharField(source='dist_audio', max_length=400)
+    image = serializers.CharField(source='dist_image', max_length=400)
+    pdf = serializers.CharField(source='dist_pdf', max_length=400)
+
 
     class Meta:
         model = Media
-        fields = ['owner','kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','image_presigned_url','pdf_presigned_url','pdf','content']
-    def get_image_presigned_url(self, obj):
-        url = obj.image
-        if url == None or len(url) == 0:
-            return obj.image
-        # import logging
-        # logging.debug(url)
-        # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
-        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
-            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
-            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-            try:
-                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
-            except Exception as e:
-                return str(e)
-            return response
-        else:
-            return url
-        
-    def get_pdf_presigned_url(self, obj):
-        url = obj.image
-        if url == None or len(url) == 0:
-            return obj.image
-        # import logging
-        # logging.debug(url)
-        # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
-        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
-            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
-            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-            try:
-                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
-            except Exception as e:
-                return str(e)
-            return response
-        else:
-            return url
+        fields = ['owner','kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','image_presigned_url','pdf_presigned_url','content']
+    
 
 
 class SermonSerializer4API(serializers.ModelSerializer):
     medias = MediaSerializer4API(many=True, read_only=True)
     church = ChurchSerializer4API(read_only=True)
     speaker = SpeakerSerializer4API(read_only=True)
+    series = SermonSeriesSerializer4API(read_only=True)
 
 
     class Meta:
         model = Sermon
-        fields = ['id','church','user','title','speaker','scripture','series','medias','create_time','update_time','pub_time','status']
+        fields = ['id','church','user','title','pub_time','status','speaker','scripture','series','medias','create_time','update_time']
 
 
 # sermon:

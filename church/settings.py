@@ -28,9 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-APPEND_SLASH = False
+APPEND_SLASH = True
 
-X_FRAME_OPTIONS = 'ALLOW-FROM *'
+# X_FRAME_OPTIONS = 'ALLOW-FROM *'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 # Application definition
@@ -278,7 +278,7 @@ AUTHENTICATION_BACKENDS = (
     # `allauth` specific authentication methods, such as login by e-mail
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-
+SIMPLEUI_LOGIN_PARTICLES = False
 
 def create_filename(filename):
     import uuid
@@ -378,6 +378,9 @@ PRIVATE_FILE_STORAGE = 'church.storage_backends.PrivateMediaStorage'
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 # AWS_QUERYSTRING_AUTH = False
+
+APP_SERVER_IP = "54.169.143.92"
+
 
 CKEDITOR_CONFIGS = {
     'default': {

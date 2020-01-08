@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
 from .views import SermonDetailView,CustomUserViewSet,ChurchViewSet,EweeklyViewSet,SermonViewSet
+from .alioss_directup_views import AliOssSignature, AliOssCallBack
 user_create = CustomUserViewSet.as_view({
     'post': 'register'
 })
@@ -31,8 +32,10 @@ urlpatterns = [
     path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
     path("eweekly/<int:pk>",church_eweekly,name="church_eweekly"),
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),
-    path("getmychurch",user_church,name="mychurch")
-    
+    path("getmychurch",user_church,name="mychurch"),
+
+    path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
+    path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback")
 
 
 ]

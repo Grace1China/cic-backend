@@ -3,6 +3,7 @@ from church.storage_backends import PrivateMediaStorage
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from users.models import CustomUser
+from django.core.validators import *
 
 class Church(models.Model):
     STATUS_INITED = 1
@@ -13,7 +14,7 @@ class Church(models.Model):
     )
     # id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=32,blank=False,verbose_name='名称')
-    code = models.CharField(max_length=32,unique=True,blank=False,default='086-010-0001',verbose_name='代码')
+    code = models.CharField(max_length=32,unique=True,blank=False,default='086-010-0001',verbose_name='代码',help_text='只能含有字母，数字, _和-, 不要超过 254个字符',validators=[validate_slug])
     description = models.CharField(max_length=255,verbose_name='描叙')
     address = models.CharField(max_length=32,verbose_name='地址')
     promot_cover =  models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报封面')
