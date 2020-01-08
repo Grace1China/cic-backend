@@ -85,7 +85,7 @@ class MediaSerializer4API(serializers.ModelSerializer):
     # image_presigned_url = serializers.SerializerMethodField()
     # pdf_presigned_url = serializers.SerializerMethodField()
     video = serializers.CharField(source='dist_video', max_length=400)
-    video_status = serializers.CharField(source='dist_video_status', max_length=400)
+    video_status = serializers.IntegerField(source='dist_video_status')
     SHD_URL = serializers.CharField(source='dist_SHD_URL', max_length=400)
     HD_URL = serializers.CharField(source='dist_HD_URL', max_length=400)
     SD_URL = serializers.CharField(source='dist_SD_URL', max_length=400)
