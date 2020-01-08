@@ -116,7 +116,7 @@ class Media(models.Model):
         elif self.alioss_video_status is not None:
             return self.alioss_video_status
         else:
-            return ''
+            return STATUS_NONE
     @property
     def dist_SHD_URL(self):
         pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')

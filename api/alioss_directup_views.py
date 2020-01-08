@@ -62,6 +62,7 @@ class AliOssSignature(APIView):
         callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
                                         '&height=${imageInfo.height}&width=${imageInfo.width}';
         callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
+        pprint.PrettyPrinter(4).pprint(callback_dict)
         callback_param = json.dumps(callback_dict).strip()
         base64_callback_body = base64.b64encode(callback_param.encode());
 
