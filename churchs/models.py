@@ -119,9 +119,12 @@ class Media(models.Model):
             return ''
     @property
     def dist_SHD_URL(self):
+        pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
+        pprint.PrettyPrinter(4).pprint(self.s3_SHD_URL)
+        pprint.PrettyPrinter(4).pprint(self.alioss_SHD_URL)
         if self.s3_SHD_URL is not None and self.s3_SHD_URL != '':
             return self.s3_SHD_URL
-        elif self.alioss_SHD_URL is not None and self.s3_SHD_URL != '':
+        elif self.alioss_SHD_URL is not None and self.alioss_SHD_URL != '':
             return self.alioss_SHD_URL
         else:
             return ''
