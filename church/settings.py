@@ -221,7 +221,7 @@ REST_FRAMEWORK = {
 
 from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=7),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -346,7 +346,7 @@ S3DIRECT_DESTINATIONS = {
 # ]
 
 SITE_ID = 1
-DEFAULT_CHURCH_CODE = '086-010-0001'
+DEFAULT_CHURCH_CODE = 'ims'
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = []

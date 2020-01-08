@@ -23,11 +23,11 @@ class AliOssSignature(APIView):
     # 请填写您的AccessKeySecret。
     access_key_secret = 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I'
     # host的格式为 bucketname.endpoint ，请替换为您的真实信息。
-    host = 'http://luxmundi.oss-cn-beijing.aliyuncs.com' 
+    host = 'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
     # callback_url为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
     callback_url = "http://%s/rapi/alioss_directup_callback" %  settings.APP_SERVER_IP
     # 用户上传文件时指定的前缀。
-    upload_dir = 'media_base/'
+    # upload_dir = '%s' %
     expire_time = 30
 
 
@@ -40,7 +40,7 @@ class AliOssSignature(APIView):
     def get_token(self,request):
         now = int(time.time())
         expire_syncpoint = now + self.expire_time
-        expire_syncpoint = 1612345678
+        # expire_syncpoint = 1612345678
         expire = self.get_iso_8601(expire_syncpoint)
 
         policy_dict = {}
@@ -49,7 +49,9 @@ class AliOssSignature(APIView):
         array_item = []
         array_item.append('starts-with');
         array_item.append('$key');
-        array_item.append(self.upload_dir);
+        if (request.user.church == None):
+            raise Exception('user or church of user is null')
+        array_item.append(request.user.church.code);
         condition_array.append(array_item)
         policy_dict['conditions'] = condition_array
         policy = json.dumps(policy_dict).strip()
@@ -74,9 +76,9 @@ class AliOssSignature(APIView):
         token_dict['expire'] = expire_syncpoint
 
         if request.user.church == None:
-            token_dict['dir'] = self.upload_dir + 'l3/'
+            token_dict['dir'] = 'l3/'
         else:
-            token_dict['dir'] = self.upload_dir + '%s/' % request.user.church.code
+            token_dict['dir'] = '%s/' % request.user.church.code
 
 
 
@@ -110,11 +112,21 @@ class AliOssCallBack(APIView):
     '''
     阿里上传完成视频后进行回写
     '''
-    def get(self,request,*args,**kwargs):
+    def post(self,request,*args,**kwargs):
         '''
-        用get方法
+        用post方法
         '''
+        import logging
+        auth = request.META.get('Authorization')
+        logging.debug(auth)
+        if not username:
+            return None
+        logging.debug(request)
+        logging.debug(args)
+        logging.debug(kwargs)
         pprint.PrettyPrinter(4).pprint(request)
         pprint.PrettyPrinter(4).pprint(args)
         pprint.PrettyPrinter(4).pprint(kwargs)
+        return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
+
 

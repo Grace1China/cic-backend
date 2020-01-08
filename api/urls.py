@@ -4,6 +4,11 @@ from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
 from .views import SermonDetailView,CustomUserViewSet,ChurchViewSet,EweeklyViewSet,SermonViewSet
 from .alioss_directup_views import AliOssSignature, AliOssCallBack
+from rest_framework import permissions
+
+from django.contrib.auth.decorators import login_required,permission_required,user_passes_test
+from django.contrib.auth.models import Group
+
 user_create = CustomUserViewSet.as_view({
     'post': 'register'
 })
@@ -19,6 +24,11 @@ l3_eweekly = EweeklyViewSet.as_view({
 church_eweekly = EweeklyViewSet.as_view({
     'get':'GetChurchEweekly'
 })
+
+v2_church_eweekly = EweeklyViewSet.as_view({
+    'get':'GetChurchEweekly_v2'
+})
+
 l3_lorddayinfo = SermonViewSet.as_view({'get':'GetDefaultLordsDayInfo'})
 church_lorddayinfo = SermonViewSet.as_view({'get':'GetCurrentLordsDayInfo'})
 
@@ -31,6 +41,8 @@ urlpatterns = [
     path("lorddayinfo/l3",l3_lorddayinfo,name="l3_lorddayinfo"),
     path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
     path("eweekly/<int:pk>",church_eweekly,name="church_eweekly"),
+    path("eweekly",v2_church_eweekly,name="church_eweekly"),
+
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),
     path("getmychurch",user_church,name="mychurch"),
 
