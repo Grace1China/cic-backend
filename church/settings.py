@@ -298,6 +298,10 @@ S3DIRECT_DESTINATIONS = {
         'key': 'uploads/pdfs',
         'auth': lambda u: u.is_staff,
         'acl': 'private',
+        'allowed': [
+            'image/jpeg',
+            'image/png'
+        ],
 
     },
 
@@ -307,8 +311,7 @@ S3DIRECT_DESTINATIONS = {
         'auth': lambda u: True,
         'acl': 'private',
         'allowed': [
-            'image/jpeg',
-            'image/png'
+            'file/pdf',
         ],
         'content_length_range': (5000, 20000000),
         'allow_existence_optimization': True

@@ -112,15 +112,15 @@ class AliOssCallBack(APIView):
     '''
     阿里上传完成视频后进行回写
     '''
-    def post(self,request,*args,**kwargs):
+    def get(self,request,*args,**kwargs):
         '''
         用post方法
         '''
         import logging
         auth = request.META.get('Authorization')
         logging.debug(auth)
-        if not username:
-            return None
+        # if not request:
+        #     return None
         logging.debug(request)
         logging.debug(args)
         logging.debug(kwargs)

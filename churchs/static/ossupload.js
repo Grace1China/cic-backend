@@ -185,7 +185,9 @@ function UploaderFactory(
                 mime_types : [ //只允许上传图片和zip文件
                 { title : "Image files", extensions : "jpg,gif,png,bmp" }, 
                 { title : "Zip files", extensions : "zip,rar" },
-                { title : "media files", extensions : "mp4,mp3" }
+                { title : "media files", extensions : "mp4,mp3" },
+                { title : "document files", extensions : "pdf,doc,docx,txt" }
+
         
                 ],
                 max_file_size : max_file_size, //最大只能上传10mb的文件
