@@ -18,6 +18,7 @@ function UploaderFactory(
     var accessid = ''
     var accesskey = ''
     var host = ''
+    var desthost = ''
     var policyBase64 = ''
     var signature = ''
     var callbackbody = ''
@@ -79,6 +80,7 @@ function UploaderFactory(
             token = JSON.parse(res.token)
             // var obj = eval ("(" + body + ")");
             host = token.host//obj['host']
+            desthost = token.desthost
             policyBase64 = token.policy//obj['policy']
             accessid = token.accessid//obj['accessid']
             signature = token.signature//obj['signature']
@@ -145,7 +147,9 @@ function UploaderFactory(
             ret = get_signature()
         }
         g_object_name = key;
-        if (filename != '') { suffix = get_suffix(filename)
+        suffix = get_suffix(filename)
+
+        if (filename != '') { 
             calculate_object_name(filename)
         }
         // that = this
@@ -160,7 +164,7 @@ function UploaderFactory(
         console.log('----------set_upload_param-----------')
         console.log(new_multipart_params)
         up.setOption({
-            'url':host,
+            'url':suffix.toLowerCase() == 'mp4' ? host:desthost,
             'multipart_params': new_multipart_params
         });
 
@@ -183,10 +187,11 @@ function UploaderFactory(
         
             filters: {
                 mime_types : [ //只允许上传图片和zip文件
-                { title : "Image files", extensions : "jpg,gif,png,bmp" }, 
-                { title : "Zip files", extensions : "zip,rar" },
-                { title : "media files", extensions : "mp4,mp3" },
-                { title : "document files", extensions : "pdf,doc,docx,txt" }
+                { title : "Image files", extensions : "jpg,gif,png,bmp"}, 
+                { title : "Zip files", extensions : "zip,rar"},
+                { title : "mp4 files", extensions : "mp4"},
+                { title : "mp3 files", extensions : "mp3"},
+                { title : "document files", extensions : "pdf,doc,docx,txt"}
 
         
                 ],

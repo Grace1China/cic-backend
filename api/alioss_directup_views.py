@@ -24,6 +24,7 @@ class AliOssSignature(APIView):
     access_key_secret = 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I'
     # host的格式为 bucketname.endpoint ，请替换为您的真实信息。
     host = 'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
+    desthost = 'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
     # callback_url为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
     callback_url = "http://%s/rapi/alioss_directup_callback" %  settings.APP_SERVER_IP
     # 用户上传文件时指定的前缀。
@@ -64,13 +65,15 @@ class AliOssSignature(APIView):
         callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
                                         '&height=${imageInfo.height}&width=${imageInfo.width}';
         callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
-        pprint.PrettyPrinter(4).pprint(callback_dict)
+        import logging
+        logging.debug(callback_dict)
         callback_param = json.dumps(callback_dict).strip()
         base64_callback_body = base64.b64encode(callback_param.encode());
 
         token_dict = {}
         token_dict['accessid'] = self.access_key_id
         token_dict['host'] = self.host
+        token_dict['desthost'] = self.desthost
         token_dict['policy'] = policy_encode.decode()
         token_dict['signature'] = sign_result.decode()
         token_dict['expire'] = expire_syncpoint
@@ -117,6 +120,26 @@ class AliOssCallBack(APIView):
         用post方法
         '''
         import logging
+        logging.debug('-------------------in get ----------------------')
+        auth = request.META.get('Authorization')
+        logging.debug(auth)
+        # if not request:
+        #     return None
+        logging.debug(request)
+        logging.debug(args)
+        logging.debug(kwargs)
+        pprint.PrettyPrinter(4).pprint(request)
+        pprint.PrettyPrinter(4).pprint(args)
+        pprint.PrettyPrinter(4).pprint(kwargs)
+        return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
+
+    def post(self,request,*args,**kwargs):
+        '''
+        用post方法
+        '''
+        import logging
+        logging.debug('-------------------in post ----------------------')
+
         auth = request.META.get('Authorization')
         logging.debug(auth)
         # if not request:
