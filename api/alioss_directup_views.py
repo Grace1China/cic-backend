@@ -51,6 +51,8 @@ class AliOssSignature(APIView):
         array_item.append('starts-with');
         array_item.append('$key');
         if (request.user.church == None):
+            import pprint
+            pprint.PrettyPrinter(6).pprint(request.user)
             raise Exception('user or church of user is null')
         array_item.append(request.user.church.code);
         condition_array.append(array_item)
@@ -138,15 +140,16 @@ class AliOssCallBack(APIView):
         用post方法
         '''
         import logging
-        logging.debug('-------------------in post ----------------------')
+        logging.info('-------------------in post ----------------------')
 
         auth = request.META.get('Authorization')
-        logging.debug(auth)
+        logging.info(auth)
         # if not request:
         #     return None
-        logging.debug(request)
-        logging.debug(args)
-        logging.debug(kwargs)
+        logging.info(request)
+        logging.info(args)
+        logging.info(kwargs)
+        
         pprint.PrettyPrinter(4).pprint(request)
         pprint.PrettyPrinter(4).pprint(args)
         pprint.PrettyPrinter(4).pprint(kwargs)
