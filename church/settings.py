@@ -470,7 +470,7 @@ LOGGING = {
             'propagate': True,
         },
         'myproject.error': {
-            'handlers': ['file', 'mail_admins'],
+            'handlers': ['file'],
             'level': 'ERROR',
             'propagate': False
         }
