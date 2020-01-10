@@ -469,6 +469,12 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'myproject.error': {
+            'handlers': ['file', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False
+        }
     },
 }
+
 
