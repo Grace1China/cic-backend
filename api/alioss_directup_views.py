@@ -148,6 +148,9 @@ class AliOssCallBack(APIView):
         # if not request:
         #     return None
         logger.error(request)
+        logger.error(request.headers)
+        logger.error(request.POST)
+
         logger.error(args)
         logger.error(kwargs)
         
