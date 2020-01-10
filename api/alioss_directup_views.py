@@ -140,15 +140,16 @@ class AliOssCallBack(APIView):
         用post方法
         '''
         import logging
-        logging.error('-------------------in post ----------------------')
+        logger = logging.getLogger(__name__)
+        logger.error('-------------------in post ----------------------')
 
         auth = request.META.get('Authorization')
-        logging.error(auth)
+        logger.error(auth)
         # if not request:
         #     return None
-        logging.error(request)
-        logging.error(args)
-        logging.error(kwargs)
+        logger.error(request)
+        logger.error(args)
+        logger.error(kwargs)
         
         pprint.PrettyPrinter(4).pprint(request)
         pprint.PrettyPrinter(4).pprint(args)
