@@ -143,12 +143,12 @@ class AliOssCallBack(APIView):
         logging.info('-------------------in post ----------------------')
 
         auth = request.META.get('Authorization')
-        logging.info(auth)
+        logging.debug(auth)
         # if not request:
         #     return None
-        logging.info(request)
-        logging.info(args)
-        logging.info(kwargs)
+        logging.debug(request)
+        logging.debug(args)
+        logging.debug(kwargs)
         
         pprint.PrettyPrinter(4).pprint(request)
         pprint.PrettyPrinter(4).pprint(args)
