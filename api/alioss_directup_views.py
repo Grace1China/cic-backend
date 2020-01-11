@@ -149,7 +149,12 @@ class AliOssCallBack(APIView):
         #     return None
         logger.error(request)
         logger.error(request.headers)
+        # X-Oss-Bucket
         logger.error(request.POST)
+        data = request.data
+        filename = data.get('filename', '')
+        mimeType = data.get('mimeType','')
+        # filename
 
         logger.error(args)
         logger.error(kwargs)
@@ -157,6 +162,6 @@ class AliOssCallBack(APIView):
         pprint.PrettyPrinter(4).pprint(request)
         pprint.PrettyPrinter(4).pprint(args)
         pprint.PrettyPrinter(4).pprint(kwargs)
-        return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
+        return JsonResponse({'String value': 'OK', 'Key': 'Status','bucket':request.headers['X-Oss-Bucket'],'filename':filename,'mimeType':mimeType}, safe=False)
 
 

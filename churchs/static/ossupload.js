@@ -164,7 +164,7 @@ function UploaderFactory(
         console.log('----------set_upload_param-----------')
         console.log(new_multipart_params)
         up.setOption({
-            'url':suffix.toLowerCase() == 'mp4' ? host:desthost,
+            'url':suffix.toLowerCase() != '.mp4' ? desthost:host,
             'multipart_params': new_multipart_params
         });
 
