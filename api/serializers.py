@@ -97,7 +97,7 @@ class MediaSerializer4API(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ['owner','kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','image_presigned_url','pdf_presigned_url','content']
+        fields = ['kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','image_presigned_url','pdf_presigned_url','content']
     
 
 
@@ -118,11 +118,9 @@ class CourseSerializer4API(serializers.ModelSerializer):
     church = ChurchSerializer4API(read_only=True)
     speaker = SpeakerSerializer4API(read_only=True)
     # series = SermonSeriesSerializer4API(read_only=True)
-
-
     class Meta:
         model = models.Course
-        fields = ['id','church','speaker','title','image','description','content','price','medias','create_time','update_time']
+        fields = ['id','church','speaker','title','description','content','price','medias','create_time','update_time']
 
 
 

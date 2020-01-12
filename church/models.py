@@ -5,6 +5,8 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from users.models import CustomUser
 from django.core.validators import *
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class Church(models.Model):
@@ -21,7 +23,7 @@ class Church(models.Model):
     address = models.CharField(max_length=32,verbose_name='地址')
     promot_cover =  models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报封面')
     promot_video =  models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报短片')
-    venue = models.ManyToManyField(to="churchs.Venue",default=None, null=True, blank=True,verbose_name='场地')
+    venue = models.ManyToManyField(to="churchs.Venue",default=None,  blank=True,verbose_name='场地')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_INITED,verbose_name='状态')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
@@ -38,18 +40,18 @@ class Church(models.Model):
 
         
 class Course(models.Model):
-    church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
-    speaker = models.ForeignKey('churchs.Speaker', on_delete=models.CASCADE)
-    title = models.CharField(u'标题', max_length=32)
-    image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
-    description = models.CharField(u'描述', max_length=255)
-    content = models.TextField(null=True, blank=True)
-    price = models.DecimalField(default=0,max_digits=9, decimal_places=2)
+    church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会或平台')
+    speaker = models.ForeignKey('churchs.Speaker', on_delete=models.CASCADE,verbose_name='讲员')
+    title = models.CharField(max_length=500,verbose_name='标题')
+    # image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
+    description = models.TextField(max_length=255,verbose_name='描叙')
+    content = RichTextField(null=True, blank=True,verbose_name='内容')
+    price = models.DecimalField(default=0,max_digits=9, decimal_places=2,verbose_name='价格')
     # s3video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
     import churchs.models as churchs_models
-    medias = GenericRelation(churchs_models.Media, related_query_name='Course')
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    medias = GenericRelation(churchs_models.Media, related_query_name='Course',verbose_name='视听媒体')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
     class Meta:
         verbose_name = "课程"
         verbose_name_plural = "课程"

@@ -22,6 +22,7 @@ class ChurchAdmin(admin.ModelAdmin):
 
 class MediaInline(GenericStackedInline):
     model = Media
+    extra = 0
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = [
@@ -30,12 +31,9 @@ class CourseAdmin(admin.ModelAdmin):
 
     list_display = ('title', 'speaker') 
     search_fields = ('speaker', 'title')
-    fields = ('church','title', 'speaker', 'image', 'description','content','price')
+    fields = ('church','title', 'speaker','description','content','price')
 
     change_form_template ="admin/churchs/sermon_change_form.html"
-
-
-
 
 admin.site.register(church_md.Church, ChurchAdmin)
 admin.site.register(models.Course, CourseAdmin)

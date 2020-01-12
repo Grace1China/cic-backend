@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import WeeklyReport, Sermon, Media
 from . import models
 from ckeditor.widgets import CKEditorWidget
+from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
+
 
 
 # Register your models here.
@@ -46,24 +48,23 @@ class SpeakerAdmin(admin.ModelAdmin):
     search_fields = ('name', 'title')
     fields = ('name', 'title', 'introduction')
 
-class MediaAdmin(admin.StackedInline):
-    model = models.Media
-    # form = S3DirectUploadForm
-    list_display = ('kind','title','s3_video_status', 'alioss_video_status','content')
-    extra = 1
+
+
+class MediaInline(GenericStackedInline):
+    model = Media
+    extra = 0
     max_num = 4
-    fields = ('kind','title','s3_video','s3_video_status','s3_SHD_URL','s3_HD_URL','s3_SD_URL','s3_audio','s3_image','s3_pdf','alioss_video','alioss_video_status','alioss_SHD_URL','alioss_HD_URL','alioss_SD_URL','alioss_audio','alioss_image','alioss_pdf','content')
-
-    
-
 
 class SermonAdmin(admin.ModelAdmin):
+    inlines = [
+        MediaInline,
+    ]
+
     model = models.Sermon
     list_display = ('title','user','pub_time','status')
     search_fields = ('pub_time', 'title','status','user')
     fields = ('title','speaker','scripture','series','church','pub_time','status','user')
 
-    inlines = [MediaAdmin]
 
     change_form_template ="admin/churchs/sermon_change_form.html"
     

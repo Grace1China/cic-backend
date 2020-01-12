@@ -10,6 +10,7 @@ import boto3
 import pprint
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
 # Create your models here.
@@ -59,7 +60,8 @@ class Media(models.Model):
     MEDIA_MC = 2
     MEDIA_SERMON = 3
     MEDIA_GIVING = 4
-    MEDIA_OTHER = 5
+    MEDIA_COURSE = 5
+    MEDIA_OTHER = 6
 
 
     MEDIA_KIND = (
@@ -67,6 +69,7 @@ class Media(models.Model):
     (MEDIA_MC,'主持'),
     (MEDIA_SERMON,'讲道'),
     (MEDIA_GIVING,'奉献'),
+    (MEDIA_COURSE,'课程'),
     (MEDIA_OTHER,'其它'),
     )
     STATUS_NONE = 1
@@ -77,7 +80,7 @@ class Media(models.Model):
         (STATUS_UPLOADED,'媒体已上传'),
         (STATUS_DISTRIBUTED,'媒体已转码发布')
     )
-    owner = models.ForeignKey('Sermon',null=True, blank=True,related_name='medias', on_delete=models.CASCADE)
+    # owner = models.ForeignKey('Sermon',null=True, blank=True,related_name='medias', on_delete=models.CASCADE)
 
     content_type = models.ForeignKey(ContentType,null=True, blank=True, on_delete=models.CASCADE, related_name='medias')
     object_id = models.PositiveIntegerField(null=True, blank=True)
@@ -99,9 +102,9 @@ class Media(models.Model):
 
     alioss_video = AliOssDirectField(dest='videos',fieldname='alioss_video', blank=True,verbose_name='阿里云视频')
     alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='Aliyun媒体状态')
-    alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 超高清链接')
-    alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 高清链接')
-    alioss_SD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 标清链接')
+    alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 高清链接')
+    alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 标清链接')
+    alioss_SD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 流畅链接')
     alioss_audio = AliOssDirectField(dest='audios', fieldname='alioss_audio',blank=True,verbose_name='Aliyun oss 音频')
     alioss_image = AliOssDirectField(dest='images',fieldname='alioss_image', blank=True,verbose_name='Aliyun oss 封面')
     alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='Aliyun oss 讲义')
@@ -266,6 +269,7 @@ class Sermon(models.Model):
     # givingnote = models.TextField(null=True, blank=True,verbose_name='奉献摘要')
     # worshiptext = models.TextField(u'敬拜', null=True, blank=True)
     # content = RichTextUploadingField(null=True, blank=True)
+    medias = GenericRelation(Media, related_query_name='Sermon',verbose_name='视听媒体')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
