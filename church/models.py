@@ -4,6 +4,8 @@ from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from users.models import CustomUser
 from django.core.validators import *
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+
 
 class Church(models.Model):
     STATUS_INITED = 1
@@ -32,6 +34,27 @@ class Church(models.Model):
 
     def __str__(self):
         return '%s' % (self.name)
+
+
+        
+class Course(models.Model):
+    church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
+    speaker = models.ForeignKey('churchs.Speaker', on_delete=models.CASCADE)
+    title = models.CharField(u'标题', max_length=32)
+    image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
+    description = models.CharField(u'描述', max_length=255)
+    content = models.TextField(null=True, blank=True)
+    price = models.DecimalField(default=0,max_digits=9, decimal_places=2)
+    # s3video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
+    import churchs.models as churchs_models
+    medias = GenericRelation(churchs_models.Media, related_query_name='Course')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    class Meta:
+        verbose_name = "课程"
+        verbose_name_plural = "课程"
+    def __str__(self):
+        return '%s' % (self.title)
 
 
     

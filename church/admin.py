@@ -7,7 +7,9 @@ from users import models as users_md
 
 from api import models as api_md
 from ckeditor.widgets import CKEditorWidget
-# from photos.views import ProgressBarUploadView
+from churchs.models import Media
+
+from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 
 class ChurchAdmin(admin.ModelAdmin):
     list_display = ('name','promot_cover', 'status') 
@@ -16,39 +18,28 @@ class ChurchAdmin(admin.ModelAdmin):
     def get_changeform_initial_data(self, request):
         return {'creator': request.user}
     
-class SpeakerAdmin(admin.ModelAdmin):
-    list_display = ('church', 'name', 'title') 
-    search_fields = ('name', 'title')
-    fields = ('name', 'title', 'introduction')
+
+
+class MediaInline(GenericStackedInline):
+    model = Media
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title','video', 'speaker') 
+    inlines = [
+        MediaInline,
+    ]
+
+    list_display = ('title', 'speaker') 
     search_fields = ('speaker', 'title')
-    fields = ('title', 'speaker', 'image', 'video','description')
-    
+    fields = ('church','title', 'speaker', 'image', 'description','content','price')
+
+    change_form_template ="admin/churchs/sermon_change_form.html"
 
 
-
-
-
-    
 
 
 admin.site.register(church_md.Church, ChurchAdmin)
-# admin.site.register(churchs_md.Member)
-admin.site.register(churchs_md.Team)
-admin.site.register(churchs_md.Donation)
-admin.site.register(churchs_md.Venue)
-# admin.site.register(churchs_md.Sermon,SermonAdmin)
-admin.site.register(churchs_md.SermonSeries)
-# admin.site.register(churchs_md.userProfile,userProfileAdmin)
-# admin.site.register(users_md.CustomUser)
+admin.site.register(models.Course, CourseAdmin)
 
-admin.site.register(churchs_md.Speaker, SpeakerAdmin)
-admin.site.register(churchs_md.Meeting)
-admin.site.register(churchs_md.BibleStudy)
-admin.site.register(churchs_md.BibleStudyComment)
-admin.site.register(churchs_md.Course, CourseAdmin)
 admin.AdminSite.site_header = '教会平台'
 admin.AdminSite.site_title = '教会平台'
 

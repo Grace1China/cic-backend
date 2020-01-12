@@ -28,12 +28,12 @@ schema_view = get_swagger_view(title='Church API')
 urlpatterns = [
     path('hello', view.hello),
     path('admin/', admin.site.urls),
-    path('admindev/', admin.site.urls),
+    # path('admindev/', admin.site.urls),
 
     re_path('swagger/', schema_view),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^admin/ckeditor/', include('ckeditor_uploader.urls')),
-    re_path(r'^admindev/ckeditor/', include('ckeditor_uploader.urls')),
+    # re_path(r'^admindev/ckeditor/', include('ckeditor_uploader.urls')),
 
 
     # re_path(r'^api/auth/', include('rest_auth.urls')),

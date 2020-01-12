@@ -33,6 +33,13 @@ def str2varname(astr):
         return astr
     else:
         return astr.replace('-','_')
+def tofilename(astr):
+    '''
+    '''
+    ar = astr.split('/')
+    return ar[len(ar)-1]
     
 register.filter('str2varname', str2varname)
 register.filter('pre_signed_url', pre_signed_url)
+register.filter('tofilename', tofilename)
+

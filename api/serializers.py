@@ -7,6 +7,7 @@ from django.conf import settings
 import boto3
 from django.db import models
 from rest_framework import serializers
+from .import models
 
 class CustomUserSerializer(serializers.ModelSerializer):
     user=serializers.StringRelatedField(read_only=True)
@@ -112,19 +113,20 @@ class SermonSerializer4API(serializers.ModelSerializer):
         fields = ['id','church','user','title','pub_time','status','speaker','scripture','series','medias','create_time','update_time']
 
 
-# sermon:
-# -------------------
-# id 
-# church
-# user
-# title
-# speaker
-# scripture
-# series
-# create_time
-# update_time
-# pub_time
-# status
+class CourseSerializer4API(serializers.ModelSerializer):
+    medias = MediaSerializer4API(many=True, read_only=True)
+    church = ChurchSerializer4API(read_only=True)
+    speaker = SpeakerSerializer4API(read_only=True)
+    # series = SermonSeriesSerializer4API(read_only=True)
+
+
+    class Meta:
+        model = models.Course
+        fields = ['id','church','speaker','title','image','description','content','price','medias','create_time','update_time']
+
+
+
+
 
 
         

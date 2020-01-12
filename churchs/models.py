@@ -8,6 +8,9 @@ from users.models import CustomUser
 from django.conf import settings
 import boto3
 import pprint
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import ContentType
+
 
 # Create your models here.
 
@@ -75,6 +78,13 @@ class Media(models.Model):
         (STATUS_DISTRIBUTED,'媒体已转码发布')
     )
     owner = models.ForeignKey('Sermon',null=True, blank=True,related_name='medias', on_delete=models.CASCADE)
+
+    content_type = models.ForeignKey(ContentType,null=True, blank=True, on_delete=models.CASCADE, related_name='medias')
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey("content_type", "object_id")
+
+
+
     kind = models.IntegerField(choices=MEDIA_KIND,default=MEDIA_SERMON,verbose_name='媒体种类')
     title = models.CharField(max_length=120, blank=True,verbose_name='标题')  
 
@@ -449,22 +459,7 @@ class BibleStudyComment(models.Model):
     def __str__(self):
         return '%s' % (self.content)
 
-    
-class Course(models.Model):
-    church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
-    speaker = models.ForeignKey('Speaker', on_delete=models.CASCADE)
-    title = models.CharField(u'标题', max_length=32)
-    image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
-    description = models.CharField(u'描述', max_length=255)
-    content = models.TextField(null=True, blank=True)
-    video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    class Meta:
-        verbose_name = "课程"
-        verbose_name_plural = "课程"
-    def __str__(self):
-        return '%s' % (self.title)
+
     
 
 

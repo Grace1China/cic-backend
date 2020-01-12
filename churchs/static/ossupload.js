@@ -4,7 +4,9 @@ function UploaderFactory(
     possfile = 'ossfile',
     ppostfiles = 'postfiles',
     pconsole = 'console',
-    pmyradio = 'myradio'
+    pmyradio = 'myradio',
+    pfileurl = 'fileurl',
+    pwidget_div = 'widget_div'
 
 ) {
     var browse_button = pbrowse_button
@@ -13,6 +15,8 @@ function UploaderFactory(
     var postfiles = ppostfiles
     var loc_console = pconsole
     var myradio = pmyradio
+    var loc_fileurl = pfileurl
+    var loc_widget_div = pwidget_div
     var max_file_size = '1gb'
     
     var accessid = ''
@@ -114,30 +118,36 @@ function UploaderFactory(
 
     function calculate_object_name(filename)
     {
-        if (g_object_name_type == 'local_name')
-        {
-           g_object_name += "${filename}"
-        }
-        else if (g_object_name_type == 'random_name')
-        {
-            suffix = get_suffix(filename)
-            g_object_name = key + random_string(10) + suffix
-        }
+        // if (g_object_name_type == 'local_name')
+        // {
+        g_object_name += "${filename}"
+        // }
+        // else if (g_object_name_type == 'random_name')
+        // {
+        //     suffix = get_suffix(filename)
+        //     g_object_name = key + random_string(10) + suffix
+        // }
         return ''
     }
 
     function get_uploaded_object_name(filename)
     {
-        if (g_object_name_type == 'local_name')
-        {
-            tmp_name = g_object_name
-            tmp_name = tmp_name.replace("${filename}", filename);
-            return tmp_name
-        }
-        else if(g_object_name_type == 'random_name')
-        {
-            return g_object_name
-        }
+        // if (g_object_name_type == 'local_name')
+        // {
+
+        tmp_name = g_object_name
+        tmp_name = tmp_name.replace("${filename}", filename);
+        return tmp_name
+        // }
+        // else if(g_object_name_type == 'random_name')
+        // {
+        //     return g_object_name
+        // }
+    }
+
+    function get_bucket_url(filename){
+        suffix = get_suffix(filename)
+        return suffix.toLowerCase() != '.mp4' ? desthost:host
     }
 
     function set_upload_param(up, filename, ret)
@@ -231,9 +241,15 @@ function UploaderFactory(
                 },
         
                 FileUploaded: function(up, file, info) {
+                    // fileurl_medias_0_alioss_image
+                    //file.name  loc_fileurl
+                    filename = file.name.replace(' ','')
                     if (info.status == 200)
                     {
-                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = 'upload to oss success, object name:' + get_uploaded_object_name(file.name) + ' 回调服务器返回的内容是:' + info.response;
+                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}">${filename}${info.response}</a>`     
+                        document.getElementById(loc_fileurl).value =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
+                        document.getElementById(loc_widget_div).getElementsByTagName('ossurl').href =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
+                        document.getElementById(loc_widget_div).getElementsByTagName('ossurl').innerText  =`${get_uploaded_object_name(filename)}`
                     }
                     else if (info.status == 203)
                     {

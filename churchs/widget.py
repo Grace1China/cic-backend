@@ -84,7 +84,7 @@ class AliOssDirectWidgetExt(TextInput):
             # 'dest': self.dest,
             # 'name': name,
             # 'csrf_cookie_name': csrf_cookie_name,
-            # 'file_url': file_url,
+            'file_url': file_url,
             # 'file_name': os.path.basename(urlunquote_plus(file_url)),
             # 'test':'test_1',
             'name':name,

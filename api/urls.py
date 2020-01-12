@@ -2,12 +2,14 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
-from .views import SermonDetailView,CustomUserViewSet,ChurchViewSet,EweeklyViewSet,SermonViewSet
+from .views import CustomUserViewSet,ChurchViewSet,EweeklyViewSet,SermonViewSet
+from . import views
 from .alioss_directup_views import AliOssSignature, AliOssCallBack
 from rest_framework import permissions
 
 from django.contrib.auth.decorators import login_required,permission_required,user_passes_test
 from django.contrib.auth.models import Group
+#----------------------------v1---------------------------------------------------------
 
 user_create = CustomUserViewSet.as_view({
     'post': 'register'
@@ -24,6 +26,12 @@ l3_eweekly = EweeklyViewSet.as_view({
 church_eweekly = EweeklyViewSet.as_view({
     'get':'GetChurchEweekly'
 })
+course_list = views.CourseViewSet.as_view({
+    'get':'GetCourseList'
+})
+course = views.CourseViewSet.as_view({'get':'GetCoursebyID'})
+
+#------------------------------v2------------------------------------------------------
 
 v2_church_eweekly = EweeklyViewSet.as_view({
     'get':'GetChurchEweekly_v2'
@@ -46,8 +54,12 @@ urlpatterns = [
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),
     path("getmychurch",user_church,name="mychurch"),
 
+    path("courses",course_list,name="courses"),
+    path("course/<int:pk>",course,name="course"),
+
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback")
+
 
 
 ]

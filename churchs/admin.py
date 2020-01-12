@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import WeeklyReport, Sermon, Media
+from . import models
 from ckeditor.widgets import CKEditorWidget
 
 
@@ -11,7 +12,7 @@ class WeeklyReportAdmin(admin.ModelAdmin):
     fields = ('title','creator','church','image', 'status','content','pub_time')
     readonly_fields = ['pub_time']
     formfield_overrides = {
-        WeeklyReport.content: {'widget': CKEditorWidget()},
+        models.WeeklyReport.content: {'widget': CKEditorWidget()},
     }
 
 
@@ -37,16 +38,16 @@ class WeeklyReportAdmin(admin.ModelAdmin):
             obj.church
         obj.save()
 
-admin.site.register(WeeklyReport, WeeklyReportAdmin)
+admin.site.register(models.WeeklyReport, WeeklyReportAdmin)
 
 
-# class SermonAdmin(admin.ModelAdmin):
-#     list_display = ('title','user','cover','pub_time','status')
-#     search_fields = ('pub_time', 'title','status','user')
-#     fields = ('title','creator','church','image', 'status','content','pub_time')
+class SpeakerAdmin(admin.ModelAdmin):
+    list_display = ('church', 'name', 'title') 
+    search_fields = ('name', 'title')
+    fields = ('name', 'title', 'introduction')
 
 class MediaAdmin(admin.StackedInline):
-    model = Media
+    model = models.Media
     # form = S3DirectUploadForm
     list_display = ('kind','title','s3_video_status', 'alioss_video_status','content')
     extra = 1
@@ -54,17 +55,10 @@ class MediaAdmin(admin.StackedInline):
     fields = ('kind','title','s3_video','s3_video_status','s3_SHD_URL','s3_HD_URL','s3_SD_URL','s3_audio','s3_image','s3_pdf','alioss_video','alioss_video_status','alioss_SHD_URL','alioss_HD_URL','alioss_SD_URL','alioss_audio','alioss_image','alioss_pdf','content')
 
     
- 
- 
-# admin.site.register(Media, MediaAdmin)
 
-   
-# class pdfstoreInline(admin.StackedInline):
-#     model = pdfstore
-#     extra = 1
 
 class SermonAdmin(admin.ModelAdmin):
-    model = Sermon
+    model = models.Sermon
     list_display = ('title','user','pub_time','status')
     search_fields = ('pub_time', 'title','status','user')
     fields = ('title','speaker','scripture','series','church','pub_time','status','user')
@@ -73,5 +67,14 @@ class SermonAdmin(admin.ModelAdmin):
 
     change_form_template ="admin/churchs/sermon_change_form.html"
     
-admin.site.register(Sermon, SermonAdmin)
+admin.site.register(models.Sermon, SermonAdmin)
+admin.site.register(models.Team)  
+admin.site.register(models.Donation)
+admin.site.register(models.Venue)
+admin.site.register(models.SermonSeries)
+
+admin.site.register(models.Speaker, SpeakerAdmin)
+admin.site.register(models.Meeting)
+admin.site.register(models.BibleStudy)
+admin.site.register(models.BibleStudyComment)
 
