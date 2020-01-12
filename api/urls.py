@@ -54,7 +54,7 @@ urlpatterns = [
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),
     path("getmychurch",user_church,name="mychurch"),
 
-    path("courses",course_list,name="courses"),
+    path("courses/pagesize/<int:pagesize>/page/<int:page>",course_list,name="courses"),
     path("course/<int:pk>",course,name="course"),
 
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),

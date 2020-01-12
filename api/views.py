@@ -281,15 +281,27 @@ class  CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=CourseSerializer4API
+    # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
     @action(detail=True,methods=['POST'], format="json")
-    def GetCourseList(self,request):
+    def GetCourseList(self,request,page,pagesize):
         '''
-        查找当前用户所在教会主日信息
+        查找课程列表信息
         '''
         try:
+            # data = request.GET
+            # page = data.get('page', 1)
+            # pPageSize = data.get('pageSize', 10)
+            if pagesize <=0 or pagesize >100 :
+                return JsonResponse({'errCode': '1002', 'data': {},'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
+            if page < 0 :
+                return JsonResponse({'errCode': '1003', 'data': {},'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
+                
+            from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
             courseList = self.get_queryset().filter().order_by('-update_time')
-            slzCourseList = self.get_serializer(courseList, many=True)
+            paginator = Paginator(courseList, pagesize)
+            coursePage = paginator.get_page(page)
+            slzCourseList = self.get_serializer(coursePage, many=True)
             return JsonResponse({'errCode': '0', 'data': slzCourseList.data}, safe=False)
         except Exception as e:
             # pprint.PrettyPrinter(4).pprint(e.__traceback__)
@@ -301,7 +313,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
     @action(detail=True,methods=['POST'], format="json")
     def GetCoursebyID(self,request,pk):
         '''
-        查找当前用户所在教会主日信息
+        按照id查找课程信息
         '''
         try:
             course = self.get_queryset().filter(id=pk).order_by('-update_time')[0]
