@@ -16,3 +16,4 @@ djangorestframework_simplejwt
 djoser
 django-s3direct
 aliyun-python-sdk-sts
+oss2
