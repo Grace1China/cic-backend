@@ -302,7 +302,8 @@ class  CourseViewSet(viewsets.ModelViewSet):
             paginator = Paginator(courseList, pagesize)
             coursePage = paginator.get_page(page)
             slzCourseList = self.get_serializer(coursePage, many=True)
-            return JsonResponse({'errCode': '0', 'data': slzCourseList.data}, safe=False)
+            # 前端需要用来取页面 
+            return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 'page':coursePage.number, 'totalPage':paginator.num_pages}, safe=False)
         except Exception as e:
             # pprint.PrettyPrinter(4).pprint(e.__traceback__)
             import traceback
