@@ -139,7 +139,9 @@ class AliOssCallBack(APIView):
         '''
         用post方法
         '''
+        import oss2
         import logging
+        
         logger = logging.getLogger('myproject.error')
         logger.error('-------------------in post ----------------------')
 
@@ -162,6 +164,19 @@ class AliOssCallBack(APIView):
         pprint.PrettyPrinter(4).pprint(request)
         pprint.PrettyPrinter(4).pprint(args)
         pprint.PrettyPrinter(4).pprint(kwargs)
+
+        # ALIOSS_ACCESS_KEY_ID = os.envi
+        # ALIOSS_SECRET_ACCESS_KEY = os.
+        # ALIOSS_SOURCE_BUCKET_NAME = os
+        # ALIOSS_DESTINATION_BUCKET_NAME
+
+        # auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+        # # Endpoint以杭州为例，其它Region请按实际情况填写。
+        # bucket = oss2.Bucket(auth,settings.ALIOSS_DESTINATION_ENDPOINT , settings.ALIOSS_DESTINATION_BUCKET_NAME)
+
+        # # 设置此签名URL在60秒内有效。
+        # bucket.sign_url('GET', , settings.ALIOSS_EXPIRES)
+
         return JsonResponse({'String value': 'OK', 'Key': 'Status','bucket':request.headers['X-Oss-Bucket'],'filename':filename,'mimeType':mimeType}, safe=False)
 
 

@@ -133,7 +133,7 @@ DATABASES = {
         'NAME': 'cic',  # 数据库名，先前创建的
         'USER': 'backend_user',     # 用户名，可以自己创建用户
         'PASSWORD': '11/28/2019',  # 密码
-        'HOST': '54.169.143.92',  # mysql服务所在的主机ip
+        'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
         'PORT': '3306',         # mysql服务端口
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
@@ -371,6 +371,15 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 AWS_LOCATION = 'static'
 
+ALIOSS_ACCESS_KEY_ID = os.environ.get('ALIOSS_ACCESS_KEY_ID', 'LTAI4Fd1JMHM3WSUN4vrHcj8')
+ALIOSS_SECRET_ACCESS_KEY = os.environ.get('ALIOSS_SECRET_ACCESS_KEY', 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I')
+ALIOSS_SOURCE_ENDPOINT = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'http://oss-cn-beijing.aliyuncs.com')
+ALIOSS_DESTINATION_ENDPOINT = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'http://oss-cn-beijing.aliyuncs.com')
+
+ALIOSS_SOURCE_BUCKET_NAME = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'bicf-media-source')
+ALIOSS_DESTINATION_BUCKET_NAME = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'bicf-media-destination')
+ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES', 3600)
+
 
 DEFAULT_FILE_STORAGE = 'church.storage_backends.MediaStorage'
 AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
@@ -382,7 +391,7 @@ PRIVATE_FILE_STORAGE = 'church.storage_backends.PrivateMediaStorage'
 CKEDITOR_UPLOAD_PATH = "uploads/"
 # AWS_QUERYSTRING_AUTH = False
 
-APP_SERVER_IP = "54.169.143.92"
+APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
 
 
 CKEDITOR_CONFIGS = {

@@ -1,4 +1,5 @@
 function UploaderFactory(
+
     pbrowse_button = 'selectfiles',  
     pcontainer = 'container',
     possfile = 'ossfile',
@@ -6,18 +7,18 @@ function UploaderFactory(
     pconsole = 'console',
     pmyradio = 'myradio',
     pfileurl = 'fileurl',
-    pwidget_div = 'widget_div'
+    // pwidget_div = 'widget_div'
 
 ) {
-    var browse_button = pbrowse_button
-    var container = pcontainer
-    var ossfile = possfile
-    var postfiles = ppostfiles
+    var loc_browse_button = pbrowse_button
+    var loc_container = pcontainer
+    var loc_ossfile = possfile
+    var loc_postfiles = ppostfiles
     var loc_console = pconsole
-    var myradio = pmyradio
+    var loc_myradio = pmyradio
     var loc_fileurl = pfileurl
-    var loc_widget_div = pwidget_div
-    var max_file_size = '1gb'
+    // var loc_widget_div = pwidget_div
+    var max_file_size = '4gb'
     
     var accessid = ''
     var accesskey = ''
@@ -61,8 +62,13 @@ function UploaderFactory(
         }
     };
 
+    // function getControlByClassName(classname){
+    //     widget = document.getElementById(loc_widget_div)
+    //     return widget.getElementsByClassName(classname)
+    // }
+
     function check_object_radio() {
-        var tt = document.getElementsByName(myradio);
+        var tt = loc_myradio;
         for (var i = 0; i < tt.length ; i++ )
         {
             if(tt[i].checked)
@@ -185,12 +191,12 @@ function UploaderFactory(
 
     return function get_one_uploader(){
         // var upload_config = this
-        //当外部得到本函数时，就得到五个闭包。这个函数里面的对像，可以访问本函数外部的作用域。就是这个this. 这样每个uploader都可以访问一个单独的组件配置。
+        //当外部得到本函数时，就得到五个闭包。这个函数里面的对像，可以访问本函数外部的作用域。就是这. 这样每个uploader都可以访问一个单独的组件配置。
         var uploader =  new plupload.Uploader({
             runtimes : 'html5,flash,silverlight,html4',
-            browse_button : browse_button, 
-            //multi_selection: false,
-            container: document.getElementById(container),
+            browse_button : loc_browse_button, 
+            //multi_selection: fa           se,
+            container: loc_container,
             flash_swf_url : 'lib/plupload-2.1.2/js/Moxie.swf',
             silverlight_xap_url : 'lib/plupload-2.1.2/js/Moxie.xap',
             url : 'http://oss.aliyuncs.com',
@@ -211,8 +217,8 @@ function UploaderFactory(
         
             init: {
                 PostInit: function() {
-                    document.getElementById(ossfile).innerHTML = '';
-                    document.getElementById(postfiles).onclick = function() {
+                    loc_ossfile.innerHTML = '';
+                    loc_postfiles.onclick = function() {
                     set_upload_param(uploader, '', false);
                     return false;
                     };
@@ -220,7 +226,7 @@ function UploaderFactory(
         
                 FilesAdded: function(up, files) {
                     plupload.each(files, function(file) {
-                        document.getElementById(ossfile).innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>'
+                        loc_ossfile.innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>'
                         +'<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>'
                         +'</div>';
                     });
@@ -241,15 +247,13 @@ function UploaderFactory(
                 },
         
                 FileUploaded: function(up, file, info) {
-                    // fileurl_medias_0_alioss_image
-                    //file.name  loc_fileurl
                     filename = file.name.replace(' ','')
                     if (info.status == 200)
                     {
                         document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}">${filename}${info.response}</a>`     
-                        document.getElementById(loc_fileurl).value =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
-                        document.getElementById(loc_widget_div).getElementsByTagName('ossurl').href =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
-                        document.getElementById(loc_widget_div).getElementsByTagName('ossurl').innerText  =`${get_uploaded_object_name(filename)}`
+                        loc_fileurl.value =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
+                        loc_ossurl.href =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
+                        loc_ossurl.innerText  =`${get_uploaded_object_name(filename)}`
                     }
                     else if (info.status == 203)
                     {
@@ -263,17 +267,17 @@ function UploaderFactory(
         
                 Error: function(up, err) {
                     if (err.code == -600) {
-                        document.getElementById(loc_console).appendChild(document.createTextNode(`\n选择的文件太大了,不能超过${max_file_size}`));
+                        loc_console.appendChild(document.createTextNode(`\n选择的文件太大了,不能超过${max_file_size}`));
                     }
                     else if (err.code == -601) {
-                        document.getElementById(loc_console).appendChild(document.createTextNode("\n选择的文件后缀不对，必须是jpg,gif,png,bmp,mp4,mp3"));
+                        loc_console.appendChild(document.createTextNode("\n选择的文件后缀不对，必须是jpg,gif,png,bmp,mp4,mp3"));
                     }
                     else if (err.code == -602) {
-                        document.getElementById(loc_console).appendChild(document.createTextNode("\n这个文件已经上传过一遍了"));
+                        loc_console.appendChild(document.createTextNode("\n这个文件已经上传过一遍了"));
                     }
                     else 
                     {
-                        document.getElementById(loc_console).appendChild(document.createTextNode("\nError xml:" + err.response));
+                        loc_console.appendChild(document.createTextNode("\nError xml:" + err.response));
                     }
                 }
             }

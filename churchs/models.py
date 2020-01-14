@@ -11,6 +11,8 @@ import pprint
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+import oss2
+
 
 
 # Create your models here.
@@ -110,6 +112,10 @@ class Media(models.Model):
     alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='Aliyun oss 讲义')
     
     content = models.TextField(blank=True,verbose_name='摘要') 
+
+    
+
+
     def isS3(self):
         if self.s3_video is not None and self.s3_video!='' :
             return True
@@ -130,6 +136,22 @@ class Media(models.Model):
             return self.alioss_video_status
         else:
             return STATUS_NONE
+
+
+
+    # -*- coding: utf-8 -*-
+
+    # 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录 https://ram.console.aliyun.com 创建RAM账号。
+    # Endpoint以杭州为例，其它Region请按实际情况填写。
+
+    # 设置此签名URL在60秒内有效。
+    def getObjectKey(self,obj):
+        obj = str.replace(obj, '%s.' % settings.ALIOSS_DESTINATION_BUCKET_NAME,'')
+        obj = str.replace(obj, '%s/' % settings.ALIOSS_DESTINATION_ENDPOINT,'')
+        pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
+        pprint.PrettyPrinter(4).pprint(obj)
+        return obj
+
     @property
     def dist_SHD_URL(self):
         pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
@@ -138,7 +160,20 @@ class Media(models.Model):
         if self.s3_SHD_URL is not None and self.s3_SHD_URL != '':
             return self.s3_SHD_URL
         elif self.alioss_SHD_URL is not None and self.alioss_SHD_URL != '':
-            return self.alioss_SHD_URL
+
+            # ALIOSS_ACCESS_KEY_ID = os.envir
+            # ALIOSS_SECRET_ACCESS_KEY = os.e
+            # ALIOSS_SOURCE_ENDPOINT = os.env
+            # ALIOSS_DESTINATION_ENDPOINT = o
+            # ALIOSS_SOURCE_BUCKET_NAME = os.
+            # ALIOSS_DESTINATION_BUCKET_NAME 
+            # ALIOSS_EXPIRES = os.environ.get
+        
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_SHD_URL), settings.ALIOSS_EXPIRES)
+
+            return retval #self.alioss_SHD_URL
         else:
             return ''
     @property
@@ -146,7 +181,11 @@ class Media(models.Model):
         if self.s3_HD_URL is not None and self.s3_HD_URL != '':
             return self.s3_HD_URL
         elif self.alioss_HD_URL is not None and self.alioss_HD_URL != '':
-            return self.alioss_HD_URL
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_HD_URL), settings.ALIOSS_EXPIRES)
+
+            return retval #self.alioss_HD_URL
         else:
             return ''
     @property
@@ -157,7 +196,10 @@ class Media(models.Model):
         if self.s3_SD_URL is not None and self.s3_SD_URL != '':
             return self.s3_SD_URL
         elif self.alioss_SD_URL is not None and self.alioss_SD_URL != '':
-            return self.alioss_SD_URL
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_SD_URL), settings.ALIOSS_EXPIRES)
+            return retval #self.alioss_SD_URL
         else:
             return ''
     @property
@@ -165,7 +207,10 @@ class Media(models.Model):
         if self.s3_audio is not None and self.s3_audio != '':
             return self.s3_audio
         elif self.alioss_audio is not None and self.alioss_audio != '':
-            return self.alioss_audio
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_audio), settings.ALIOSS_EXPIRES)
+            return retval  #self.alioss_audio
         else:
             return ''
     @property
@@ -173,7 +218,10 @@ class Media(models.Model):
         if self.s3_image is not None and self.s3_image != '':
             return self.s3_image
         elif self.alioss_image is not None and self.alioss_image != '':
-            return self.alioss_image
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_image), settings.ALIOSS_EXPIRES)
+            return retval #self.alioss_image
         else:
             return ''
     @property
@@ -181,48 +229,54 @@ class Media(models.Model):
         if self.s3_pdf is not None and self.s3_pdf != '':
             return self.s3_pdf
         elif self.alioss_pdf is not None and self.alioss_pdf !='':
-            return self.alioss_pdf
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_pdf), settings.ALIOSS_EXPIRES)
+            return retval #self.alioss_pdf
         else:
             return ''
-    @property
-    def image_presigned_url(self):
-        url = str(self.dist_image)
-        if url == None or len(url) == 0:
-            return ''
-        # import logging
-        # logging.debug(url)
-        pprint.PrettyPrinter(indent=4).pprint(url)
-        # pprint.pre
-        import logging
-        logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
-        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
-            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
-            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-            try:
-                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
-            except Exception as e:
-                return str(e)
-            return response
-        else:
-            return url
-    @property    
-    def pdf_presigned_url(self):
-        url = str(self.dist_image)
-        if url == None or len(url) == 0:
-            return ''
-        # import logging
-        # logging.debug(url)
-        # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
-        if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
-            url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
-            s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-            try:
-                response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
-            except Exception as e:
-                return str(e)
-            return response
-        else:
-            return url
+
+
+       
+    # @property
+    # def image_presigned_url(self):
+    #     url = str(self.dist_image)
+    #     if url == None or len(url) == 0:
+    #         return ''
+    #     # import logging
+    #     # logging.debug(url)
+    #     pprint.PrettyPrinter(indent=4).pprint(url)
+    #     # pprint.pre
+    #     import logging
+    #     logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
+    #     if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
+    #         url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
+    #         s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+    #         try:
+    #             response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
+    #         except Exception as e:
+    #             return str(e)
+    #         return response
+    #     else:
+    #         return url
+    # @property    
+    # def pdf_presigned_url(self):
+    #     url = str(self.dist_image)
+    #     if url == None or len(url) == 0:
+    #         return ''
+    #     # import logging
+    #     # logging.debug(url)
+    #     # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
+    #     if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
+    #         url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
+    #         s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+    #         try:
+    #             response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
+    #         except Exception as e:
+    #             return str(e)
+    #         return response
+    #     else:
+    #         return url
     
 
     class Meta:

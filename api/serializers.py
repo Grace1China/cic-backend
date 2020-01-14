@@ -97,7 +97,7 @@ class MediaSerializer4API(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ['kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','image_presigned_url','pdf_presigned_url','content']
+        fields = ['kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','content']
     
 
 
