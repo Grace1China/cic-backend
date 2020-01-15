@@ -467,7 +467,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {funcName} {lineno} {message}',
+            'format': '{levelname} {asctime} {filename} {funcName} {lineno} {message}',
             'style': '{',
         },
         'simple': {
