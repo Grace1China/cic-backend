@@ -465,9 +465,20 @@ CKEDITOR_CONFIGS = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {funcName} {lineno} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'ERROR',
+            'formatter':'verbose',
             'class': 'logging.FileHandler',
             'filename': '/data/log/django/error.log',
         },
@@ -478,7 +489,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'myproject.error': {
+        'dev.error': {
             'handlers': ['file'],
             'level': 'ERROR',
             'propagate': False

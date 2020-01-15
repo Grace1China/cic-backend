@@ -179,4 +179,27 @@ class AliOssCallBack(APIView):
 
         return JsonResponse({'String value': 'OK', 'Key': 'Status','bucket':request.headers['X-Oss-Bucket'],'filename':filename,'mimeType':mimeType}, safe=False)
 
+class AliMtsCallBack(APIView):
+    def post(self,request,*args,**kwargs):
+        '''
+        用post方法
+        '''
+        import oss2
+        import logging    
+        logger = logging.getLogger('dev.error')
+        logger.error('-------------------in post ----------------------')
+
+        auth = request.META.get('Authorization')
+        logger.error(auth)
+        # if not request:
+        #     return None
+        logger.error(request)
+        logger.error(request.headers)
+        # X-Oss-Bucket
+        logger.error(request.POST)
+        # data = request.data
+        # filename = data.get('filename', '')
+        # mimeType = data.get('mimeType','')
+        return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
+
 
