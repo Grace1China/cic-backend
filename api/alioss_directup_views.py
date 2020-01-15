@@ -142,7 +142,7 @@ class AliOssCallBack(APIView):
         import oss2
         import logging
         
-        logger = logging.getLogger('myproject.error')
+        logger = logging.getLogger('dev.error')
         logger.error('-------------------in post ----------------------')
 
         auth = request.META.get('Authorization')
