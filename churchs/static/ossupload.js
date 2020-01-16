@@ -180,7 +180,7 @@ function UploaderFactory(
         console.log('----------set_upload_param-----------')
         console.log(new_multipart_params)
         up.setOption({
-            'url':suffix.toLowerCase() != '.mp4' ? desthost:host,
+            'url':(suffix.toLowerCase() == '.mp4' || suffix.toLowerCase() == '.mov') ? host:desthost,
             'multipart_params': new_multipart_params
         });
 
@@ -205,7 +205,7 @@ function UploaderFactory(
                 mime_types : [ //只允许上传图片和zip文件
                 { title : "Image files", extensions : "jpg,gif,png,bmp"}, 
                 { title : "Zip files", extensions : "zip,rar"},
-                { title : "mp4 files", extensions : "mp4"},
+                { title : "mp4 files", extensions : "mp4,mov"},
                 { title : "mp3 files", extensions : "mp3"},
                 { title : "document files", extensions : "pdf,doc,docx,txt"}
 

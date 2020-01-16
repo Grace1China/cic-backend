@@ -70,13 +70,10 @@ class AliOssDirectWidgetExt(TextInput):
         file_url = value or ''
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
 
-        pprint.PrettyPrinter(4).pprint(self)
-        pprint.PrettyPrinter(4).pprint(name)
-        pprint.PrettyPrinter(4).pprint(value)
-        pprint.PrettyPrinter(4).pprint(kwargs)
-
-
-
+        # pprint.PrettyPrinter(4).pprint(self)
+        # pprint.PrettyPrinter(4).pprint(name)
+        # pprint.PrettyPrinter(4).pprint(value)
+        # pprint.PrettyPrinter(4).pprint(kwargs)
 
         ctx = {
             # 'policy_url': reverse('s3direct'),
@@ -109,3 +106,5 @@ class AliOssDirectField(Field):
     def formfield(self, *args, **kwargs):
         kwargs['widget'] = self.widget
         return super(AliOssDirectField, self).formfield(*args, **kwargs)
+
+# class 
