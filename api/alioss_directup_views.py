@@ -196,7 +196,7 @@ class AliMtsCallBack(APIView):
         logger.error(request)
         logger.error(request.headers)
         # X-Oss-Bucket
-        logger.error(request.POST)
+        # logger.error(request.POST)
         logger.error(request.body)
         logger.error(json.loads(request.body))
         # data = request.data
