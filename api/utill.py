@@ -22,9 +22,11 @@ class CICUtill():
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+            return retval
         elif whichbucket == 'source':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_SOURCE_ENDPOINT, settings.ALIOSS_SOURCE_BUCKET_NAME)
             retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+            return retval
         else:
             raise Exception('no such bucket')
