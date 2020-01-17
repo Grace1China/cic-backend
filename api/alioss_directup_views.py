@@ -215,10 +215,10 @@ class AliMtsCallBack(APIView):
 
 
         alioss_video = 'http://%s.%s/%s' % (Bucket,Location,Object)
-        alioss_SHD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4'))
-        alioss_HD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4'))
-        alioss_SD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4'))
-        alioss_image = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg'))
+        alioss_SHD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4'))
+        alioss_HD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4'))
+        alioss_SD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4'))
+        alioss_image = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg'))
 
         logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
 
@@ -227,6 +227,6 @@ class AliMtsCallBack(APIView):
         logger.error(qrset)
         
 
-        return Response(content='',status=status.HTTP_204_NO_CONTENT)
+        return Response(data='',status=status.HTTP_204_NO_CONTENT)
         
       
