@@ -22,7 +22,7 @@ function UploaderFactory(
     
     var accessid = ''
     var accesskey = ''
-    var host = ''
+    var sourhost = ''
     var desthost = ''
     var policyBase64 = ''
     var signature = ''
@@ -89,7 +89,7 @@ function UploaderFactory(
             res = JSON.parse(res)
             token = JSON.parse(res.token)
             // var obj = eval ("(" + body + ")");
-            host = token.host//obj['host']
+            sourhost = token.host//obj['host']
             desthost = token.desthost
             policyBase64 = token.policy//obj['policy']
             accessid = token.accessid//obj['accessid']
@@ -153,7 +153,7 @@ function UploaderFactory(
 
     function get_bucket_url(filename){
         suffix = get_suffix(filename)
-        return suffix.toLowerCase() != '.mp4' ? desthost:host
+        return suffix.toLowerCase() != '.mp4' ? desthost:sourhost
     }
 
     function set_upload_param(up, filename, ret)
@@ -180,7 +180,7 @@ function UploaderFactory(
         console.log('----------set_upload_param-----------')
         console.log(new_multipart_params)
         up.setOption({
-            'url':(suffix.toLowerCase() == '.mp4' || suffix.toLowerCase() == '.mov') ? host:desthost,
+            'url':(suffix.toLowerCase() == '.mp4' || suffix.toLowerCase() == '.mov') ? sourhost:desthost,
             'multipart_params': new_multipart_params
         });
 
@@ -251,9 +251,10 @@ function UploaderFactory(
                     if (info.status == 200)
                     {
                         document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}">${filename}${info.response}</a>`     
-                        loc_fileurl.value =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
-                        loc_fileurl.href =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
+                        loc_fileurl.value =`${sourhost}/${get_uploaded_object_name(filename)}`
+                        loc_fileurl.href =`${sourhost}/${get_uploaded_object_name(filename)}`
                         loc_fileurl.innerText  =`${get_uploaded_object_name(filename)}`
+                        document.getElementsByName('_continue').click()
                     }
                     else if (info.status == 203)
                     {

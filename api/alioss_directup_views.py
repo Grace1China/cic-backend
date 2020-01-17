@@ -215,7 +215,7 @@ class AliMtsCallBack(APIView):
 
 
 
-        alioss_video = 'http://%s.%s/%s' % (Bucket,Location,Object)
+        alioss_video = 'http://%s.%s/%s' % (Bucket,settings.ALIOSS_SOURCE_LOCATION,Object)
         alioss_SHD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4'))
         alioss_HD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4'))
         alioss_SD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4'))
