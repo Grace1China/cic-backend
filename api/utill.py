@@ -18,11 +18,13 @@ class CICUtill():
     一些有用的方法
     '''
     def signurl(self,key='', whichbucket='source'):
-        if which == 'destination':
+        if whichbucket == 'destination':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
-        else:
+        elif whichbucket == 'source':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_SOURCE_ENDPOINT, settings.ALIOSS_SOURCE_BUCKET_NAME)
             retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+        else:
+            raise Exception('no such bucket')
