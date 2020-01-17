@@ -376,6 +376,10 @@ ALIOSS_SECRET_ACCESS_KEY = os.environ.get('ALIOSS_SECRET_ACCESS_KEY', 'pXfMGYs2x
 ALIOSS_SOURCE_ENDPOINT = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'http://oss-cn-beijing.aliyuncs.com')
 ALIOSS_DESTINATION_ENDPOINT = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'http://oss-cn-beijing.aliyuncs.com')
 
+
+ALIOSS_SOURCE_LOCATION = os.environ.get('ALIOSS_SOURCE_LOCATION', 'oss-cn-beijing.aliyuncs.com')
+ALIOSS_DESTINATION_LOCATION = os.environ.get('ALIOSS_DESTINATION_LOCATION', 'oss-cn-beijing.aliyuncs.com')
+
 ALIOSS_SOURCE_BUCKET_NAME = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'bicf-media-source')
 ALIOSS_DESTINATION_BUCKET_NAME = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'bicf-media-destination')
 ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES', 3600)

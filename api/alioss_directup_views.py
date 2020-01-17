@@ -183,9 +183,14 @@ class AliMtsCallBack(APIView):
     def post(self,request,*args,**kwargs):
         '''
         用post方法
+
+        用原文件来定位media,
+        用计算的方法，来求得目标文件，存储在相应的记录里面
         '''
         import oss2
         import logging    
+        import churchs.models as md
+
         logger = logging.getLogger('dev.error')
         logger.error('-------------------in post ----------------------')
 
@@ -198,10 +203,37 @@ class AliMtsCallBack(APIView):
         # X-Oss-Bucket
         # logger.error(request.POST)
         logger.error(request.body)
-        logger.error(json.loads(request.body))
-        # data = request.data
-        # filename = data.get('filename', '')
-        # mimeType = data.get('mimeType','')
+        topic = json.loads(request.body)
+        msg = json.loads(topic['Message'])
+        Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
+        Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
+        Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
+
+        # ALIOSS_SOURCE_ENDPOINT = os.enviro
+        # ALIOSS_DESTINATION_ENDPOINT = os.e
+
+        # ALIOSS_SOURCE_BUCKET_NAME = os.env
+        # ALIOSS_DESTINATION_BUCKET_NAME = o
+
+
+        # ALIOSS_SOURCE_LOCATION = os
+        # ALIOSS_DESTINATION_LOCATION
+        key_arr = Object.split('/')
+        filename_arr = key_arr[1].split('.')
+
+        
+
+
+        alioss_SHD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4'))
+        alioss_HD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4'))
+        alioss_SD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4'))
+        alioss_image = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg'))
+
+
+        qrset = md.Media.objects.filter(alioss_video='http://%s.%s/%s' % (Bucket,Location,Object)).update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
+        logger.error(qrset)
+        
+
         return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
-
-
+        
+      
