@@ -143,7 +143,7 @@ class AliOssCallBack(APIView):
         '''
         import oss2
         import logging
-        
+        from .utill import CICUtill
         logger = logging.getLogger('dev.error')
         logger.error('-------------------in post ----------------------')
 
@@ -156,9 +156,16 @@ class AliOssCallBack(APIView):
         # X-Oss-Bucket
         logger.error(request.POST)
         data = request.data
-        filename = data.get('filename', '')
-        mimeType = data.get('mimeType','')
         # filename
+        ret_dict = {}
+        ret_dict['filename'] = data.get('filename', '')
+        ret_dict['mimeType'] = data.get('mimeType','')
+        ret_dict['signedurl'] = CICUtill.signurl(data.get('filename', ''),whichbucket='source')
+        ret_dict['String value'] = 'OK'
+        ret_dict['Key'] = 'Status'
+
+
+        jstr = json.dumps(ret_dict)
 
         logger.error(args)
         logger.error(kwargs)
@@ -179,7 +186,9 @@ class AliOssCallBack(APIView):
         # # 设置此签名URL在60秒内有效。
         # bucket.sign_url('GET', , settings.ALIOSS_EXPIRES)
 
-        return JsonResponse({'String value': 'OK', 'Key': 'Status','bucket':request.headers['X-Oss-Bucket'],'filename':filename,'mimeType':mimeType}, safe=False)
+        return Response(data=jstr,status=status.HTTP_200_OK,content_type='application/json',headers= {'Content-Length': len(jstr)})
+
+        # return JsonResponse({'String value': 'OK', 'Key': 'Status','bucket':request.headers['X-Oss-Bucket'],'filename':filename,'mimeType':mimeType}, safe=False)
 
 class AliMtsCallBack(APIView):
     def post(self,request,*args,**kwargs):

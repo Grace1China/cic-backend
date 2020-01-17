@@ -247,12 +247,12 @@ function UploaderFactory(
                 },
         
                 FileUploaded: function(up, file, info) {
-                    filename = file.name.replace(' ','')
+                    // filename = file.name.replace(' ','')
                     if (info.status == 200)
                     {
                         document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}">${filename}${info.response}</a>`     
-                        loc_fileurl.value =`${sourhost}/${get_uploaded_object_name(filename)}`
-                        loc_fileurl.href =`${sourhost}/${get_uploaded_object_name(filename)}`
+                        loc_fileurl.value =`${get_uploaded_object_name(filename)}`
+                        loc_fileurl.href =`${get_uploaded_object_name(filename)}`
                         loc_fileurl.innerText  =`${get_uploaded_object_name(filename)}`
                         document.getElementsByName('_continue')[0].click()
                     }
