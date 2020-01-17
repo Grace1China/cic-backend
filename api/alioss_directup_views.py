@@ -11,6 +11,8 @@ from hashlib import sha1 as sha
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from django.conf import settings
+from rest_framework import status
+from rest_framework.response import Response
 
 
 
@@ -194,46 +196,37 @@ class AliMtsCallBack(APIView):
         logger = logging.getLogger('dev.error')
         logger.error('-------------------in post ----------------------')
 
-        auth = request.META.get('Authorization')
-        logger.error(auth)
-        # if not request:
-        #     return None
-        logger.error(request)
-        logger.error(request.headers)
-        # X-Oss-Bucket
-        # logger.error(request.POST)
-        logger.error(request.body)
+        # auth = request.META.get('Authorization')
+        # logger.error(auth)
+        # logger.error(request)
+        # logger.error(request.headers)
+        # logger.error(request.body)
         topic = json.loads(request.body)
         msg = json.loads(topic['Message'])
+        logger.error(msg)
+
         Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
         Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
         Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
 
-        # ALIOSS_SOURCE_ENDPOINT = os.enviro
-        # ALIOSS_DESTINATION_ENDPOINT = os.e
-
-        # ALIOSS_SOURCE_BUCKET_NAME = os.env
-        # ALIOSS_DESTINATION_BUCKET_NAME = o
-
-
-        # ALIOSS_SOURCE_LOCATION = os
-        # ALIOSS_DESTINATION_LOCATION
         key_arr = Object.split('/')
         filename_arr = key_arr[1].split('.')
 
-        
 
 
+        alioss_video = 'http://%s.%s/%s' % (Bucket,Location,Object)
         alioss_SHD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4'))
         alioss_HD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4'))
         alioss_SD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4'))
         alioss_image = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'/%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg'))
+
+        logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
 
 
         qrset = md.Media.objects.filter(alioss_video='http://%s.%s/%s' % (Bucket,Location,Object)).update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
         logger.error(qrset)
         
 
-        return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
+        return Response(content='',status=status.HTTP_204_NO_CONTENT)
         
       
