@@ -254,7 +254,7 @@ function UploaderFactory(
                         loc_fileurl.value =`${sourhost}/${get_uploaded_object_name(filename)}`
                         loc_fileurl.href =`${sourhost}/${get_uploaded_object_name(filename)}`
                         loc_fileurl.innerText  =`${get_uploaded_object_name(filename)}`
-                        document.getElementsByName('_continue').click()
+                        document.getElementsByName('_continue')[0].click()
                     }
                     else if (info.status == 203)
                     {

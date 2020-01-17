@@ -222,7 +222,7 @@ class AliMtsCallBack(APIView):
         alioss_image = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg'))
 
         logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (urllib.parse.quote(alioss_video),urllib.parse.quote(alioss_SHD_URL),urllib.parse.quote(alioss_HD_URL),urllib.parse.quote(alioss_SD_URL),urllib.parse.quote(alioss_image)))
-        qrset = md.Media.objects.filter(alioss_video=urllib.parse.quote(alioss_video))
+        qrset = md.Media.objects.filter(alioss_video__iexact=urllib.parse.quote(alioss_video))
         
         logger.error(qrset)
 
