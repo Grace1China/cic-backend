@@ -248,12 +248,16 @@ function UploaderFactory(
         
                 FileUploaded: function(up, file, info) {
                     // filename = file.name.replace(' ','')
+                    console.log(file)
+                    console.log(info)
+                    console.log(up)
+                    res = JSON.parse(info.response)
                     if (info.status == 200)
                     {
-                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}">${filename}${info.response}</a>`     
-                        loc_fileurl.value =`${get_uploaded_object_name(filename)}`
-                        loc_fileurl.href =`${get_uploaded_object_name(filename)}`
-                        loc_fileurl.innerText  =`${get_uploaded_object_name(filename)}`
+                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${res.signedurl}">${res.filename}</a>`     
+                        loc_fileurl.value =`${res.filename}`
+                        loc_fileurl.href =`${res.signedurl}`
+                        loc_fileurl.innerText  =`${res.filename}`
                         document.getElementsByName('_continue')[0].click()
                     }
                     else if (info.status == 203)

@@ -160,7 +160,7 @@ class AliOssCallBack(APIView):
         ret_dict = {}
         ret_dict['filename'] = data.get('filename', '')
         ret_dict['mimeType'] = data.get('mimeType','')
-        ret_dict['signedurl'] = CICUtill.signurl(data.get('filename', ''),whichbucket='source')
+        ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
         ret_dict['String value'] = 'OK'
         ret_dict['Key'] = 'Status'
 
