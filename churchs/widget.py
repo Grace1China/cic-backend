@@ -9,6 +9,8 @@ from django.utils.http import urlunquote_plus
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 import pprint
+import urllib
+# from urllib import urlencode
 
 class S3DirectWidgetExt(TextInput):
     class Media:
@@ -106,5 +108,20 @@ class AliOssDirectField(Field):
     def formfield(self, *args, **kwargs):
         kwargs['widget'] = self.widget
         return super(AliOssDirectField, self).formfield(*args, **kwargs)
+    def to_python(self,value):
+        if not value:
+            value=[]
+        if isinstance(value,list):
+            return value
+        return urllib.parse.unquote(value)
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+        return urllib.parse.quote(value)   #存储为url
+    def value_to_string(self, obj):
+        value=self._get_val_from_obj(obj)
+        return urllib.parse.unquote(self.get_db_prep_value(value))
+
+
 
 # class 
