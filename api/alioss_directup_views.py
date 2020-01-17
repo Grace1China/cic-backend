@@ -165,14 +165,14 @@ class AliOssCallBack(APIView):
         ret_dict['Key'] = 'Status'
 
 
-        jstr = json.dumps(ret_dict)
+        # jstr = json.dumps(ret_dict)
 
-        logger.error(args)
-        logger.error(kwargs)
+        logger.error(ret_dict)
+        # logger.error(kwargs)
         
-        pprint.PrettyPrinter(4).pprint(request)
-        pprint.PrettyPrinter(4).pprint(args)
-        pprint.PrettyPrinter(4).pprint(kwargs)
+        # pprint.PrettyPrinter(4).pprint(request)
+        # pprint.PrettyPrinter(4).pprint(args)
+        # pprint.PrettyPrinter(4).pprint(kwargs)
 
         # ALIOSS_ACCESS_KEY_ID = os.envi
         # ALIOSS_SECRET_ACCESS_KEY = os.
@@ -186,9 +186,9 @@ class AliOssCallBack(APIView):
         # # 设置此签名URL在60秒内有效。
         # bucket.sign_url('GET', , settings.ALIOSS_EXPIRES)
 
-        return Response(data=jstr,status=status.HTTP_200_OK,content_type='application/json',headers= {'Content-Length': len(jstr)})
+        # return Response(data=jstr,status=status.HTTP_200_OK,content_type='application/json',headers= {'Content-Length': len(jstr)})
 
-        # return JsonResponse({'String value': 'OK', 'Key': 'Status','bucket':request.headers['X-Oss-Bucket'],'filename':filename,'mimeType':mimeType}, safe=False)
+        return JsonResponse(ret_dict, safe=False)
 
 class AliMtsCallBack(APIView):
     def post(self,request,*args,**kwargs):
