@@ -252,8 +252,8 @@ function UploaderFactory(
                     {
                         document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}">${filename}${info.response}</a>`     
                         loc_fileurl.value =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
-                        loc_ossurl.href =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
-                        loc_ossurl.innerText  =`${get_uploaded_object_name(filename)}`
+                        loc_fileurl.href =`${get_bucket_url(filename)}/${get_uploaded_object_name(filename)}`
+                        loc_fileurl.innerText  =`${get_uploaded_object_name(filename)}`
                     }
                     else if (info.status == 203)
                     {
