@@ -63,6 +63,12 @@
                     </div>
                     {{ adminform.form.non_field_errors }}
                 {% endif %}
+                
+                {% block inline_field_sets %}
+                    {% for inline_admin_formset in inline_admin_formsets %}
+                        {% include inline_admin_formset.opts.template %}
+                    {% endfor %}
+                {% endblock %}
 
                 {% block field_sets %}
                     {% for fieldset in adminform %}
@@ -72,11 +78,7 @@
 
                 {% block after_field_sets %}{% endblock %}
 
-                {% block inline_field_sets %}
-                    {% for inline_admin_formset in inline_admin_formsets %}
-                        {% include inline_admin_formset.opts.template %}
-                    {% endfor %}
-                {% endblock %}
+                
 
                 {% block after_related_objects %}{% endblock %}
 

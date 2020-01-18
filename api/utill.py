@@ -17,7 +17,7 @@ class CICUtill():
     '''
     一些有用的方法
     '''
-    def signurl(self,key='', whichbucket='source'):
+    def signurl(key='', whichbucket='source'):
         if whichbucket == 'destination':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)

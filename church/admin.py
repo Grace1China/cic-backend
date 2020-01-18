@@ -22,7 +22,7 @@ class ChurchAdmin(admin.ModelAdmin):
 
 class MediaInline(GenericStackedInline):
     model = Media
-    extra = 0
+    extra = 1
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = [
