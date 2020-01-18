@@ -8,6 +8,7 @@ from users import models as users_md
 from api import models as api_md
 from ckeditor.widgets import CKEditorWidget
 from churchs.models import Media
+from parsley.mixins import ParsleyAdminMixin
 
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 
@@ -24,16 +25,19 @@ class MediaInline(GenericStackedInline):
     model = Media
     extra = 1
 
-class CourseAdmin(admin.ModelAdmin):
+class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
     inlines = [
         MediaInline,
     ]
 
-    list_display = ('title', 'speaker') 
-    search_fields = ('speaker', 'title')
-    fields = ('church','title', 'speaker','description','content','price')
+    list_display = ('title', 'teacher') 
+    search_fields = ('teacher', 'title')
+    fields = ('church','title', 'teacher','description','content','price')
 
     change_form_template ="admin/churchs/sermon_change_form.html"
+    
+    def get_changeform_initial_data(self, request):
+        return {'church': request.user.church}
 
 admin.site.register(church_md.Church, ChurchAdmin)
 admin.site.register(models.Course, CourseAdmin)

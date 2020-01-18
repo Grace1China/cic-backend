@@ -17,3 +17,4 @@ djoser
 django-s3direct
 aliyun-python-sdk-sts
 oss2
+django-parsley

@@ -233,6 +233,7 @@ function UploaderFactory(
                 },
         
                 BeforeUpload: function(up, file) {
+                    
                     check_object_radio();
                     set_upload_param(up, file.name, true);
                 },
@@ -252,12 +253,14 @@ function UploaderFactory(
                     console.log(info)
                     console.log(up)
                     res = JSON.parse(info.response)
+                    console.log(res.signedurl)
                     if (info.status == 200)
                     {
-                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${res.signedurl}">${res.filename}</a>`     
-                        loc_fileurl.value =`${res.filename}`
-                        loc_fileurl.href =`${res.signedurl}`
-                        loc_fileurl.innerText  =`${res.filename}`
+                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${decodeURI(res.signedurl)}">${decodeURI(res.filename)}</a>`     
+                        loc_fileurl.value =`${decodeURI(res.filename)}`
+                        loc_fileurl.href =`${decodeURI(res.signedurl)}`
+                        loc_fileurl.innerText  =`${decodeURI(res.filename)}`
+                        document.getElementsByName('title')[0].value = decodeURI(res.filename)
                         document.getElementsByName('_continue')[0].click()
                     }
                     else if (info.status == 203)

@@ -40,11 +40,11 @@ class Church(models.Model):
 
         
 class Course(models.Model):
-    church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会或平台')
-    speaker = models.ForeignKey('churchs.Speaker', on_delete=models.CASCADE,verbose_name='讲员')
+    church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会或平台，默认是用户所在的组织')
+    teacher = models.ForeignKey('churchs.Speaker',null=True, blank=True,on_delete=models.CASCADE,verbose_name='讲员')
     title = models.CharField(max_length=500,verbose_name='标题')
     # image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
-    description = models.TextField(max_length=255,verbose_name='描叙')
+    description = models.TextField(max_length=255, blank=True,verbose_name='描叙')
     content = RichTextField(null=True, blank=True,verbose_name='内容')
     price = models.DecimalField(default=0,max_digits=9, decimal_places=2,verbose_name='价格')
     # s3video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
