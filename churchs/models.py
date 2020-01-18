@@ -114,6 +114,18 @@ class Media(models.Model):
     
     content = models.TextField(blank=True,verbose_name='摘要') 
 
+
+    def save(self, *args, **kwargs):
+        # do_something()
+        print('before save-------------------')
+        print(self.alioss_video)
+        print(self.alioss_image)
+        self.alioss_video = urllib.parse.quote(self.alioss_video) #存储成为url比较，用于后台查找
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        # do_something_else()
+        print(self.alioss_video)
+
+
     
 
 

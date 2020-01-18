@@ -83,7 +83,7 @@ class AliOssDirectWidgetExt(TextInput):
             # 'dest': self.dest,
             # 'name': name,
             # 'csrf_cookie_name': csrf_cookie_name,
-            'file_url': file_url,
+            'file_url': urllib.parse.unquote(file_url),
             # 'file_name': os.path.basename(urlunquote_plus(file_url)),
             # 'test':'test_1',
             'name':name,
@@ -113,11 +113,11 @@ class AliOssDirectField(Field):
             value=[]
         if isinstance(value,list):
             return value
-        return urllib.parse.unquote(value)
+        return urllib.parse.quote(value)
     def get_prep_value(self, value):
         if value is None:
             return value
-        return urllib.parse.quote(value)   #存储为url
+        # return urllib.parse.quote(value)   #存储为url
     def value_to_string(self, obj):
         value=self._get_val_from_obj(obj)
         return urllib.parse.unquote(self.get_db_prep_value(value))

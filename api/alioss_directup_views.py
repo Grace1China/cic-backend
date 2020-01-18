@@ -233,10 +233,10 @@ class AliMtsCallBack(APIView):
         # alioss_image = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg'))
 
         alioss_video = '%s/%s.%s' % (key_arr[0],quotedfn,filename_arr[1])
-        alioss_SHD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-hd',quotedfn,'mp4')
-        alioss_HD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-sd',quotedfn,'mp4')
-        alioss_SD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-ld',quotedfn,'mp4')
-        alioss_image = '%s/%s.%s' % (key_arr[0],quotedfn,'jpg')
+        alioss_SHD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4')
+        alioss_HD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4')
+        alioss_SD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4')
+        alioss_image = '%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg')
 
 
         logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % ((alioss_video),(alioss_SHD_URL),(alioss_HD_URL),(alioss_SD_URL),(alioss_image)))
