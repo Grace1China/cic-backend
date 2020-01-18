@@ -385,6 +385,26 @@ ALIOSS_SOURCE_BUCKET_NAME = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'bicf-me
 ALIOSS_DESTINATION_BUCKET_NAME = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'bicf-media-destination')
 ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES', 3600)
 
+# from django.conf import settings
+ALIOSS_DESTINATIONS = {
+    'images':{
+        'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME
+    },
+    'pdfs':{
+        'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME
+    },
+    'source':{
+        'endpoint':ALIOSS_SOURCE_ENDPOINT,
+        'bucket':ALIOSS_SOURCE_BUCKET_NAME
+    },
+    'audios':{
+        'endpoint':ALIOSS_SOURCE_ENDPOINT,
+        'bucket':ALIOSS_SOURCE_BUCKET_NAME
+    }
+}
+
 
 DEFAULT_FILE_STORAGE = 'church.storage_backends.MediaStorage'
 AWS_PUBLIC_MEDIA_LOCATION = 'media/public'

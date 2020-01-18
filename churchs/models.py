@@ -12,6 +12,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 import oss2
+import urllib
 
 
 
@@ -102,7 +103,7 @@ class Media(models.Model):
     s3_image = S3DirectField(dest='images', blank=True,verbose_name='AWS S3 封面')
     s3_pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='AWS S3 讲义')
 
-    alioss_video = AliOssDirectField(dest='videos',fieldname='alioss_video', blank=True,verbose_name='阿里云视频')
+    alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='阿里云视频')
     alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='Aliyun媒体状态')
     alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 高清链接')
     alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 标清链接')
@@ -148,6 +149,7 @@ class Media(models.Model):
     def getObjectKey(self,obj):
         obj = str.replace(obj, '%s.' % settings.ALIOSS_DESTINATION_BUCKET_NAME,'')
         obj = str.replace(obj, '%s/' % settings.ALIOSS_DESTINATION_ENDPOINT,'')
+        obj = urllib.parse.unquote(obj)
         pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
         pprint.PrettyPrinter(4).pprint(obj)
         return obj
@@ -161,14 +163,6 @@ class Media(models.Model):
             return self.s3_SHD_URL
         elif self.alioss_SHD_URL is not None and self.alioss_SHD_URL != '':
 
-            # ALIOSS_ACCESS_KEY_ID = os.envir
-            # ALIOSS_SECRET_ACCESS_KEY = os.e
-            # ALIOSS_SOURCE_ENDPOINT = os.env
-            # ALIOSS_DESTINATION_ENDPOINT = o
-            # ALIOSS_SOURCE_BUCKET_NAME = os.
-            # ALIOSS_DESTINATION_BUCKET_NAME 
-            # ALIOSS_EXPIRES = os.environ.get
-        
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_SHD_URL), settings.ALIOSS_EXPIRES)
@@ -237,46 +231,7 @@ class Media(models.Model):
             return ''
 
 
-       
-    # @property
-    # def image_presigned_url(self):
-    #     url = str(self.dist_image)
-    #     if url == None or len(url) == 0:
-    #         return ''
-    #     # import logging
-    #     # logging.debug(url)
-    #     pprint.PrettyPrinter(indent=4).pprint(url)
-    #     # pprint.pre
-    #     import logging
-    #     logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
-    #     if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
-    #         url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
-    #         s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-    #         try:
-    #             response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
-    #         except Exception as e:
-    #             return str(e)
-    #         return response
-    #     else:
-    #         return url
-    # @property    
-    # def pdf_presigned_url(self):
-    #     url = str(self.dist_image)
-    #     if url == None or len(url) == 0:
-    #         return ''
-    #     # import logging
-    #     # logging.debug(url)
-    #     # logging.debug(settings.AWS_STORAGE_BUCKET_NAME)
-    #     if url.index(settings.AWS_STORAGE_BUCKET_NAME) >= 0:
-    #         url = url.split('%s/' % settings.AWS_STORAGE_BUCKET_NAME)[1]
-    #         s3_client = boto3.client('s3',aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
-    #         try:
-    #             response = s3_client.generate_presigned_url('get_object',Params={ 'Bucket': settings.AWS_STORAGE_BUCKET_NAME,'Key': url },ExpiresIn=3600)
-    #         except Exception as e:
-    #             return str(e)
-    #         return response
-    #     else:
-    #         return url
+   
     
 
     class Meta:
@@ -305,31 +260,16 @@ class Sermon(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
     title = models.CharField(max_length=32, default='',verbose_name='标题')
-    # date = models.DateField(verbose_name='日期')
-   
-    # description = models.TextField(null=True, blank=True,verbose_name='敬拜')
-    # pdf = models.FileField(storage=PrivateMediaStorage(),null=True, blank=True,verbose_name='讲义')
     speaker = models.ForeignKey("Speaker",on_delete=models.CASCADE,default=None,verbose_name='讲员')
     scripture = models.CharField(max_length=100, default='',verbose_name='经文')
     series = models.ForeignKey(SermonSeries, on_delete=models.CASCADE,null=True,default=None,verbose_name='讲道系列')
-    # cover = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
-    # worshipvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='敬拜')
-    # worshipnote = models.TextField(null=True, blank=True,verbose_name='敬拜歌单')
-    # mcvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='主持')
-    # mcnote = models.TextField(null=True, blank=True,verbose_name='主持摘要')
-    # sermonvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='讲道')
-    # sermonvnote = models.TextField(null=True, blank=True,verbose_name='讲道摘要')
-    # givingvideo = models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='奉献')
-    # givingnote = models.TextField(null=True, blank=True,verbose_name='奉献摘要')
-    # worshiptext = models.TextField(u'敬拜', null=True, blank=True)
-    # content = RichTextUploadingField(null=True, blank=True)
+
     medias = GenericRelation(Media, related_query_name='Sermon',verbose_name='视听媒体')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
 
-    # sermonfile = models.ForeignKey("file2s3",on_delete=models.CASCADE,default=None,related_name="sermon2s3",verbose_name='讲道')
 
 
     class Meta:
@@ -339,11 +279,6 @@ class Sermon(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
-# class file2s3(models.Model):
-#     summary = models.TextField(max_length=255, blank=True,verbose_name='摘要')
-#     file = models.FileField(storage=PrivateMediaStorage(),null=True, blank=True,verbose_name='文件')
-#     cover = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
-#     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
 class WeeklyReport(models.Model):

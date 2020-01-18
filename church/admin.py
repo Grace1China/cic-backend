@@ -23,6 +23,10 @@ class ChurchAdmin(admin.ModelAdmin):
 
 class MediaInline(GenericStackedInline):
     model = Media
+    readonly_fields = ('dist_video','dist_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','dist_audio','dist_image','dist_pdf')
+    fields = ('alioss_video','alioss_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','alioss_audio','alioss_image','alioss_pdf','content')
+    # exclude = ['name']
+
     extra = 1
 
 class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):

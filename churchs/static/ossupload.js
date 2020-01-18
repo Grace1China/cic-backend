@@ -12,11 +12,11 @@ function UploaderFactory(
 ) {
     var loc_browse_button = pbrowse_button
     var loc_container = pcontainer
-    var loc_ossfile = possfile
+    var loc_ossfile = possfile //用来显示链接
     var loc_postfiles = ppostfiles
     var loc_console = pconsole
     var loc_myradio = pmyradio
-    var loc_fileurl = pfileurl
+    var loc_fileurl = pfileurl //用来上传form里
     // var loc_widget_div = pwidget_div
     var max_file_size = '4gb'
     
@@ -187,6 +187,12 @@ function UploaderFactory(
         up.start();
     }
 
+    function decodeFileN(key){
+        console.log(`encode filename${key}`)
+        arr = key.split('/')
+        return arr[0]+'/'+encodeURI(arr[1])
+    }
+
    
 
     return function get_one_uploader(){
@@ -256,11 +262,13 @@ function UploaderFactory(
                     console.log(res.signedurl)
                     if (info.status == 200)
                     {
-                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${decodeURI(res.signedurl)}">${decodeURI(res.filename)}</a>`     
-                        loc_fileurl.value =`${decodeURI(res.filename)}`
-                        loc_fileurl.href =`${decodeURI(res.signedurl)}`
-                        loc_fileurl.innerText  =`${decodeURI(res.filename)}`
-                        document.getElementsByName('title')[0].value = decodeURI(res.filename)
+                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${(res.signedurl)}">${(res.filename)}</a>`     
+                        loc_fileurl.value =`${(res.filename)}`
+                        loc_ossfile.href =`${(res.signedurl)}`
+                        loc_ossfile.innerText  =`${(res.filename)}`
+
+
+                        document.getElementsByName('title')[0].value = (res.filename)
                         document.getElementsByName('_continue')[0].click()
                     }
                     else if (info.status == 203)

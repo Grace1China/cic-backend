@@ -63,7 +63,7 @@ class AliOssDirectWidgetExt(TextInput):
         css = {'all': ('/static/ossstyle.css', )}
 
     def __init__(self, *args, **kwargs):
-        self.dest = kwargs.pop('dest', None)
+        self.dest  = kwargs.pop('dest', None)
         self.fieldname = kwargs.pop('fieldname', None)
         super(AliOssDirectWidgetExt, self).__init__(*args, **kwargs)
 
