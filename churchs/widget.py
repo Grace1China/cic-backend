@@ -108,19 +108,19 @@ class AliOssDirectField(Field):
     def formfield(self, *args, **kwargs):
         kwargs['widget'] = self.widget
         return super(AliOssDirectField, self).formfield(*args, **kwargs)
-    def to_python(self,value):
-        if not value:
-            value=[]
-        if isinstance(value,list):
-            return value
-        return urllib.parse.quote(value)
-    def get_prep_value(self, value):
-        if value is None:
-            return value
-        # return urllib.parse.quote(value)   #存储为url
-    def value_to_string(self, obj):
-        value=self._get_val_from_obj(obj)
-        return urllib.parse.unquote(self.get_db_prep_value(value))
+    # def to_python(self,value):
+    #     if not value:
+    #         value=[]
+    #     if isinstance(value,list):
+    #         return value
+    #     return urllib.parse.quote(value)
+    # def get_prep_value(self, value):
+    #     if value is None:
+    #         return value
+    #     # return urllib.parse.quote(value)   #存储为url
+    # def value_to_string(self, obj):
+    #     value=self._get_val_from_obj(obj)
+    #     return urllib.parse.unquote(self.get_db_prep_value(value))
 
 
 

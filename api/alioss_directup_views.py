@@ -239,12 +239,12 @@ class AliMtsCallBack(APIView):
         alioss_image = '%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg')
 
 
-        logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % ((alioss_video),(alioss_SHD_URL),(alioss_HD_URL),(alioss_SD_URL),(alioss_image)))
+        logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
         qrset = md.Media.objects.filter(alioss_video__iexact=alioss_video)
         
         logger.error(qrset)
 
-        qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=(alioss_SHD_URL),alioss_HD_URL=(alioss_HD_URL),alioss_SD_URL=(alioss_SD_URL),alioss_image=(alioss_image))
+        qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
         
 
         return Response(data='',status=status.HTTP_204_NO_CONTENT)
