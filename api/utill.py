@@ -30,3 +30,10 @@ class CICUtill():
             return retval
         else:
             raise Exception('no such bucket')
+    def signurl1(key='', dest='source'):
+        from django.conf import settings
+        auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+        bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
+        retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+        return retval
+

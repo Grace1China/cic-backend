@@ -41,7 +41,11 @@ class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
     change_form_template ="admin/churchs/sermon_change_form.html"
     
     def get_changeform_initial_data(self, request):
-        return {'church': request.user.church}
+        from churchs.models import Speaker
+        spk = Speaker.objects.filter(churchs__in=[request.user.church])[0]
+        ret = {'church': request.user.church,'teacher':spk}
+        print(ret)
+        return ret
 
 admin.site.register(church_md.Church, ChurchAdmin)
 admin.site.register(models.Course, CourseAdmin)

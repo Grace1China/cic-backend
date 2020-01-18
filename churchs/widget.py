@@ -69,7 +69,10 @@ class AliOssDirectWidgetExt(TextInput):
 
 
     def render(self, name, value, **kwargs):
-        file_url = value or ''
+        from api.utill import CICUtill
+        file_url = value or ''  #目前这个是bucket的key
+        file_url = urllib.parse.unquote(file_url)
+        signed_url = CICUtill.signurl1(file_url,dest=self.dest)
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
 
         # pprint.PrettyPrinter(4).pprint(self)
@@ -84,6 +87,7 @@ class AliOssDirectWidgetExt(TextInput):
             # 'name': name,
             # 'csrf_cookie_name': csrf_cookie_name,
             'file_url': urllib.parse.unquote(file_url),
+            'signed_url':signed_url,
             # 'file_name': os.path.basename(urlunquote_plus(file_url)),
             # 'test':'test_1',
             'name':name,

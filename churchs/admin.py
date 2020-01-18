@@ -44,9 +44,9 @@ admin.site.register(models.WeeklyReport, WeeklyReportAdmin)
 
 
 class SpeakerAdmin(admin.ModelAdmin):
-    list_display = ('church', 'name', 'title') 
-    search_fields = ('name', 'title')
-    fields = ('name', 'title', 'introduction')
+    list_display = ('name', 'title') 
+    search_fields = ('churchs','name', 'title')
+    fields = ('name', 'churchs','title', 'introduction')
 
 
 

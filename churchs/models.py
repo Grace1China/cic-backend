@@ -357,38 +357,6 @@ class Team(models.Model):
         return self.name
 
 
-# class userProfile(models.Model):
-#     ROLE_MEMBER = 1
-#     ROLE_GROUPLEAD = 2
-#     ROLE_CHURCHLEAD = 3
-
-
-#     ROLE_CHOICES = (
-#         (ROLE_MEMBER ,'会员'),
-#         (ROLE_GROUPLEAD , '组长'),
-#         (ROLE_CHURCHLEAD ,'教会管理员')
-#     )
-#     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="userProfile",verbose_name='用户')
-#     description=models.TextField(blank=True,null=True,verbose_name='描叙')
-#     location=models.CharField(max_length=30,blank=True,verbose_name='地点')
-#     church = models.ForeignKey(Church, on_delete=models.CASCADE,related_name="userProfile",blank=True,verbose_name='教会')
-#     team = models.ForeignKey(Team, on_delete=models.CASCADE,related_name="userProfile",blank=True,verbose_name='小组')
-
-#     role = models.IntegerField(choices=ROLE_CHOICES,default=ROLE_MEMBER,verbose_name='角色')
-#     date_joined=models.DateTimeField(auto_now_add=True,verbose_name='参加日期')
-#     updated_on=models.DateTimeField(auto_now=True,verbose_name='更新日期')
-#     creator = models.ForeignKey(userProfile, on_delete=models.CASCADE,related_name="userProfile",blank=True,verbose_name='创立者')
-
-#     def __str__(self):
-#         return self.user.username
-#     class Meta:
-#         verbose_name = "会友信息"
-#         verbose_name_plural = "会友信息"
-
-
-
-
-    
 class Donation(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,blank=True,null=True,verbose_name='会友信息')
@@ -408,7 +376,8 @@ class Donation(models.Model):
 
 
 class Speaker(models.Model):
-    church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
+    # church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
+    churchs = models.ManyToManyField(to=Church,default=None,  blank=True,verbose_name='教会')
     name = models.CharField(max_length=32)
     title = models.CharField(max_length=32)
     introduction = models.CharField(max_length=255)
