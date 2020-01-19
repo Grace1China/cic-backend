@@ -27,10 +27,13 @@ l3_eweekly = EweeklyViewSet.as_view({
 church_eweekly = EweeklyViewSet.as_view({
     'get':'GetChurchEweekly'
 })
+
 course_list = views.CourseViewSet.as_view({
     'get':'GetCourseList'
 })
 course = views.CourseViewSet.as_view({'get':'GetCoursebyID'})
+
+search_course = views.CourseViewSet.as_view({'post':'SearchCourse'})
 
 #------------------------------v2------------------------------------------------------
 
@@ -60,7 +63,8 @@ urlpatterns = [
 
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback"),
-    path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished")
+    path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished"),
+    path('search_course',search_course,name='search_course')
 
 
 

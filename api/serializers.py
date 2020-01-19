@@ -113,12 +113,22 @@ class SermonSerializer4API(serializers.ModelSerializer):
         fields = ['id','church','user','title','pub_time','status','speaker','scripture','series','medias','create_time','update_time']
 
 
+
+class CourseSerializer4APIPOST(serializers.ModelSerializer):
+    keyword = serializers.CharField()
+
+    class Meta:
+        model = models.Course
+        fields = ['keyword']
+
+
+    
 class CourseSerializer4API(serializers.ModelSerializer):
     medias = MediaSerializer4API(many=True, read_only=True)
     church = ChurchSerializer4API(read_only=True)
-    speaker = SpeakerSerializer4API(read_only=True)
+    speaker = SpeakerSerializer4API(source='teacher',read_only=True)
     # series = SermonSeriesSerializer4API(read_only=True)
-    speaker = serializers.PrimaryKeyRelatedField(source='teacher', queryset=Speaker.objects.all())
+    # speaker = serializers.PrimaryKeyRelatedField(source='teacher', queryset=Speaker.objects.all())
 
     class Meta:
         model = models.Course

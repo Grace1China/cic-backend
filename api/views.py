@@ -24,6 +24,8 @@ from datetime import timedelta
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 import traceback, sys 
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+
 
 
 # Create your views here.
@@ -76,42 +78,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return JsonResponse({'errCode': '1001','msg': str(e), 'data': serializer.data}, safe=False)
             
-# class SermonDetailView(APIView):
-#     '''
-#     retrieve and update sermon
-#     # 1、首先要实现一个能查找主日信息的api可以返回主日的所有信息，现在只要实现当前主日信息 这个信息里面有id title cover pdf worship sermon giving等信息
-#     # 2、在这个信息中，应该可以自定义presignedurl的过期时间。这些都已经是presignedurl了。
-#     '''
-#     def get_object(self, pk):
-#         try:
-#             return Sermon.objects.get(pk=pk)
-#         except Sermon.DoesNotExist:
-#             raise Http404
 
-#     def get(self, request, pk, format=None):
-#         '''
-#         retrieve sermon data
-#         '''
-#         sermon = None
-#         print('----------------->'+str(pk))
-#         if pk == None or int(pk) <= 0:
-#             #选一个最近的sermon
-#             sermonQry = Sermon.objects.all()
-#             sermon = sermonQry.reverse()[:1]
-#             if len(sermon) != 1:
-#                 return JsonResponse({'errCode': '1001', msg:'database has no record.','data':None}, safe=False)
-#             else:
-#                 sermon = sermon[0]
-
-#             print('---------pk <=0------------')
-#             print(sermon)
-#             serializer = SermonSerializer(sermon)
-#         else: 
-#             sermon = self.get_object(pk)
-#             print('---------pk >0------------')
-#             serializer = SermonSerializer(sermon)
-            
-#         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
 class EweeklyViewSet(viewsets.ModelViewSet):
     '''
@@ -269,18 +236,19 @@ class SermonViewSet(viewsets.ModelViewSet):
 
             return JsonResponse({'errCode': '1001', 'data': {},'msg':'平台教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
 
+
+from .serializers import CourseSerializer4API, MediaSerializer4API, CourseSerializer4APIPOST
 class  CourseViewSet(viewsets.ModelViewSet):
     '''
     课程视图
     
     '''
-    from .serializers import CourseSerializer4API, MediaSerializer4API
     from churchs.models import Media
     from church.models import Course
     from django.db.models import Prefetch
     queryset = Course.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
-    serializer_class=CourseSerializer4API
+    serializer_class=CourseSerializer4APIPOST
     # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
     @action(detail=True,methods=['POST'], format="json")
@@ -297,11 +265,10 @@ class  CourseViewSet(viewsets.ModelViewSet):
             if page < 0 :
                 return JsonResponse({'errCode': '1003', 'data': {},'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
                 
-            from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
             courseList = self.get_queryset().filter().order_by('-update_time')
             paginator = Paginator(courseList, pagesize)
             coursePage = paginator.get_page(page)
-            slzCourseList = self.get_serializer(coursePage, many=True)
+            slzCourseList = CourseSerializer4API(coursePage, many=True)
             # 前端需要用来取页面 
             return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 'page':coursePage.number, 'totalPage':paginator.num_pages}, safe=False)
         except Exception as e:
@@ -318,13 +285,38 @@ class  CourseViewSet(viewsets.ModelViewSet):
         '''
         try:
             course = self.get_queryset().filter(id=pk).order_by('-update_time')[0]
-            slzCourse = self.get_serializer(course)
+            slzCourse = CourseSerializer4API(course)
             return JsonResponse({'errCode': '0', 'data': slzCourse.data}, safe=False)
         except Exception as e:
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
             return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+    
+    @action(detail=True,methods=['post'], format="json")
+    def SearchCourse(self,request):
+        '''
+        查找课程
+        '''
+        try:
+            data = request.data
+            keyword = data.get('keyword', '')
+            if keyword == '':
+                return JsonResponse({'errCode': '1001', 'data': {},'msg':'搜索关键词不能为空','sysErrMsg':e.__str__()}, safe=False)
+
+            courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by('-update_time')
+            # paginator = Paginator(courseList, pagesize)
+            # coursePage = paginator.get_page(page)
+            slzCourseList = CourseSerializer4API(courseList, many=True)
+            # 前端需要用来取页面 
+            return JsonResponse({'errCode': '0', 'data': slzCourseList.data}, safe=False)
+        except Exception as e:
+            import traceback
+            import sys
+            traceback.print_exc(file=sys.stdout)
+            return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+
+
 
    
 
