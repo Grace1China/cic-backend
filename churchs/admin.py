@@ -78,4 +78,6 @@ admin.site.register(models.Speaker, SpeakerAdmin)
 admin.site.register(models.Meeting)
 admin.site.register(models.BibleStudy)
 admin.site.register(models.BibleStudyComment)
+admin.site.register(models.Media)
+
 

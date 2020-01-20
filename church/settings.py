@@ -389,19 +389,23 @@ ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES', 3600)
 ALIOSS_DESTINATIONS = {
     'images':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
-        'bucket':ALIOSS_DESTINATION_BUCKET_NAME
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'x-oss-object-acl':'public-read'   #public-read、private、public-read-write
     },
     'pdfs':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
-        'bucket':ALIOSS_DESTINATION_BUCKET_NAME
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'x-oss-object-acl':'private'   #public-read、private、public-read-write
     },
     'source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
-        'bucket':ALIOSS_SOURCE_BUCKET_NAME
+        'bucket':ALIOSS_SOURCE_BUCKET_NAME,
+        'x-oss-object-acl':'private'   #public-read、private、public-read-write
     },
     'audios':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
-        'bucket':ALIOSS_SOURCE_BUCKET_NAME
+        'bucket':ALIOSS_SOURCE_BUCKET_NAME,
+        'x-oss-object-acl':'private'   #public-read、private、public-read-write
     }
 }
 

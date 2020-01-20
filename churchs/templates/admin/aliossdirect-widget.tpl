@@ -12,6 +12,7 @@
 	<a class="selectfiles" href="javascript:void(0);" class='btn'>选择文件</a>
 	<a class="postfiles" href="javascript:void(0);" class='btn'>开始上传</a>
 	<input class="file-url fileurl" name="{{ name }}" type="hidden" value="{{ file_url }}" >
+    <input class='x-oss-object-acl' type='hidden' value = '{{ acl }}'>
 </div>
 
 <pre class="console"></pre>
@@ -48,7 +49,8 @@ if (`{{ name  }}`.indexOf('__prefix__') < 0){
                 myradio = item.getElementsByClassName('myradio')[0] 
                 fileurl = item.getElementsByClassName('fileurl')[0] 
                 selectfiles = item.getElementsByClassName('selectfiles')[0] 
-                var upfact = UploaderFactory(selectfiles,container,ossfile,postfiles,pconsole,myradio,fileurl);
+                acl = item.getElementsByClassName('x-oss-object-acl')[0]
+                var upfact = UploaderFactory(selectfiles,container,ossfile,postfiles,pconsole,myradio,fileurl,acl);
                 console.log('-----------formset:added--------------')
                 upfact().init()
     

@@ -20,7 +20,9 @@
                 myradio = item.getElementsByClassName('myradio')[0] 
                 fileurl = item.getElementsByClassName('fileurl')[0] 
                 selectfiles = item.getElementsByClassName('selectfiles')[0] 
-                var upfact = UploaderFactory(selectfiles,container,ossfile,postfiles,pconsole,myradio,fileurl);
+                acl = item.getElementsByClassName('x-oss-object-acl')[0]
+
+                var upfact = UploaderFactory(selectfiles,container,ossfile,postfiles,pconsole,myradio,fileurl,acl);
                 console.log('-----------formset:added--------------')
                 upfact().init()
     

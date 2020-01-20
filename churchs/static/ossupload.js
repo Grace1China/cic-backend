@@ -7,6 +7,7 @@ function UploaderFactory(
     pconsole = 'console',
     pmyradio = 'myradio',
     pfileurl = 'fileurl',
+    pacl = 'private'
     // pwidget_div = 'widget_div'
 
 ) {
@@ -17,6 +18,7 @@ function UploaderFactory(
     var loc_console = pconsole
     var loc_myradio = pmyradio
     var loc_fileurl = pfileurl //用来上传form里
+    var loc_acl = pacl
     // var loc_widget_div = pwidget_div
     var max_file_size = '4gb'
     
@@ -176,11 +178,12 @@ function UploaderFactory(
             'success_action_status' : '200', //让服务端返回200,不然，默认会返回204
             'callback' : callbackbody,
             'signature': signature,
+            'x-oss-object-acl':loc_acl.value
         };
         console.log('----------set_upload_param-----------')
         console.log(new_multipart_params)
         up.setOption({
-            'url':(suffix.toLowerCase() == '.mp4' || suffix.toLowerCase() == '.mov') ? sourhost:desthost,
+            'url':(suffix.toLowerCase() == '.mp4' || suffix.toLowerCase() == '.mov' || suffix.toLowerCase() == '.m4v' ) ? sourhost:desthost,
             'multipart_params': new_multipart_params
         });
 
@@ -211,7 +214,7 @@ function UploaderFactory(
                 mime_types : [ //只允许上传图片和zip文件
                 { title : "Image files", extensions : "jpg,gif,png,bmp"}, 
                 { title : "Zip files", extensions : "zip,rar"},
-                { title : "mp4 files", extensions : "mp4,mov"},
+                { title : "mp4 files", extensions : "mp4,mov,m4v"},
                 { title : "mp3 files", extensions : "mp3"},
                 { title : "document files", extensions : "pdf,doc,docx,txt"}
 

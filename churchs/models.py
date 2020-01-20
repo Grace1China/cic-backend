@@ -226,7 +226,13 @@ class Media(models.Model):
         elif self.alioss_image is not None and self.alioss_image != '':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_image), settings.ALIOSS_EXPIRES)
+            if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl == 'private':
+                bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+                retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_image), settings.ALIOSS_EXPIRES)
+                return retval #self.alioss_pdf
+            else:
+                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,setting.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_image))
+            
             return retval #self.alioss_image
         else:
             return ''
@@ -237,8 +243,12 @@ class Media(models.Model):
         elif self.alioss_pdf is not None and self.alioss_pdf !='':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_pdf), settings.ALIOSS_EXPIRES)
-            return retval #self.alioss_pdf
+            if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl == 'private':
+                bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+                retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_pdf), settings.ALIOSS_EXPIRES)
+                return retval #self.alioss_pdf
+            else:
+                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,setting.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_pdf))
         else:
             return ''
 
@@ -253,10 +263,10 @@ class Media(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
-class ossMedia(models.Model):
-    '''
-    存储oss相关信息，可能是s3,可能是alioss,有原文件信息，也有发布以后的媒体信息
-    '''
+# class ossMedia(models.Model):
+#     '''
+#     存储oss相关信息，可能是s3,可能是alioss,有原文件信息，也有发布以后的媒体信息
+#     '''
 
 
 

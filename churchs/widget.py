@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 import pprint
 import urllib
+import django.conf
 # from urllib import urlencode
 
 class S3DirectWidgetExt(TextInput):
@@ -91,7 +92,9 @@ class AliOssDirectWidgetExt(TextInput):
             # 'file_name': os.path.basename(urlunquote_plus(file_url)),
             # 'test':'test_1',
             'name':name,
-            'fieldname':self.fieldname
+            'fieldname':self.fieldname,
+            'acl':settings.ALIOSS_DESTINATIONS[self.dest]['x-oss-object-acl']
+
         }
 
         return mark_safe(

@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
+import oss2
+
 
 
 
@@ -69,6 +71,7 @@ class AliOssSignature(APIView):
         callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
                                         '&height=${imageInfo.height}&width=${imageInfo.width}';
         callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
+
         import logging
         logging.debug(callback_dict)
         callback_param = json.dumps(callback_dict).strip()
@@ -81,6 +84,7 @@ class AliOssSignature(APIView):
         token_dict['policy'] = policy_encode.decode()
         token_dict['signature'] = sign_result.decode()
         token_dict['expire'] = expire_syncpoint
+        # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
 
         if request.user.church == None:
             token_dict['dir'] = 'l3/'
@@ -103,6 +107,7 @@ class AliOssSignature(APIView):
         :return:
         """
         print("********************* do_GET ")
+        
 
         token = self.get_token(request)
         # server.send_response(200)
@@ -141,7 +146,6 @@ class AliOssCallBack(APIView):
         '''
         用post方法
         '''
-        import oss2
         import logging
         from .utill import CICUtill
         logger = logging.getLogger('dev.error')
@@ -164,29 +168,7 @@ class AliOssCallBack(APIView):
         ret_dict['String value'] = 'OK'
         ret_dict['Key'] = 'Status'
 
-
-        # jstr = json.dumps(ret_dict)
-
         logger.error(ret_dict)
-        # logger.error(kwargs)
-        
-        # pprint.PrettyPrinter(4).pprint(request)
-        # pprint.PrettyPrinter(4).pprint(args)
-        # pprint.PrettyPrinter(4).pprint(kwargs)
-
-        # ALIOSS_ACCESS_KEY_ID = os.envi
-        # ALIOSS_SECRET_ACCESS_KEY = os.
-        # ALIOSS_SOURCE_BUCKET_NAME = os
-        # ALIOSS_DESTINATION_BUCKET_NAME
-
-        # auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-        # # Endpoint以杭州为例，其它Region请按实际情况填写。
-        # bucket = oss2.Bucket(auth,settings.ALIOSS_DESTINATION_ENDPOINT , settings.ALIOSS_DESTINATION_BUCKET_NAME)
-
-        # # 设置此签名URL在60秒内有效。
-        # bucket.sign_url('GET', , settings.ALIOSS_EXPIRES)
-
-        # return Response(data=jstr,status=status.HTTP_200_OK,content_type='application/json',headers= {'Content-Length': len(jstr)})
 
         return JsonResponse(ret_dict, safe=False)
 
@@ -198,7 +180,6 @@ class AliMtsCallBack(APIView):
         用原文件来定位media,
         用计算的方法，来求得目标文件，存储在相应的记录里面
         '''
-        import oss2
         import logging    
         import churchs.models as md
         import urllib
@@ -214,6 +195,11 @@ class AliMtsCallBack(APIView):
         topic = json.loads(request.body)
         msg = json.loads(topic['Message'])
         logger.error(msg)
+
+        if msg['MediaWorkflowExecution']['State'] != 'Completed':
+            return Response(data='',status=status.HTTP_204_NO_CONTENT)
+
+
 
         Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
         Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
@@ -245,7 +231,9 @@ class AliMtsCallBack(APIView):
         logger.error(qrset)
 
         qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
-        
+        auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+        bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, setting.ALIOSS_DESTINATION_BUCKET_NAME)
+        bucket.put_object_acl(alioss_image, oss2.OBJECT_ACL_PUBLIC_READ)
 
         return Response(data='',status=status.HTTP_204_NO_CONTENT)
         
