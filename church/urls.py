@@ -22,6 +22,7 @@ from . import view
 from api import urls as apiusrls
 # from api
 import logging
+from django.conf import settings
 
 schema_view = get_swagger_view(title='Church API')
 

@@ -199,14 +199,14 @@ class AliMtsCallBack(APIView):
         if msg['MediaWorkflowExecution']['State'] != 'Completed':
             return Response(data='',status=status.HTTP_204_NO_CONTENT)
 
-
+        #  {'status': 404, 'x-oss-request-id': '5E2F0786980F8F36369B0A7B', 'details': {'Code': 'NoSuchKey', 'Message': 'The specified key does not exist.', 'RequestId': '5E2F0786980F8F36369B0A7B', 'HostId': 'bicf-media-destination.oss-cn-beijing.aliyuncs.com', 'Key': 'citychurch/video 4 - make impact 2.0.jpg'}}
 
         Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
         Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
         Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
 
         key_arr = Object.split('/')
-        filename_arr = key_arr[1].split('.')
+        filename_arr = key_arr[1].rsplit('.',1)
 
         quotedfn = urllib.parse.quote(filename_arr[0])
 
