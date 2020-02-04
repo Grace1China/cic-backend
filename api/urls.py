@@ -58,9 +58,10 @@ urlpatterns = [
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),
     path("getmychurch",user_church,name="mychurch"),
 
-    path("courses/pagesize/<int:pagesize>/page/<int:page>",course_list,name="courses"),
+    path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>/orderby/<str:orderby>",course_list,name="courses_search"),
+    path("courses/pagesize/<int:pagesize>/page/<int:page>",course_list,name="courses_list"),
     path("course/<int:pk>",course,name="course"),
-
+    
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback"),
     path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished"),

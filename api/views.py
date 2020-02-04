@@ -252,7 +252,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
     # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
     @action(detail=True,methods=['POST'], format="json")
-    def GetCourseList(self,request,page,pagesize):
+    def GetCourseList(self,request,page=1,pagesize=10,keyword=None,orderby=None):
         '''
         查找课程列表信息
         '''
@@ -264,8 +264,19 @@ class  CourseViewSet(viewsets.ModelViewSet):
                 return JsonResponse({'errCode': '1002', 'data': {},'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
             if page < 0 :
                 return JsonResponse({'errCode': '1003', 'data': {},'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
-                
-            courseList = self.get_queryset().filter().order_by('-update_time')
+
+            if orderby is not None:
+                (orderby,ordertype) = orderby.split(' ') 
+                orderby = '%s%s' % ('' if(ordertype.lower() =='asc') else '-',orderby)
+            else:
+                orderby = '-update_time'
+
+            courseLis = None
+            if keyword is not None:
+                courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by(orderby)
+            else:
+                courseList = self.get_queryset().filter().order_by(orderby)
+
             paginator = Paginator(courseList, pagesize)
             coursePage = paginator.get_page(page)
             slzCourseList = CourseSerializer4API(coursePage, many=True)
