@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path, include
 from rest_framework_swagger.views import get_swagger_view
+# from api.schema_view import schema_view
 from django.conf.urls import url, include
 from . import view
 from api import urls as apiusrls
@@ -25,6 +26,7 @@ import logging
 from django.conf import settings
 
 schema_view = get_swagger_view(title='Church API')
+
 
 urlpatterns = [
     path('hello', view.hello),

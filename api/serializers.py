@@ -115,12 +115,14 @@ class SermonSerializer4API(serializers.ModelSerializer):
 
 
 class CourseSerializer4APIPOST(serializers.ModelSerializer):
-    keyword = serializers.CharField()
+    pagesize = serializers.IntegerField(default=10)
+    page = serializers.IntegerField(default=1)
+    keyword = serializers.CharField(default=None)
+    orderby = serializers.CharField(default=None)
 
     class Meta:
         model = models.Course
-        fields = ['keyword']
-
+        fields = ['pagesize','page','keyword','orderby']
 
     
 class CourseSerializer4API(serializers.ModelSerializer):

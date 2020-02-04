@@ -246,28 +246,46 @@ class  CourseViewSet(viewsets.ModelViewSet):
     from churchs.models import Media
     from church.models import Course
     from django.db.models import Prefetch
+    
+    # from .schema_view import  CustomSchema
     queryset = Course.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=CourseSerializer4APIPOST
+    # schema = CustomSchema()
     # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
-    @action(detail=True,methods=['POST'], format="json")
+    @action(detail=True,methods=['get','post'], format="json")
     def GetCourseList(self,request,page=1,pagesize=10,keyword=None,orderby=None):
         '''
         查找课程列表信息
         '''
         try:
-            # data = request.GET
-            # page = data.get('page', 1)
-            # pPageSize = data.get('pageSize', 10)
+            if(request.method == 'GET'):
+                data = request.GET
+                page = data.get('page', page)
+                pagesize = data.get('pagesize', pagesize)
+                keyword = data.get('keyword', keyword)
+                orderby = data.get('orderby', orderby)
+            else:
+                from ast import literal_eval
+                data = eval(request.body)
+                pprint.PrettyPrinter(4).pprint(data)
+                page = data.get('page', page)
+                pagesize = data.get('pagesize', pagesize)
+                keyword = data.get('keyword', keyword)
+                orderby = data.get('orderby', orderby)
+
+            # data = self.request.data
+            # church_code = data.get('church_code', '-1')
+
             if pagesize <=0 or pagesize >100 :
                 return JsonResponse({'errCode': '1002', 'data': {},'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
             if page < 0 :
                 return JsonResponse({'errCode': '1003', 'data': {},'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
 
             if orderby is not None:
-                (orderby,ordertype) = orderby.split(' ') 
-                orderby = '%s%s' % ('' if(ordertype.lower() =='asc') else '-',orderby)
+                orderpair = orderby.split(' ') 
+                orderby = '%s%s' % ('-' if((len(orderpair)==2) and (orderpair[1].lower() =='desc')) else '',orderpair[0])
             else:
                 orderby = '-update_time'
 

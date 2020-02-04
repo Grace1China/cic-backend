@@ -31,6 +31,10 @@ church_eweekly = EweeklyViewSet.as_view({
 course_list = views.CourseViewSet.as_view({
     'get':'GetCourseList'
 })
+course_list_post = views.CourseViewSet.as_view({
+    'post':'GetCourseList'
+})
+
 course = views.CourseViewSet.as_view({'get':'GetCoursebyID'})
 
 search_course = views.CourseViewSet.as_view({'post':'SearchCourse'})
@@ -58,10 +62,13 @@ urlpatterns = [
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),
     path("getmychurch",user_church,name="mychurch"),
 
-    path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>/orderby/<str:orderby>",course_list,name="courses_search"),
-    path("courses/pagesize/<int:pagesize>/page/<int:page>",course_list,name="courses_list"),
+    path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>/orderby/<str:orderby>",course_list,name="courses_search_order"),
+    path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>",course_list,name="courses_search"),
+    path("courses/pagesize/<int:pagesize>/page/<int:page>",course_list,name="courses_list_page"),
+    path("courses",course_list,name="courses_list"),
+    path("course_list_post",course_list_post,name="courses_list"),
+
     path("course/<int:pk>",course,name="course"),
-    
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback"),
     path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished"),
