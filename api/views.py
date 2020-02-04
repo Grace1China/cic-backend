@@ -260,21 +260,26 @@ class  CourseViewSet(viewsets.ModelViewSet):
         查找课程列表信息
         '''
         try:
-            data = eval(request.body)
-            if(request.method == 'GET'):
-                # data = request.GET
-                page = data.get('page', page)
-                pagesize = data.get('pagesize', pagesize)
-                keyword = data.get('keyword', keyword)
-                orderby = data.get('orderby', orderby)
-            else:
+            logger = logging.getLogger('dev.error')
+            logger.error(request.body)
+            sbody = str(request.body,'utf-8')
+            if sbody!='':
                 from ast import literal_eval
-                # data = eval(request.body)
-                pprint.PrettyPrinter(4).pprint(data)
-                page = data.get('page', page)
-                pagesize = data.get('pagesize', pagesize)
-                keyword = data.get('keyword', keyword)
-                orderby = data.get('orderby', orderby)
+                data = literal_eval(sbody)
+                if(request.method == 'GET'):
+                    # data = request.GET
+                    page = data.get('page', page)
+                    pagesize = data.get('pagesize', pagesize)
+                    keyword = data.get('keyword', keyword)
+                    orderby = data.get('orderby', orderby)
+                else:
+                    
+                    # data = eval(request.body)
+                    # pprint.PrettyPrinter(4).pprint(data)
+                    page = data.get('page', page)
+                    pagesize = data.get('pagesize', pagesize)
+                    keyword = data.get('keyword', keyword)
+                    orderby = data.get('orderby', orderby)
 
             # data = self.request.data
             # church_code = data.get('church_code', '-1')
