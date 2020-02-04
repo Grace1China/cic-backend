@@ -305,7 +305,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             logger = logging.getLogger('dev.error')
-            traceback.print_exc(file=logger.handle)
+            traceback.print_exc(file=logger.handlers[0]._open())
             traceback.print_exc(file=sys.stdout)
             # logger.error()
             return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
