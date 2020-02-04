@@ -260,15 +260,16 @@ class  CourseViewSet(viewsets.ModelViewSet):
         查找课程列表信息
         '''
         try:
+            data = eval(request.body)
             if(request.method == 'GET'):
-                data = request.GET
+                # data = request.GET
                 page = data.get('page', page)
                 pagesize = data.get('pagesize', pagesize)
                 keyword = data.get('keyword', keyword)
                 orderby = data.get('orderby', orderby)
             else:
                 from ast import literal_eval
-                data = eval(request.body)
+                # data = eval(request.body)
                 pprint.PrettyPrinter(4).pprint(data)
                 page = data.get('page', page)
                 pagesize = data.get('pagesize', pagesize)
