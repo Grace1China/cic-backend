@@ -304,7 +304,10 @@ class  CourseViewSet(viewsets.ModelViewSet):
             # pprint.PrettyPrinter(4).pprint(e.__traceback__)
             import traceback
             import sys
+            logger = logging.getLogger('dev.error')
+            traceback.print_exc(file=logger.handle)
             traceback.print_exc(file=sys.stdout)
+            # logger.error()
             return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
