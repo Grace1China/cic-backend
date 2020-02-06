@@ -261,25 +261,29 @@ class  CourseViewSet(viewsets.ModelViewSet):
         '''
         try:
             logger = logging.getLogger('dev.error')
-            logger.error(request.body)
-            sbody = str(request.body,'utf-8')
-            if sbody!='':
+
+            logger.error(request.META)
+          
+
+            if(request.META['REQUEST_METHOD']  == 'GET'):
+                data = request.GET
+                pprint.PrettyPrinter(6).pprint(data)
+                page = int(data.get('page', page))
+                pagesize = int(data.get('pagesize', pagesize))
+                keyword = data.get('keyword', keyword)
+                orderby = data.get('orderby', orderby)
+            else:
+                
+                # data = eval(request.body)
+                # pprint.PrettyPrinter(4).pprint(data)
+                logger.error(request.body)
+                sbody = str(request.body,'utf-8')
                 from ast import literal_eval
                 data = literal_eval(sbody)
-                if(request.method == 'GET'):
-                    # data = request.GET
-                    page = data.get('page', page)
-                    pagesize = data.get('pagesize', pagesize)
-                    keyword = data.get('keyword', keyword)
-                    orderby = data.get('orderby', orderby)
-                else:
-                    
-                    # data = eval(request.body)
-                    # pprint.PrettyPrinter(4).pprint(data)
-                    page = data.get('page', page)
-                    pagesize = data.get('pagesize', pagesize)
-                    keyword = data.get('keyword', keyword)
-                    orderby = data.get('orderby', orderby)
+                page = int(data.get('page', page))
+                pagesize = int(data.get('pagesize', pagesize))
+                keyword = data.get('keyword', keyword)
+                orderby = data.get('orderby', orderby)
 
             # data = self.request.data
             # church_code = data.get('church_code', '-1')
