@@ -234,6 +234,9 @@ class AliMtsCallBack(APIView):
         auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
         bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
         bucket.put_object_acl(alioss_image, oss2.OBJECT_ACL_PUBLIC_READ)
+        bucket.put_object_acl(alioss_HD_URL, oss2.OBJECT_ACL_PUBLIC_READ)
+
+        
 
         return Response(data='',status=status.HTTP_204_NO_CONTENT)
         

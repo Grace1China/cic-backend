@@ -178,6 +178,8 @@ class Media(models.Model):
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_SHD_URL), settings.ALIOSS_EXPIRES)
+            if bucket.get_object_acl(self.getObjectKey(self.alioss_SHD_URL)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+                retval = retval.split('?')[0]
 
             return retval #self.alioss_SHD_URL
         else:
@@ -190,6 +192,8 @@ class Media(models.Model):
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_HD_URL), settings.ALIOSS_EXPIRES)
+            if bucket.get_object_acl(self.getObjectKey(self.alioss_HD_URL)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+                retval = retval.split('?')[0]
 
             return retval #self.alioss_HD_URL
         else:
@@ -205,6 +209,10 @@ class Media(models.Model):
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_SD_URL), settings.ALIOSS_EXPIRES)
+            pprint.PrettyPrinter(4).pprint(retval)
+            pprint.PrettyPrinter(4).pprint(bucket.get_object_acl(self.getObjectKey(self.alioss_SD_URL)).acl)
+            if bucket.get_object_acl(self.getObjectKey(self.alioss_SD_URL)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+                retval = retval.split('?')[0]
             return retval #self.alioss_SD_URL
         else:
             return ''
@@ -216,6 +224,8 @@ class Media(models.Model):
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_audio), settings.ALIOSS_EXPIRES)
+            if bucket.get_object_acl(self.getObjectKey(self.alioss_audio)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+                retval = retval.split('?')[0]
             return retval  #self.alioss_audio
         else:
             return ''
@@ -229,6 +239,8 @@ class Media(models.Model):
             if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl == 'private':
                 bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
                 retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_image), settings.ALIOSS_EXPIRES)
+                if bucket.get_object_acl(self.getObjectKey(self.alioss_image)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+                    retval = retval.split('?')[0]
                 return retval #self.alioss_pdf
             else:
                 return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,setting.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_image))
@@ -246,6 +258,8 @@ class Media(models.Model):
             if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl == 'private':
                 bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
                 retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_pdf), settings.ALIOSS_EXPIRES)
+                if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+                    retval = retval.split('?')[0]
                 return retval #self.alioss_pdf
             else:
                 return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,setting.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_pdf))
@@ -281,7 +295,7 @@ class Sermon(models.Model):
     id = models.AutoField(primary_key=True)
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
-    title = models.CharField(max_length=32, default='',verbose_name='标题')
+    title = models.CharField(max_length=200, default='',verbose_name='标题')
     speaker = models.ForeignKey("Speaker",on_delete=models.CASCADE,default=None,verbose_name='讲员')
     scripture = models.CharField(max_length=100, default='',verbose_name='经文')
     series = models.ForeignKey(SermonSeries, on_delete=models.CASCADE,null=True,default=None,verbose_name='讲道系列')

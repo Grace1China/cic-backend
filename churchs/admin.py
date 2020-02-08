@@ -50,10 +50,18 @@ class SpeakerAdmin(admin.ModelAdmin):
 
 
 
+
 class MediaInline(GenericStackedInline):
     model = Media
+    readonly_fields = ('dist_video','dist_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','dist_audio','dist_image','dist_pdf')
+    fields = ('alioss_video','alioss_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','alioss_audio','alioss_image','alioss_pdf','content')
     extra = 0
     max_num = 4
+
+# class MediaInline(GenericStackedInline):
+#     model = Media
+    
+    
 
 class SermonAdmin(admin.ModelAdmin):
     inlines = [
