@@ -30,7 +30,7 @@ schema_view = get_swagger_view(title='Church API')
 
 urlpatterns = [
     path('hello', view.hello),
-    path('admin/', admin.site.urls),
+    re_path('^admin/', admin.site.urls),
     # path('admindev/', admin.site.urls),
 
     re_path('swagger/', schema_view),
