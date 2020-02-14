@@ -7,10 +7,16 @@
 
 <div class="ossfile"></div>
 <div class='preview'></div>
-<a href="{{ signed_url }}" class='ossurl'>{{ file_url | tofilename }}</a>
+<input type="hidden" value="{{ public }}" name="nouse"/>
+
+{% if public %}
+   <a href="{{ signed_url }}" class='ossurl'>{{ file_url | tofilename }}</a>
+{% endif %}
+
+
 <div class="container">
 	<a class="selectfiles" href="javascript:void(0);" class='btn'>选择文件</a>
-	<a class="postfiles" href="javascript:void(0);" class='btn'>开始上传</a>
+	<a class="postfiles" href="javascript:void(0);" class='btn' style="display:none;">开始上传</a>
 	<input class="file-url fileurl" name="{{ name }}" type="hidden" value="{{ file_url }}" >
     <input class='x-oss-object-acl' type='hidden' value = '{{ acl }}'>
 </div>
@@ -28,8 +34,9 @@ if (`{{ name  }}`.indexOf('__prefix__') < 0){
                 return [].slice.call(this);
             };
 			inline_div = document.getElementById('{{ name }}'.replace('-{{ fieldname }}',''))  //-alioss_video
-			field_div= inline_div.getElementsByClassName('field-{{ fieldname }}')
-            widget_fields = field_div[0].getElementsByClassName('widget_field')
+
+			field_div= inline_div.querySelector('div.fieldBox.field-{{ fieldname }}')
+            widget_fields = field_div.getElementsByClassName('widget_field')
             widget_fields.toArray().forEach(function(item){
 
                 preview = item.getElementsByClassName('preview')[0] 

@@ -57,3 +57,23 @@
 		transition-timing-function: ease;
 		width: 266.188px;
 	}
+
+	#churchs-media-content_type-object_id-group .form-row{
+		display: flex;
+		justify-content: flex-start;
+	}
+
+	#churchs-media-content_type-object_id-group  .form-row > .fieldBox video{
+		width:100%;
+	}
+	#churchs-media-content_type-object_id-group  .form-row > .fieldBox img{
+		width:100%;
+	}
+
+	#churchs-media-content_type-object_id-group  .form-row > .fieldBox {
+		width: 25%;
+		float: left;
+	}
+	#churchs-media-content_type-object_id-group  .widget_field, .widget_container{
+		padding:0 3px;
+	}

@@ -402,6 +402,11 @@ ALIOSS_DESTINATIONS = {
         'bucket':ALIOSS_SOURCE_BUCKET_NAME,
         'x-oss-object-acl':'private'   #public-read、private、public-read-write
     },
+    'destination':{
+        'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'x-oss-object-acl':'private'   #public-read、private、public-read-write
+    },
     'audios':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
         'bucket':ALIOSS_SOURCE_BUCKET_NAME,

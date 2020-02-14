@@ -64,10 +64,6 @@ function UploaderFactory(
         }
     };
 
-    // function getControlByClassName(classname){
-    //     widget = document.getElementById(loc_widget_div)
-    //     return widget.getElementsByClassName(classname)
-    // }
 
     function check_object_radio() {
         var tt = loc_myradio;
@@ -104,16 +100,16 @@ function UploaderFactory(
         return false;
     };
 
-    function random_string(len) {
-    　　len = len || 32;
-    　　var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';   
-    　　var maxPos = chars.length;
-    　　var pwd = '';
-    　　for (i = 0; i < len; i++) {
-        　　pwd += chars.charAt(Math.floor(Math.random() * maxPos));
-        }
-        return pwd;
-    }
+    // function random_string(len) {
+    // 　　len = len || 32;
+    // 　　var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';   
+    // 　　var maxPos = chars.length;
+    // 　　var pwd = '';
+    // 　　for (i = 0; i < len; i++) {
+    //     　　pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+    //     }
+    //     return pwd;
+    // }
 
     function get_suffix(filename) {
         pos = filename.lastIndexOf('.')
@@ -138,25 +134,25 @@ function UploaderFactory(
         return ''
     }
 
-    function get_uploaded_object_name(filename)
-    {
-        // if (g_object_name_type == 'local_name')
-        // {
+    // function get_uploaded_object_name(filename)
+    // {
+    //     // if (g_object_name_type == 'local_name')
+    //     // {
 
-        tmp_name = g_object_name
-        tmp_name = tmp_name.replace("${filename}", filename);
-        return tmp_name
-        // }
-        // else if(g_object_name_type == 'random_name')
-        // {
-        //     return g_object_name
-        // }
-    }
+    //     tmp_name = g_object_name
+    //     tmp_name = tmp_name.replace("${filename}", filename);
+    //     return tmp_name
+    //     // }
+    //     // else if(g_object_name_type == 'random_name')
+    //     // {
+    //     //     return g_object_name
+    //     // }
+    // }
 
-    function get_bucket_url(filename){
-        suffix = get_suffix(filename)
-        return suffix.toLowerCase() != '.mp4' ? desthost:sourhost
-    }
+    // function get_bucket_url(filename){
+    //     suffix = get_suffix(filename)
+    //     return suffix.toLowerCase() != '.mp4' ? desthost:sourhost
+    // }
 
     function set_upload_param(up, filename, ret)
     {
@@ -206,8 +202,8 @@ function UploaderFactory(
             browse_button : loc_browse_button, 
             //multi_selection: fa           se,
             container: loc_container,
-            flash_swf_url : 'lib/plupload-2.1.2/js/Moxie.swf',
-            silverlight_xap_url : 'lib/plupload-2.1.2/js/Moxie.xap',
+            // flash_swf_url : 'lib/plupload-2.1.2/js/Moxie.swf',
+            // silverlight_xap_url : 'lib/plupload-2.1.2/js/Moxie.xap',
             url : 'http://oss.aliyuncs.com',
         
             filters: {
@@ -227,10 +223,10 @@ function UploaderFactory(
             init: {
                 PostInit: function() {
                     loc_ossfile.innerHTML = '';
-                    loc_postfiles.onclick = function() {
-                    set_upload_param(uploader, '', false);
-                    return false;
-                    };
+                    // loc_postfiles.onclick = function() {
+                    // set_upload_param(uploader, '', false);
+                    // return false;
+                    // };
                 },
         
                 FilesAdded: function(up, files) {
@@ -238,6 +234,7 @@ function UploaderFactory(
                         loc_ossfile.innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>'
                         +'<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>'
                         +'</div>';
+                        set_upload_param(uploader, file.name, false);
                     });
                 },
         

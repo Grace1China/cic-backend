@@ -162,8 +162,8 @@ class Media(models.Model):
         obj = str.replace(obj, '%s.' % settings.ALIOSS_DESTINATION_BUCKET_NAME,'')
         obj = str.replace(obj, '%s/' % settings.ALIOSS_DESTINATION_ENDPOINT,'')
         obj = urllib.parse.unquote(obj)
-        pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
-        pprint.PrettyPrinter(4).pprint(obj)
+        # pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
+        # pprint.PrettyPrinter(4).pprint(obj)
         return obj
 
     @property
@@ -184,8 +184,7 @@ class Media(models.Model):
             return retval #self.alioss_SHD_URL
         else:
             return ''
-    @property
-    def dist_HD_URL(self):
+    def prop_dist_HD_URL(self):
         if self.s3_HD_URL is not None and self.s3_HD_URL != '':
             return self.s3_HD_URL
         elif self.alioss_HD_URL is not None and self.alioss_HD_URL != '':
@@ -198,19 +197,21 @@ class Media(models.Model):
             return retval #self.alioss_HD_URL
         else:
             return ''
+    prop_dist_HD_URL.short_description = "转码后视频(transcoded video)"
+    dist_HD_URL = property(prop_dist_HD_URL)
     @property
     def dist_SD_URL(self):
-        pprint.PrettyPrinter(4).pprint('----------------dist_SD_URL----------------------')
-        pprint.PrettyPrinter(4).pprint(self.s3_SD_URL)
-        pprint.PrettyPrinter(4).pprint(self.alioss_SD_URL)
+        # pprint.PrettyPrinter(4).pprint('----------------dist_SD_URL----------------------')
+        # pprint.PrettyPrinter(4).pprint(self.s3_SD_URL)
+        # pprint.PrettyPrinter(4).pprint(self.alioss_SD_URL)
         if self.s3_SD_URL is not None and self.s3_SD_URL != '':
             return self.s3_SD_URL
         elif self.alioss_SD_URL is not None and self.alioss_SD_URL != '':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
             retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_SD_URL), settings.ALIOSS_EXPIRES)
-            pprint.PrettyPrinter(4).pprint(retval)
-            pprint.PrettyPrinter(4).pprint(bucket.get_object_acl(self.getObjectKey(self.alioss_SD_URL)).acl)
+            # pprint.PrettyPrinter(4).pprint(retval)
+            # pprint.PrettyPrinter(4).pprint(bucket.get_object_acl(self.getObjectKey(self.alioss_SD_URL)).acl)
             if bucket.get_object_acl(self.getObjectKey(self.alioss_SD_URL)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
                 retval = retval.split('?')[0]
             return retval #self.alioss_SD_URL
@@ -236,7 +237,7 @@ class Media(models.Model):
         elif self.alioss_image is not None and self.alioss_image != '':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl == 'private':
+            if bucket.get_object_acl(self.getObjectKey(self.alioss_image)).acl == 'private':
                 bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
                 retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_image), settings.ALIOSS_EXPIRES)
                 if bucket.get_object_acl(self.getObjectKey(self.alioss_image)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:

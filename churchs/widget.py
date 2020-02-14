@@ -74,6 +74,7 @@ class AliOssDirectWidgetExt(TextInput):
         file_url = value or ''  #目前这个是bucket的key
         file_url = urllib.parse.unquote(file_url)
         signed_url = CICUtill.signurl1(file_url,dest=self.dest)
+        
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
 
         # pprint.PrettyPrinter(4).pprint(self)
@@ -93,13 +94,12 @@ class AliOssDirectWidgetExt(TextInput):
             # 'test':'test_1',
             'name':name,
             'fieldname':self.fieldname,
-            'acl':settings.ALIOSS_DESTINATIONS[self.dest]['x-oss-object-acl']
+            'acl':settings.ALIOSS_DESTINATIONS[self.dest]['x-oss-object-acl'],
+            'public': CICUtill.isReadable(file_url,dest=self.dest)
 
         }
 
-        return mark_safe(
-            render_to_string( 'admin/aliossdirect-widget.tpl',
-                             ctx))
+        return mark_safe(render_to_string( 'admin/aliossdirect-widget.tpl',ctx))
 
 
 class AliOssDirectField(Field):
@@ -115,20 +115,52 @@ class AliOssDirectField(Field):
     def formfield(self, *args, **kwargs):
         kwargs['widget'] = self.widget
         return super(AliOssDirectField, self).formfield(*args, **kwargs)
-    # def to_python(self,value):
-    #     if not value:
-    #         value=[]
-    #     if isinstance(value,list):
-    #         return value
-    #     return urllib.parse.quote(value)
-    # def get_prep_value(self, value):
-    #     if value is None:
-    #         return value
-    #     # return urllib.parse.quote(value)   #存储为url
-    # def value_to_string(self, obj):
-    #     value=self._get_val_from_obj(obj)
-    #     return urllib.parse.unquote(self.get_db_prep_value(value))
 
 
+class AliVideoField(Field):
+    def __init__(self, *args, **kwargs):
+        dest = kwargs.pop('dest', None)
+        fn = kwargs.pop('fieldname', None)
+        self.widget = AliVideoWidgetExt(dest=dest,fieldname=fn)
+        super(AliOssDirectField, self).__init__(*args, **kwargs)
 
-# class 
+    def get_internal_type(self):
+        return 'TextField'
+
+    def formfield(self, *args, **kwargs):
+        kwargs['widget'] = self.widget
+        return super(AliVideoField, self).formfield(*args, **kwargs)
+
+
+class AliVideoWidgetExt(TextInput):
+    class Media:
+        # js = ('/static/lib/plupload-2.1.2/js/plupload.full.min.js','/static/upload.js' )
+        # css = {'all': ('/static/ossstyle.css', )}
+        pass
+    def __init__(self, *args, **kwargs):
+        self.dest  = kwargs.pop('dest', None)
+        self.fieldname = kwargs.pop('fieldname', None)
+        # self.public = kwargs.pop('public', None)
+        super(AliVideoWidgetExt, self).__init__(*args, **kwargs)
+
+
+    def render(self, name, value, **kwargs):
+        from api.utill import CICUtill
+        file_url = value or ''  #目前这个是bucket的key
+        file_url = urllib.parse.unquote(file_url)
+        
+        # signed_url = CICUtill.signurl1(file_url,dest=self.dest)
+        
+        csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
+
+
+        ctx = {
+            'file_url': urllib.parse.unquote(file_url),
+            'signed_url':file_url,
+            'name':name,
+            'fieldname':self.fieldname,
+            'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest)
+
+        }
+
+        return mark_safe(render_to_string( 'admin/video-wedget.tpl',ctx))
