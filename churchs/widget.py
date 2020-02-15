@@ -66,7 +66,10 @@ class AliOssDirectWidgetExt(TextInput):
     def __init__(self, *args, **kwargs):
         self.dest  = kwargs.pop('dest', None)
         self.fieldname = kwargs.pop('fieldname', None)
+        self.vbn = kwargs.pop('label',None)
+        
         super(AliOssDirectWidgetExt, self).__init__(*args, **kwargs)
+        # 要处理的问题是：在前面只要是<churchs.widget.AliOssDirectWidgetExt, 并且要在widget中显示label
 
 
     def render(self, name, value, **kwargs):
@@ -77,22 +80,12 @@ class AliOssDirectWidgetExt(TextInput):
         
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
 
-        # pprint.PrettyPrinter(4).pprint(self)
-        # pprint.PrettyPrinter(4).pprint(name)
-        # pprint.PrettyPrinter(4).pprint(value)
-        # pprint.PrettyPrinter(4).pprint(kwargs)
 
         ctx = {
-            # 'policy_url': reverse('s3direct'),
-            # 'signing_url': reverse('s3direct-signing'),
-            # 'dest': self.dest,
-            # 'name': name,
-            # 'csrf_cookie_name': csrf_cookie_name,
             'file_url': urllib.parse.unquote(file_url),
             'signed_url':signed_url,
-            # 'file_name': os.path.basename(urlunquote_plus(file_url)),
-            # 'test':'test_1',
             'name':name,
+            'vbn':self.vbn,
             'fieldname':self.fieldname,
             'acl':settings.ALIOSS_DESTINATIONS[self.dest]['x-oss-object-acl'],
             'public': CICUtill.isReadable(file_url,dest=self.dest)
@@ -104,9 +97,18 @@ class AliOssDirectWidgetExt(TextInput):
 
 class AliOssDirectField(Field):
     def __init__(self, *args, **kwargs):
-        dest = kwargs.pop('dest', None)
-        fn = kwargs.pop('fieldname', None)
-        self.widget = AliOssDirectWidgetExt(dest=dest,fieldname=fn)
+        self.dest = kwargs.pop('dest', None)
+        self.fn = kwargs.pop('fieldname', None)
+        # self.vbn = kwargs.pop('verbose_name', None)
+        # self.label = kwargs.pop('verbose_name', None)
+        # pprint.PrettyPrinter(6).pprint('===========verbose_name=====================')
+
+        # pprint.PrettyPrinter(6).pprint(kwargs.get('verbose_name', None))
+        # pprint.PrettyPrinter(6).pprint(kwargs.get('verbose_name', None))
+        # pprint.PrettyPrinter(6).pprint(kwargs.get('verbose_name', None))
+
+        
+        self.widget = AliOssDirectWidgetExt(dest=self.dest,fieldname=self.fn,label=kwargs.get('verbose_name', None))
         super(AliOssDirectField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
@@ -119,8 +121,8 @@ class AliOssDirectField(Field):
 
 class AliVideoField(Field):
     def __init__(self, *args, **kwargs):
-        dest = kwargs.pop('dest', None)
-        fn = kwargs.pop('fieldname', None)
+        dest = kwargs.get('dest', None)
+        fn = kwargs.get('fieldname', None)
         self.widget = AliVideoWidgetExt(dest=dest,fieldname=fn)
         super(AliOssDirectField, self).__init__(*args, **kwargs)
 
@@ -140,6 +142,7 @@ class AliVideoWidgetExt(TextInput):
     def __init__(self, *args, **kwargs):
         self.dest  = kwargs.pop('dest', None)
         self.fieldname = kwargs.pop('fieldname', None)
+        self.label = kwargs.pop('label', None)
         # self.public = kwargs.pop('public', None)
         super(AliVideoWidgetExt, self).__init__(*args, **kwargs)
 
@@ -159,7 +162,8 @@ class AliVideoWidgetExt(TextInput):
             'signed_url':file_url,
             'name':name,
             'fieldname':self.fieldname,
-            'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest)
+            'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest),
+            'label':self.label
 
         }
 

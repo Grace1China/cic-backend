@@ -1,8 +1,8 @@
 {% load cust_filters %}
-<div class="widget_container">
-
-<video src="{{ signed_url }}"  x5-playsinline="" playsinline="" webkit-playsinline="" controls="controls" ></video>
-{% if public %}
+<el-card :body-style="{ padding: '0px' }" class="widget_container">
+{% if signed_url %}
+    <el-tag type="info">{{ label }}</el-tag>
+    <video src="{{ signed_url }}"  x5-playsinline="" playsinline="" webkit-playsinline="" controls="controls" ></video>
+    <el-button type="primary">获取公共链接<br>get public link</el-button>
 {% endif %}
-<div type="text" class="button">获取公共链接(get public link)</div>
-</div>
+</el-card>

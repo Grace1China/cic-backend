@@ -103,14 +103,14 @@ class Media(models.Model):
     s3_image = S3DirectField(dest='images', blank=True,verbose_name='AWS S3 封面')
     s3_pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='AWS S3 讲义')
 
-    alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='阿里云视频')
-    alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='Aliyun媒体状态')
-    alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 高清链接')
-    alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 标清链接')
-    alioss_SD_URL = models.CharField(max_length=400, blank=True,verbose_name='Aliyun oss 流畅链接')
-    alioss_audio = AliOssDirectField(dest='audios', fieldname='alioss_audio',blank=True,verbose_name='Aliyun oss 音频')
-    alioss_image = AliOssDirectField(dest='images',fieldname='alioss_image', blank=True,verbose_name='Aliyun oss 封面')
-    alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='Aliyun oss 讲义')
+    alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
+    alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='视频状态')
+    alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='高清链接')
+    alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='标清链接')
+    alioss_SD_URL = models.CharField(max_length=400, blank=True,verbose_name='流畅链接')
+    alioss_audio = AliOssDirectField(dest='audios', fieldname='alioss_audio',blank=True,verbose_name='音频')
+    alioss_image = AliOssDirectField(dest='images',fieldname='alioss_image', blank=True,verbose_name='封面')
+    alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='讲义')
     
     content = models.TextField(blank=True,verbose_name='摘要') 
 
@@ -244,7 +244,7 @@ class Media(models.Model):
                     retval = retval.split('?')[0]
                 return retval #self.alioss_pdf
             else:
-                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,setting.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_image))
+                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_image))
             
             return retval #self.alioss_image
         else:

@@ -14,9 +14,11 @@
 {% endif %}
 
 
-<div class="container">
-	<a class="selectfiles" href="javascript:void(0);" class='btn'>选择文件</a>
-	<a class="postfiles" href="javascript:void(0);" class='btn' style="display:none;">开始上传</a>
+<div class="container" style="text-align: center;">
+    <el-button type="primary" class="selectfiles" >
+	   上传(Upload){{ vbn  }}
+    </el-button>
+	{% comment %} <a class="postfiles" href="javascript:void(0);" class='btn' style="display:none;">开始上传</a> {% endcomment %}
 	<input class="file-url fileurl" name="{{ name }}" type="hidden" value="{{ file_url }}" >
     <input class='x-oss-object-acl' type='hidden' value = '{{ acl }}'>
 </div>
@@ -64,9 +66,6 @@ if (`{{ name  }}`.indexOf('__prefix__') < 0){
             })
 			//现在有一个外层的id 唯一标识了  inline record
 			//我所要做的是要把当前widget的内容找出来。1 首先要找到 inline-record.   2 再就是要找到某一个字段 3就找到不同的内置的控件
-            
-
-
 	});
 }
 

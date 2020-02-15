@@ -67,9 +67,9 @@ class MeidaForm(forms.Form):
 
 
 class MeidaForm2(forms.ModelForm):
-    dist_SHD_URL = forms.CharField(label="转码后超清视频",widget=AliVideoWidgetExt(dest="destination"),required=False)
-    dist_HD_URL = forms.CharField(label="转码后高清视频",widget=AliVideoWidgetExt(dest="destination"),required=False)
-    dist_SD_URL = forms.CharField(label="转码后流畅视频",widget=AliVideoWidgetExt(dest="destination"),required=False)
+    dist_SHD_URL = forms.CharField(label="",widget=AliVideoWidgetExt(dest="destination",label="超清视频"),required=False)
+    dist_HD_URL = forms.CharField(label="",widget=AliVideoWidgetExt(dest="destination",label="高清视频"),required=False)
+    dist_SD_URL = forms.CharField(label="",widget=AliVideoWidgetExt(dest="destination",label="流畅视频"),required=False)
 
     class Meta:
         model = Media
@@ -107,7 +107,7 @@ class MediaInline1(GenericStackedInline):
     form = MeidaForm2
     model = Media
     readonly_fields = ('dist_video','dist_video_status','dist_audio','dist_image','dist_pdf')
-    fields = (('alioss_video','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status',('alioss_audio','alioss_image','alioss_pdf'),'content')
+    fields = (('alioss_video','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status','alioss_audio','alioss_image','alioss_pdf','content')
    
     extra = 0
     max_num = 4
