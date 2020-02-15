@@ -145,6 +145,13 @@
          new Vue({
             el: "#{{ opts.model_name }}_form",
             methods:{
+                openMsg:function(value){
+
+                    
+                    this.$alert(`<a href='${value}' target="_blank">${value}</a>`, '公共链接(Public Link)', {
+                        dangerouslyUseHTMLString: true
+                    });
+                },
                 goBack:function () {
                     //找到上级
                     var array = location.pathname.split('/')

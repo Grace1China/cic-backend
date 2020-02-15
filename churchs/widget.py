@@ -163,6 +163,7 @@ class AliVideoWidgetExt(TextInput):
             'name':name,
             'fieldname':self.fieldname,
             'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest),
+            'public_url':file_url.split('?')[0],
             'label':self.label
 
         }

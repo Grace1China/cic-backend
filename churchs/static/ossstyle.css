@@ -61,23 +61,36 @@
 	#churchs-media-content_type-object_id-group .form-row{
 		display: flex;
 		justify-content: flex-start;
+		/* flex-direction: column; */
+	}
+	.form-row.linewithcap{
+		flex-direction: column;
 	}
 
-	#churchs-media-content_type-object_id-group  .form-row > .fieldBox video{
+	#churchs-media-content_type-object_id-group  .form-row  .fieldBox video{
 		width:100%;
 	}
-	#churchs-media-content_type-object_id-group  .form-row > .fieldBox img{
+	#churchs-media-content_type-object_id-group  .form-row  .fieldBox img{
 		width:100%;
 	}
 
-	#churchs-media-content_type-object_id-group  .form-row > .fieldBox {
+	#churchs-media-content_type-object_id-group  .form-row  .fieldBox {
 		display: flex;
 		flex-direction: column;
 		width: 25%;
 		float: left;
 		justify-content:start;
 	}
-	#churchs-media-content_type-object_id-group  .widget_field, .widget_container{
+	.widget_container{
 		padding:0 3px;
 		text-align: center;
+	}
+	#churchs-media-content_type-object_id-group  .widget_field{
+		float:left;
+	}
+	.widget_field .preview{
+		max-width: 280px;
+	}
+	.widget_field .preview img,.widget_field .preview video{
+		width: 100%;
 	}
