@@ -93,9 +93,10 @@ class MeidaForm2(forms.ModelForm):
         # if(self.cleaned_data['dist_SHD_URL'])
         import pprint
         pprint.PrettyPrinter(6).pprint('+++++++++++++++form:save')
-        pprint.PrettyPrinter(6).pprint(self)
+        pprint.PrettyPrinter(6).pprint(self.instance.alioss_video)
+        pprint.PrettyPrinter(6).pprint(self.cleaned_data.get('alioss_video',None))
 
-        if(self.cleaned_data.get('alioss_video',None)!=None):
+        if(self.cleaned_data.get('alioss_video',None)!=self.instance.alioss_video):
             self.instance.alioss_SHD_URL = ""
             self.instance.alioss_HD_URL = ""
             self.instance.alioss_SD_URL = ""

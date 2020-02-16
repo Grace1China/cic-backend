@@ -60,8 +60,10 @@ class S3DirectField(Field):
 
 class AliOssDirectWidgetExt(TextInput):
     class Media:
+        import time
+        ticks = time.time()
         # js = ('/static/lib/plupload-2.1.2/js/plupload.full.min.js','/static/upload.js' )
-        css = {'all': ('/static/ossstyle.css', )}
+        css = {'all': ('%s?v=%d' % ('/static/ossstyle.css?v=',int(ticks)), )}
 
     def __init__(self, *args, **kwargs):
         self.dest  = kwargs.pop('dest', None)
@@ -163,6 +165,7 @@ class AliVideoWidgetExt(TextInput):
             'name':name,
             'fieldname':self.fieldname,
             'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest),
+            'public_url':file_url.split('?')[0],
             'label':self.label
 
         }

@@ -38,8 +38,16 @@ def tofilename(astr):
     '''
     ar = astr.split('/')
     return ar[len(ar)-1]
+def timeticks(t):
+    '''
+    '''
+    import time
+    ticks = time.time()
+    return int(ticks)
     
 register.filter('str2varname', str2varname)
 register.filter('pre_signed_url', pre_signed_url)
 register.filter('tofilename', tofilename)
+register.filter('timeticks', timeticks)
+
 
