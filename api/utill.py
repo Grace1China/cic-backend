@@ -39,6 +39,8 @@ class CICUtill():
 
     def signurl1(key='', dest='source'):
         # from django.conf import settings
+        if key is None or key == '':
+            return None
         key = CICUtill. getObjectKey(key)
         auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
         bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
@@ -46,6 +48,8 @@ class CICUtill():
         return retval
 
     def isReadable(key='',dest='source'):
+        if key is None or key == '':
+            return None
         key = CICUtill. getObjectKey(key)
         auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
         bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])

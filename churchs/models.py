@@ -298,8 +298,8 @@ class Sermon(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
     title = models.CharField(max_length=200, default='',verbose_name='标题')
     speaker = models.ForeignKey("Speaker",on_delete=models.CASCADE,default=None,verbose_name='讲员')
-    scripture = models.CharField(max_length=100, default='',verbose_name='经文')
-    series = models.ForeignKey(SermonSeries, on_delete=models.CASCADE,null=True,default=None,verbose_name='讲道系列')
+    scripture = models.CharField(max_length=100, default='',blank=True,verbose_name='经文')
+    series = models.ForeignKey(SermonSeries, on_delete=models.CASCADE,null=True,blank=True,default=None,verbose_name='讲道系列')
 
     medias = GenericRelation(Media, related_query_name='Sermon',verbose_name='视听媒体')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)

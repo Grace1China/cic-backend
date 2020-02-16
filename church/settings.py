@@ -383,7 +383,7 @@ ALIOSS_DESTINATION_LOCATION = os.environ.get('ALIOSS_DESTINATION_LOCATION', 'oss
 
 ALIOSS_SOURCE_BUCKET_NAME = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'bicf-media-source')
 ALIOSS_DESTINATION_BUCKET_NAME = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'bicf-media-destination')
-ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES', 3600)
+ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES',24*3600)
 
 # from django.conf import settings
 ALIOSS_DESTINATIONS = {

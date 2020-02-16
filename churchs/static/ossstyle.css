@@ -94,3 +94,6 @@
 	.widget_field .preview img,.widget_field .preview video{
 		width: 100%;
 	}
+	.widget_container.hide{
+		display: none;
+	}

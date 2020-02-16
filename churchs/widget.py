@@ -81,7 +81,16 @@ class AliOssDirectWidgetExt(TextInput):
         signed_url = CICUtill.signurl1(file_url,dest=self.dest)
         
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
+        
+        bPublic = CICUtill.isReadable(file_url,dest=self.dest)
+        if bPublic :
+            sPublic_url = signed_url.split('?')[0]
+        else:
+            sPublic_url = None
 
+        
+
+        
 
         ctx = {
             'file_url': urllib.parse.unquote(file_url),
@@ -90,7 +99,9 @@ class AliOssDirectWidgetExt(TextInput):
             'vbn':self.vbn,
             'fieldname':self.fieldname,
             'acl':settings.ALIOSS_DESTINATIONS[self.dest]['x-oss-object-acl'],
-            'public': CICUtill.isReadable(file_url,dest=self.dest)
+            'public':bPublic,   
+            'public_url':sPublic_url,
+
 
         }
 
@@ -154,20 +165,21 @@ class AliVideoWidgetExt(TextInput):
         file_url = value or ''  #目前这个是bucket的key
         file_url = urllib.parse.unquote(file_url)
         
-        # signed_url = CICUtill.signurl1(file_url,dest=self.dest)
+        signed_url = CICUtill.signurl1(file_url,dest=self.dest)
         
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
-
+        pprint.PrettyPrinter(6).pprint(signed_url)
 
         ctx = {
             'file_url': urllib.parse.unquote(file_url),
-            'signed_url':file_url,
+            'signed_url':signed_url,
             'name':name,
             'fieldname':self.fieldname,
             'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest),
             'public_url':file_url.split('?')[0],
-            'label':self.label
-
+            'label':self.label,
+            'class':self.attrs['class']
+,
         }
 
         return mark_safe(render_to_string( 'admin/video-wedget.tpl',ctx))

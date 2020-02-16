@@ -6,6 +6,13 @@
 
     <div class="container" style="text-align: center;">
         <el-button type="default"  class="selectfiles"  plain>上传{{ vbn  }}(Upload)<i class="el-icon-upload el-icon--right"></i></el-button>
+        {% if public %}
+            <el-button type="default" @click="openMsg('{{ public_url }}')">公共链接<br>public link</el-button>
+
+        {% elif signed_url %}
+            <el-button type="default" @click="openMsg('{{ signed_url }}')">1天链接<br>1 day link</el-button>
+        {% endif %}
+        
         <input class="file-url fileurl" name="{{ name }}" type="hidden" value="{{ file_url }}" />
         <input class='x-oss-object-acl' type='hidden' value = '{{ acl }}'/>
     </div>
