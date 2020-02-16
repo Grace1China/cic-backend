@@ -12,6 +12,9 @@ class IAPPrice(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name='更新时间')
     
+    class Meta:
+        ordering = ['price']
+    
 class IAPCharge(models.Model):
     id = models.AutoField(primary_key=True)
     product_id = models.CharField(max_length=255,unique=True, verbose_name='充值产品在apple上的真实id。不传给客户端，客户端根据product_code计算')
@@ -20,3 +23,7 @@ class IAPCharge(models.Model):
     desc = models.CharField(max_length=255,verbose_name='充值产品文案描述')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name='更新时间')
+
+    # class Meta:
+    #     order_with_respect_to = 'price_code_price'
+    #     # ordering = ['product_id']

@@ -48,6 +48,8 @@ urlpatterns = [
     re_path(r'^rapi/',include('api.urls')),
     # url(r'^admin/',include(('photos.urls','photos'), namespace='photos')),
     url(r'^admin/s3direct/', include('s3direct.urls')),
+    
+    path('rapi/', include('payment.urls')),
 
 ]
 # print(apiusrls.urlpatterns)
