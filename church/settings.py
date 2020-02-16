@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     # 'photos.apps.PhotosConfig',
+    'payment.apps.PaymentConfig', #支付
     's3direct',
     'debug_toolbar',
     'rest_framework',
@@ -132,9 +133,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
         'NAME': 'cic',  # 数据库名，先前创建的
-        'USER': 'backend_user',     # 用户名，可以自己创建用户
-        'PASSWORD': '11/28/2019',  # 密码
-        'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
+        # 'USER': 'backend_user',     # 用户名，可以自己创建用户
+        # 'PASSWORD': '11/28/2019',  # 密码
+        # 'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
+        
+        'USER': 'root',     # 用户名，可以自己创建用户
+        'PASSWORD': '',  # 密码
+        'HOST': '127.0.0.1',  # mysql服务所在的主机ip 54.169.143.92
+        
         'PORT': '3306',         # mysql服务端口
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
@@ -514,7 +520,7 @@ LOGGING = {
             'level': 'ERROR',
             'formatter':'verbose',
             'class': 'logging.FileHandler',
-            'filename': '/data/log/django/error.log',
+            'filename': 'data/log/django/error.log',
         },
     },
     'loggers': {
