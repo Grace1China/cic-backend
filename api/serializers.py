@@ -2,6 +2,7 @@ from rest_framework import serializers
 from users.models import CustomUser
 from church.models import Church
 from churchs.models import Venue, Sermon, Media, Speaker, SermonSeries
+from payment.serializers import IAPChargeSerializer
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 import boto3
@@ -131,10 +132,11 @@ class CourseSerializer4API(serializers.ModelSerializer):
     speaker = SpeakerSerializer4API(source='teacher',read_only=True)
     # series = SermonSeriesSerializer4API(read_only=True)
     # speaker = serializers.PrimaryKeyRelatedField(source='teacher', queryset=Speaker.objects.all())
-
+    iap_charge = IAPChargeSerializer(read_only=True)
+    
     class Meta:
         model = models.Course
-        fields = ['id','church','speaker','title','description','content','price','medias','create_time','update_time']
+        fields = ['id','church','speaker','title','description','content','price','iap_charge','medias','create_time','update_time']
 
 
 

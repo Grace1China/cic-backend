@@ -7,7 +7,7 @@ from django.core.validators import *
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
-
+from payment.models import IAPCharge
 
 class Church(models.Model):
     STATUS_INITED = 1
@@ -42,6 +42,7 @@ class Church(models.Model):
 class Course(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会或平台，默认是用户所在的组织')
     teacher = models.ForeignKey('churchs.Speaker',null=True, blank=True,on_delete=models.CASCADE,verbose_name='讲员')
+    iap_charge = models.ForeignKey(IAPCharge, on_delete=models.DO_NOTHING, blank=True, null=True, verbose_name='内购价格')
     title = models.CharField(max_length=500,verbose_name='标题')
     # image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
     description = models.TextField(max_length=255, blank=True,verbose_name='描叙')
