@@ -223,6 +223,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'api.utill.BrowsableAPIRendererWithoutForms',
     ),
+    'COERCE_DECIMAL_TO_STRING': False,
     
 }
 
