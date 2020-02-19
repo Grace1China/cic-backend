@@ -84,24 +84,37 @@ class MeidaForm2(forms.ModelForm):
         instance = kwargs.get('instance', None)
         if instance:
             kwargs['initial'] = {'dist_SHD_URL': instance.dist_SHD_URL,'dist_HD_URL': instance.dist_HD_URL,'dist_SD_URL': instance.dist_SD_URL, }
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+        # 这里如果没有super init就没有fields,所以super.init要在fields赋值前面
+        if instance:
+            # kwargs['initial'] = {'dist_SHD_URL': instance.dist_SHD_URL,'dist_HD_URL': instance.dist_HD_URL,'dist_SD_URL': instance.dist_SD_URL, }
+            # pprint.PrettyPrinter(6).pprint(instance.__dict__)
+
+            self.fields['dist_SHD_URL'].widget.attrs.update({'class':'show'})
+            self.fields['dist_HD_URL'].widget.attrs.update({'class': 'show'})
+            self.fields['dist_SD_URL'].widget.attrs.update({'class': 'show'})
+        else:
+            self.fields['dist_SHD_URL'].widget.attrs.update({'class': 'hide'})
+            self.fields['dist_HD_URL'].widget.attrs.update({'class': 'hide'})
+            self.fields['dist_SD_URL'].widget.attrs.update({'class': 'hide'})
+
+        # return super().__init__(*args, **kwargs)
+
 
     def save(self, *args, **kwargs):
         # self.instance.dist_SHD_URL = self.cleaned_data['dist_SHD_URL']
         # self.instance.dist_HD_URL = self.cleaned_data['dist_HD_URL']
         # self.instance.dist_SD_URL = self.cleaned_data['dist_SD_URL']
         # if(self.cleaned_data['dist_SHD_URL'])
-        import pprint
-        pprint.PrettyPrinter(6).pprint('+++++++++++++++form:save')
-        pprint.PrettyPrinter(6).pprint(self.instance.alioss_video)
-        pprint.PrettyPrinter(6).pprint(self.cleaned_data.get('alioss_video',None))
+        # import pprint
+        # pprint.PrettyPrinter(6).pprint('+++++++++++++++form:save')
+        # pprint.PrettyPrinter(6).pprint(self.instance.alioss_video)
+        # pprint.PrettyPrinter(6).pprint(self.cleaned_data.get('alioss_video',None))
 
         if(self.cleaned_data.get('alioss_video',None)!=self.instance.alioss_video):
             self.instance.alioss_SHD_URL = ""
             self.instance.alioss_HD_URL = ""
             self.instance.alioss_SD_URL = ""
-
-
         return super().save(*args, **kwargs)
 
 class MediaInline1(GenericStackedInline):
@@ -129,7 +142,7 @@ class MediaInline(GenericStackedInline):
 # class MediaInline(GenericStackedInline):
 #     model = Media
     
-    
+from datetime import datetime
 
 class SermonAdmin(admin.ModelAdmin):
     inlines = [
@@ -148,6 +161,18 @@ class SermonAdmin(admin.ModelAdmin):
                 yield inline.get_formset(request, obj), inline
 
     change_form_template ="admin/churchs/sermon_change_form.html"
+
+    def get_changeform_initial_data(self, request):
+        return {
+            'title': datetime.now() ,
+            'speaker': churchs_models.Speaker.objects.all().filter(churchs=request.user.church)[0] if len(churchs_models.Speaker.objects.all().filter(churchs=request.user.church))>0 else None,
+            'scripture' :'',
+            'series':churchs_models.SermonSeries.objects.all().filter(church=request.user.church)[0] if len(churchs_models.SermonSeries.objects.all().filter(church=request.user.church))>0 else None,
+            'church':request.user.church,
+            'pub_time': datetime.now() ,
+            'status':Sermon.STATUS_DRAFT,
+            'user':request.user
+        }
     
 admin.site.register(churchs_models.Sermon, SermonAdmin)
 admin.site.register(churchs_models.Team)  

@@ -44,10 +44,17 @@ def timeticks(t):
     import time
     ticks = time.time()
     return int(ticks)
+def jsondumps(v):
+    '''
+    '''
+    import json
+    return json.dumps(v) 
     
 register.filter('str2varname', str2varname)
 register.filter('pre_signed_url', pre_signed_url)
 register.filter('tofilename', tofilename)
 register.filter('timeticks', timeticks)
+register.filter('jsondumps', jsondumps)
+
 
 

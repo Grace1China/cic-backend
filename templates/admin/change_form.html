@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static admin_modify %}
+{% load cust_filters %}
 
 {% block extrahead %}{{ block.super }}
     <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
@@ -142,16 +143,23 @@
             })
         }
 
+        {% comment %} {{  inline_admin_formsets | jsondumps }} {% endcomment %}
+
          new Vue({
             el: "#{{ opts.model_name }}_form",
             methods:{
                 openMsg:function(value){
-
-                    
                     this.$alert(`<a href='${value}' target="_blank">${value}</a>`, '公共链接(Public Link)', {
                         dangerouslyUseHTMLString: true
                     });
                 },
+               
+                //isVideo(url){
+                //    return /.mp4$|.m4v$|.mp4?|.m4v?/.test(url)
+                //},
+                //isImage(url){
+                //    return /.jpg$|.png$|.JPG$|.PNG$|.jpg?|.png?|.JPG?|.PNG?/.test(url)
+                //},
                 goBack:function () {
                     //找到上级
                     var array = location.pathname.split('/')

@@ -138,9 +138,3 @@ class CourseSerializer4API(serializers.ModelSerializer):
         model = models.Course
         fields = ['id','church','speaker','title','description','content','price','iap_charge','medias','create_time','update_time']
 
-
-
-
-
-
-        
