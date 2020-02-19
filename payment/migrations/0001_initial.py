@@ -37,6 +37,7 @@ class Migration(migrations.Migration):
                 ('create_time', models.DateTimeField(auto_now_add=True, null=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, null=True, verbose_name='更新时间')),
                 ('price_code', models.ForeignKey(db_column='price_code', on_delete=django.db.models.deletion.DO_NOTHING, to='payment.IAPPrice', to_field='code')),
+                ('price', models.DecimalField(decimal_places=2, default=0, max_digits=9, verbose_name='人民币价格价格')),
             ],
         ),
     ]

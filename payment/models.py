@@ -18,8 +18,11 @@ class IAPPrice(models.Model):
 class IAPCharge(models.Model):
     id = models.AutoField(primary_key=True)
     product_id = models.CharField(max_length=255,unique=True, verbose_name='充值产品在apple上的真实id。不传给客户端，客户端根据product_code计算')
+    
     #db_column本表列名，不写则为price_code_id。to_field是关联表外键列名，不写则默认id。
     price_code = models.ForeignKey(IAPPrice,on_delete=models.DO_NOTHING, db_column='price_code', to_field='code')
+    price = models.DecimalField(default=0, max_digits=9, decimal_places=2, verbose_name='人民币价格') #初始化时候从iapprice表复制进来。因为关联查询太过麻烦。
+    
     desc = models.CharField(max_length=255,verbose_name='充值产品文案描述')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name='更新时间')
