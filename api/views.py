@@ -267,7 +267,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
 
             if(request.META['REQUEST_METHOD']  == 'GET'):
                 data = request.GET
-                pprint.PrettyPrinter(6).pprint(data)
+                #pprint.PrettyPrinter(6).pprint(data)
                 page = int(data.get('page', page))
                 pagesize = int(data.get('pagesize', pagesize))
                 keyword = data.get('keyword', keyword)
