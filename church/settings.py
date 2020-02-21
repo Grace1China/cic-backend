@@ -385,6 +385,8 @@ ALIOSS_SOURCE_BUCKET_NAME = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'bicf-me
 ALIOSS_DESTINATION_BUCKET_NAME = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'bicf-media-destination')
 ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES',24*3600)
 
+MEDIABASE_PREFIX='api.bicf.org/mediabase'
+
 # from django.conf import settings
 ALIOSS_DESTINATIONS = {
     'images':{

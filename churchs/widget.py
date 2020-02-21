@@ -168,7 +168,7 @@ class AliVideoWidgetExt(TextInput):
         signed_url = CICUtill.signurl1(file_url,dest=self.dest)
         
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
-        pprint.PrettyPrinter(6).pprint(signed_url)
+        # pprint.PrettyPrinter(6).pprint(signed_url)
 
         ctx = {
             'file_url': urllib.parse.unquote(file_url),
@@ -176,7 +176,7 @@ class AliVideoWidgetExt(TextInput):
             'name':name,
             'fieldname':self.fieldname,
             'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest),
-            'public_url':file_url.split('?')[0],
+            'public_url':signed_url.split('?')[0] if CICUtill.isReadable(file_url.split('?')[0],dest=self.dest) else '' ,
             'label':self.label,
             'class':self.attrs['class']
 ,

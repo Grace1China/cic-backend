@@ -45,6 +45,11 @@ class CICUtill():
         auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
         bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
         retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+        retval = retval.replace('%s.%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION),settings.MEDIABASE_PREFIX)
+        import logging
+        logger = logging.getLogger('dev.error')
+        logger.error('%s.%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION))
+        logger.error(retval)
         return retval
 
     def isReadable(key='',dest='source'):

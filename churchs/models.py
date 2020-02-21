@@ -193,7 +193,8 @@ class Media(models.Model):
             retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_HD_URL), settings.ALIOSS_EXPIRES)
             if bucket.get_object_acl(self.getObjectKey(self.alioss_HD_URL)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
                 retval = retval.split('?')[0]
-
+            # 'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
+            retval = retval.replace('%s.%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_ENDPOINT),settings.MEDIABASE_PREFIX )
             return retval #self.alioss_HD_URL
         else:
             return ''

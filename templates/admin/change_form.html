@@ -147,6 +147,13 @@
 
          new Vue({
             el: "#{{ opts.model_name }}_form",
+            mounted: function (){
+                /*
+                定时对服务器查找，是否已经转码成功。
+                要求：通过可设定查寻对象的api来处理查寻请求
+                */
+                
+            },
             methods:{
                 openMsg:function(value){
                     this.$alert(`<a href='${value}' target="_blank">${value}</a>`, '公共链接(Public Link)', {
