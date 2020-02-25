@@ -65,7 +65,8 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'djoser',
     'rest_framework_simplejwt',
-    'parsley'
+    'parsley',
+    'django_mysql'
 ]
 
 MIDDLEWARE = [
@@ -144,6 +145,7 @@ DATABASES = {
         'PORT': '3306',         # mysql服务端口
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
+            # 'charset': 'utf8md4',
         },
         'TEST': {
             'NAME': 'test_cic',
@@ -229,7 +231,7 @@ REST_FRAMEWORK = {
 
 from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60*24),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -433,7 +435,7 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 # AWS_QUERYSTRING_AUTH = False
 
 APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
-
+IAP_IS_SANDBOX = True
 
 CKEDITOR_CONFIGS = {
     'default': {
