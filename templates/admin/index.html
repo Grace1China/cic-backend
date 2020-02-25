@@ -48,6 +48,48 @@
     [v-block] {
         display: none;
     }
+
+    .el-aside{
+        height:100vh;
+        overflow:hidden;
+    }
+    .logo-wrap{
+        height:58px;
+    }
+    .menu{
+        height:100vh;
+        max-width:210px;
+    }
+    .el-submenu .el-menu-item{
+        max-width:120px !important;
+        min-width:auto !important;
+    }
+    .menu{
+        overflow-y:scroll;
+    }
+
+    .menu::-webkit-scrollbar{
+        width: 0!important;
+    }
+
+    .menu:hover::-webkit-scrollbar{
+        width: 17!important;
+    }
+
+
+    .menu:hover::-webkit-scrollbar {
+        width: 17px !important;
+    }
+
+    .menu:hover i.el-submenu__icon-arrow.el-icon-arrow-down {
+        right: 3px !important;
+    }
+
+    .menu::-webkit-scrollbar-thumb {
+        border-radius: 0px; 
+        -webkit-box-shadow: inset 0 0 5px rgba(123, 123, 123, 0.2); 
+        background: #7d7d7d;
+    }
 </style>
 
 
@@ -74,8 +116,10 @@
     {% endblock %}
 
     <el-container :style="{height: height+'px'}">
+        
 
-        <el-aside width="auto" class="menu" {% block menu_style %}{% endblock %}>
+        <el-aside width="auto"  {% block menu_style %}{% endblock %}>
+            
             {% block logo %}
                 <div class="logo-wrap" v-if="!fold">
                     <div class="float-wrap">
@@ -92,31 +136,32 @@
                     </div>
                 </div>
             {% endblock %}
-
-            <el-menu unique-opened="true" :default-active="menuActive" :collapse="fold">
-                <div v-for="(item,i) in menus" :key="item">
-                    <el-menu-item v-if="!item.models" :index="item.eid+''" @click="openTab(item,item.eid)">
-                        <i :class="item.icon"></i>
-                        <span v-if="menuTextShow" slot="title" v-text="item.name"></span>
-                    </el-menu-item>
-
-
-                    <el-submenu v-else :index="item.eid+''">
-                        <template slot="title">
+            <div class="menu">
+                <el-menu  unique-opened="true" :default-active="menuActive" :collapse="fold">
+                    <div v-for="(item,i) in menus" :key="item">
+                        <el-menu-item v-if="!item.models" :index="item.eid+''" @click="openTab(item,item.eid)">
                             <i :class="item.icon"></i>
-                            <span v-if="menuTextShow" slot="title" v-text="item.name" @click="console.log(item)"></span>
-                        </template>
+                            <span v-if="menuTextShow" slot="title" v-text="item.name"></span>
+                        </el-menu-item>
 
-                        <el-menu-item-group v-for="(sub,j) in item.models" :title="sub.name" :key="sub.name">
-                            <el-menu-item :index="sub.eid+''" @click="openTab(sub,item.eid)">
-                                <i :class="sub.icon"></i>
-                                <span slot="title" v-text="sub.name"></span>
-                            </el-menu-item>
-                        </el-menu-item-group>
-                    </el-submenu>
 
-                </div>
-            </el-menu>
+                        <el-submenu v-else :index="item.eid+''">
+                            <template slot="title">
+                                <i :class="item.icon"></i>
+                                <span v-if="menuTextShow" slot="title" v-text="item.name" @click="console.log(item)"></span>
+                            </template>
+
+                            <el-menu-item-group v-for="(sub,j) in item.models" :title="sub.name" :key="sub.name">
+                                <el-menu-item :index="sub.eid+''" @click="openTab(sub,item.eid)">
+                                    <i :class="sub.icon"></i>
+                                    <span slot="title" v-text="sub.name"></span>
+                                </el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+
+                    </div>
+                </el-menu>
+            </div>
 
         </el-aside>
         <el-container>
