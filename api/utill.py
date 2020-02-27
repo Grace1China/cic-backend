@@ -47,7 +47,10 @@ class CICUtill():
         auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
         bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
         retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
-        retval = retval.replace('%s.%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION),settings.MEDIABASE_PREFIX)
+        # retval = retval.replace('%s.%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION),settings.MEDIABASE_PREFIX)
+        retval = CICUtill.redirectWith(dest=dest,url=retval)
+        if settings.ALIOSS_DESTINATIONS[dest]['redirecturl'] not in retval :
+            raise Exception('%s:%s' % ('no right redirecturl',retval)) 
         import logging
         logger = logging.getLogger('dev.error')
         logger.error('%s.%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION))
@@ -68,4 +71,8 @@ class CICUtill():
             return True
         else:
             return False
+    def redirectWith(dest="destination",url=''):
+        url = url.replace('%s.%s' % (settings.ALIOSS_DESTINATIONS[dest]['bucket'],settings.ALIOSS_DESTINATIONS[dest]['location']),settings.ALIOSS_DESTINATIONS[dest]['redirecturl'])
+        return url
+
 

@@ -375,8 +375,8 @@ AWS_LOCATION = 'static'
 
 ALIOSS_ACCESS_KEY_ID = os.environ.get('ALIOSS_ACCESS_KEY_ID', 'LTAI4Fd1JMHM3WSUN4vrHcj8')
 ALIOSS_SECRET_ACCESS_KEY = os.environ.get('ALIOSS_SECRET_ACCESS_KEY', 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I')
-ALIOSS_SOURCE_ENDPOINT = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'http://oss-cn-beijing.aliyuncs.com')
-ALIOSS_DESTINATION_ENDPOINT = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'http://oss-cn-beijing.aliyuncs.com')
+ALIOSS_SOURCE_ENDPOINT = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'https://oss-cn-beijing.aliyuncs.com')
+ALIOSS_DESTINATION_ENDPOINT = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'https://oss-cn-beijing.aliyuncs.com')
 
 
 ALIOSS_SOURCE_LOCATION = os.environ.get('ALIOSS_SOURCE_LOCATION', 'oss-cn-beijing.aliyuncs.com')
@@ -387,32 +387,46 @@ ALIOSS_DESTINATION_BUCKET_NAME = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME'
 ALIOSS_EXPIRES = os.environ.get('ALIOSS_EXPIRES',24*3600)
 
 MEDIABASE_PREFIX='api.bicf.org/mediabase'
+ALIOSS_RedirectUrl = {
+    'source':'api.bicf.org/mediasource',
+    'destination':'api.bicf.org/mediabase'
+}
 
 # from django.conf import settings
 ALIOSS_DESTINATIONS = {
     'images':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediabase',
         'x-oss-object-acl':'public-read'   #public-read、private、public-read-write
     },
     'pdfs':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediabase',
         'x-oss-object-acl':'private'   #public-read、private、public-read-write
     },
     'source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
+        'location':ALIOSS_SOURCE_LOCATION,
         'bucket':ALIOSS_SOURCE_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediasource',
         'x-oss-object-acl':'private'   #public-read、private、public-read-write
     },
     'destination':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediabase',
         'x-oss-object-acl':'private'   #public-read、private、public-read-write
     },
     'audios':{
-        'endpoint':ALIOSS_SOURCE_ENDPOINT,
-        'bucket':ALIOSS_SOURCE_BUCKET_NAME,
+        'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'location':ALIOSS_DESTINATION_LOCATION,
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediabase',
         'x-oss-object-acl':'private'   #public-read、private、public-read-write
     }
 }
@@ -538,6 +552,12 @@ def exception_hook(type,value,traceback):
     """
     """
     import logging
+    logging.getLogger('dev.error').critical('-------------------exception_hook-----------------------------------')
+    logging.getLogger('dev.error').critical(type)
+    logging.getLogger('dev.error').critical(value)
+    # logging.getLogger('dev.error').critical(traceback)
+
+
     logging.getLogger('dev.error').critical('UnCaught Exception',exc_info(type,value,traceback))
 import sys
 sys.excepthook = exception_hook  
