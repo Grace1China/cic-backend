@@ -33,6 +33,7 @@ APPEND_SLASH = True
 # X_FRAME_OPTIONS = 'ALLOW-FROM *'
 
 AUTH_USER_MODEL = 'users.CustomUser'
+SIMPLEUI_HOME_INFO = False
 # Application definition
 
 INSTALLED_APPS = [
@@ -532,5 +533,13 @@ LOGGING = {
         }
     },
 }
+
+def exception_hook(type,value,traceback):
+    """
+    """
+    import logging
+    logging.getLogger('dev.error').critical('UnCaught Exception',exc_info(type,value,traceback))
+import sys
+sys.excepthook = exception_hook  
 
 

@@ -27,7 +27,7 @@ class AliOssSignature(APIView):
     # 请填写您的AccessKeySecret。
     access_key_secret = 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I'
     # host的格式为 bucketname.endpoint ，请替换为您的真实信息。
-    host = 'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
+    host = 'https://bicf-media-source.oss-accelerate.aliyuncs.com'#'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
     desthost = 'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
     # callback_url为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
     callback_url = "http://%s/rapi/alioss_directup_callback" %  settings.APP_SERVER_IP
@@ -43,59 +43,69 @@ class AliOssSignature(APIView):
 
 
     def get_token(self,request):
-        now = int(time.time())
-        expire_syncpoint = now + self.expire_time
-        # expire_syncpoint = 1612345678
-        expire = self.get_iso_8601(expire_syncpoint)
+        try:
+            import logging
+            logger = logging.getLogger('dev.error')
+            
+            now = int(time.time())
+            expire_syncpoint = now + self.expire_time
+            # expire_syncpoint = 1612345678
+            expire = self.get_iso_8601(expire_syncpoint)
 
-        policy_dict = {}
-        policy_dict['expiration'] = expire
-        condition_array = []
-        array_item = []
-        array_item.append('starts-with');
-        array_item.append('$key');
-        if (request.user.church == None):
-            import pprint
-            pprint.PrettyPrinter(6).pprint(request.user)
-            raise Exception('user or church of user is null')
-        array_item.append(request.user.church.code);
-        condition_array.append(array_item)
-        policy_dict['conditions'] = condition_array
-        policy = json.dumps(policy_dict).strip()
-        policy_encode = base64.b64encode(policy.encode())
-        h = hmac.new(self.access_key_secret.encode(), policy_encode, sha)
-        sign_result = base64.encodestring(h.digest()).strip()
+            policy_dict = {}
+            policy_dict['expiration'] = expire
+            condition_array = []
+            array_item = []
+            array_item.append('starts-with');
+            array_item.append('$key');
+            if (request.user.church == None):
+                import pprint
+                pprint.PrettyPrinter(6).pprint(request.user)
+                raise Exception('user or church of user is null')
+            array_item.append(request.user.church.code);
+            condition_array.append(array_item)
+            policy_dict['conditions'] = condition_array
+            policy = json.dumps(policy_dict).strip()
+            policy_encode = base64.b64encode(policy.encode())
+            h = hmac.new(self.access_key_secret.encode(), policy_encode, sha)
+            sign_result = base64.encodestring(h.digest()).strip()
 
-        callback_dict = {}
-        callback_dict['callbackUrl'] = self.callback_url;
-        callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
-                                        '&height=${imageInfo.height}&width=${imageInfo.width}';
-        callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
+            callback_dict = {}
+            callback_dict['callbackUrl'] = self.callback_url;
+            callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
+                                            '&height=${imageInfo.height}&width=${imageInfo.width}';
+            callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
 
-        import logging
-        logging.debug(callback_dict)
-        callback_param = json.dumps(callback_dict).strip()
-        base64_callback_body = base64.b64encode(callback_param.encode());
+            import logging
+            logging.debug(callback_dict)
+            callback_param = json.dumps(callback_dict).strip()
+            base64_callback_body = base64.b64encode(callback_param.encode());
 
-        token_dict = {}
-        token_dict['accessid'] = self.access_key_id
-        token_dict['host'] = self.host
-        token_dict['desthost'] = self.desthost
-        token_dict['policy'] = policy_encode.decode()
-        token_dict['signature'] = sign_result.decode()
-        token_dict['expire'] = expire_syncpoint
-        # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
+            token_dict = {}
+            token_dict['accessid'] = self.access_key_id
+            token_dict['host'] = self.host
+            token_dict['desthost'] = self.desthost
+            token_dict['policy'] = policy_encode.decode()
+            token_dict['signature'] = sign_result.decode()
+            token_dict['expire'] = expire_syncpoint
+            # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
 
-        if request.user.church == None:
-            token_dict['dir'] = 'l3/'
-        else:
-            token_dict['dir'] = '%s/' % request.user.church.code
+            if request.user.church == None:
+                token_dict['dir'] = 'l3/'
+            else:
+                token_dict['dir'] = '%s/' % request.user.church.code
 
 
 
-        token_dict['callback'] = base64_callback_body.decode()
-        result = json.dumps(token_dict)
-        return result
+            token_dict['callback'] = base64_callback_body.decode()
+            result = json.dumps(token_dict)
+            return result
+        except Exception as e:
+            import logging
+            logger = logging.getLogger('dev.error')
+            logger.exception("there is an exception")
+        finally:
+            pass
 
 
 

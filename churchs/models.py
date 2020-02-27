@@ -103,14 +103,18 @@ class Media(models.Model):
     s3_image = S3DirectField(dest='images', blank=True,verbose_name='AWS S3 封面')
     s3_pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='AWS S3 讲义')
 
-    alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
+    # alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
+    alioss_video = models.CharField(max_length=400, blank=True,verbose_name='视频')
     alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='视频状态')
     alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='高清链接')
     alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='标清链接')
     alioss_SD_URL = models.CharField(max_length=400, blank=True,verbose_name='流畅链接')
-    alioss_audio = AliOssDirectField(dest='audios', fieldname='alioss_audio',blank=True,verbose_name='音频')
-    alioss_image = AliOssDirectField(dest='images',fieldname='alioss_image', blank=True,verbose_name='封面')
-    alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='讲义')
+    # alioss_audio = AliOssDirectField(dest='audios', fieldname='alioss_audio',blank=True,verbose_name='音频')
+    # alioss_image = AliOssDirectField(dest='images',fieldname='alioss_image', blank=True,verbose_name='封面')
+    # alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='讲义')
+    alioss_audio = models.CharField(max_length=400,blank=True,verbose_name='音频')
+    alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
+    alioss_pdf = models.CharField(max_length=400,blank=True,verbose_name='讲义')
     
     content = models.TextField(blank=True,verbose_name='摘要') 
 
