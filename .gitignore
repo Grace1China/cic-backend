@@ -112,3 +112,7 @@ venv.bak/
 todo
 /static
 **/daniel_*
+church/gunicorn.conf.py
+stop_site
+run_site
+church/settings.py
