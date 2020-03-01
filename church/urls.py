@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path, include
-from rest_framework_swagger.views import get_swagger_view
+# from rest_framework_swagger.views import get_swagger_view
 # from api.schema_view import schema_view
 from django.conf.urls import url, include
 from . import view
@@ -24,8 +24,26 @@ from api import urls as apiusrls
 # from api
 import logging
 from django.conf import settings
+from rest_framework import permissions
 
-schema_view = get_swagger_view(title='Church API')
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+
+# schema_view = get_swagger_view(title='Church API')
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Church API",
+      default_version='v1',
+      description="No",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="danielqin@bicf.org"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
 
 
 urlpatterns = [
@@ -33,7 +51,11 @@ urlpatterns = [
     re_path('^admin/', admin.site.urls),
     # path('admindev/', admin.site.urls),
 
-    re_path('swagger/', schema_view),
+    # url(^'swagger/', schema_view),
+    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+   
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     re_path(r'^admin/ckeditor/', include('ckeditor_uploader.urls')),
     # re_path(r'^admindev/ckeditor/', include('ckeditor_uploader.urls')),
