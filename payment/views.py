@@ -11,12 +11,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from church.models import Course
+from django.utils import timezone
 import datetime
 import pprint
 import json
 import httplib2
 import uuid
 from django.conf import settings
+
 
 class IAPChargeViewSet(mixins.ListModelMixin,
                        viewsets.GenericViewSet):
@@ -69,11 +71,12 @@ class OrderCreateAPIView(APIView):
                 return JsonResponse({'errCode': '0', 'data': {}, "msg": "参数错误"}, safe=False)
 
             course = Course.objects.get(pk=course_id)
-            payType = PayType.objects.get(pk=1)
+            payType = PayType.objects.get(pk=PayType.IAP)
             isSandbox = settings.IAP_IS_SANDBOX
-            
+
             order = Order(order_no=uuid.uuid4(), user=request.user, course=course, price=course.price,
-                          iap_charge=course.iap_charge, pay_type=payType, iap_is_sandbox=isSandbox)
+                          price_usd=course.price_usd,
+                          iap_charge=course.iap_charge, pay_type=payType, is_sandbox=isSandbox)
             order.save()
             return JsonResponse({'errCode': '0', 'data': {'order_no': order.order_no}}, safe=False)
 
@@ -137,7 +140,7 @@ class IapVerifyReceipt(APIView):
             iapurl = "https://buy.itunes.apple.com/verifyReceipt"
             if settings.IAP_IS_SANDBOX:
                 iapurl = "https://sandbox.itunes.apple.com/verifyReceipt"
-                
+
             connect = httplib2.Http()
             resp, content = connect.request(iapurl,
                                             "POST",
@@ -155,7 +158,7 @@ class IapVerifyReceipt(APIView):
 
             decodedJson = json.loads(content)
             jsonString = json.dumps(decodedJson)
-            
+
             order.iap_receipt = jsonString
 
             status = decodedJson.get('status')
@@ -164,23 +167,26 @@ class IapVerifyReceipt(APIView):
                 return JsonResponse({'errCode': '0', 'data': {}, 'msg': "验证失败"}, safe=False)
 
             SaveWithSuccess(order)
-            return JsonResponse({'errCode': '0', 'data': {}, 'msg': "验证成功"}, safe=False)
+            return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "验证成功"}, safe=False)
 
         except Exception as e:
             print("e:" + e.__str__())
+            SaveWithFailed(order)
             return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "访问apple验证服务器错误：" + e.__str__()}, safe=False)
 
 
 def SaveWithFailed(order):
-    order.fail_time = datetime.datetime.now()
+    order.fail_time = datetime.datetime.utcnow()
     order.status = Order.STATUS_FAILED
     order.save()
 
 
 def SaveWithSuccess(order):
-    order.finish_time = datetime.datetime.now()
+    order.finish_time = datetime.datetime.utcnow()
     order.status = Order.STATUS_SUCCESS
     order.save()
+
+
 # 和上述方法一样。
 # @api_view(['POST'])
 # def IapVerification(request):
@@ -188,3 +194,118 @@ def SaveWithSuccess(order):
 # 
 #     else:
 #         return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "请使用POST方法", 'sysErrMsg': ''}, safe=False)
+
+
+# --------paypal---------
+import braintree
+
+
+class ClientToken(APIView):
+    """
+    paypal请求client token
+    """
+
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        try:
+            course_id = request.data.get('course_id', 0)
+            if course_id == 0:
+                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+            course = Course.objects.get(pk=course_id)
+            if course is None:
+                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+
+            payType = PayType.objects.get(pk=PayType.PAYPAL)
+            isSandbox = settings.PAYPAL_IS_SANEBOX
+            order = Order(order_no=uuid.uuid4(), user=request.user, course=course, price=course.price,
+                          price_usd=course.price_usd, pay_type=payType, is_sandbox=isSandbox)
+            order.save()
+
+            gateway = pp_gateway()
+            clientToken = gateway.client_token.generate()
+
+            return JsonResponse(
+                {'errCode': '0', 'data': {"client_token": clientToken, "order_no": order.order_no}, 'msg': "成功"},
+                safe=False)
+        except Exception as e:
+            print("e:" + e.__str__())
+            return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "请求client token失败：" + e.__str__()}, safe=False)
+
+
+class PaymentMethodNonce(APIView):
+    """
+    paypal 支付
+    """
+
+    # permission_classes = [IsAuthenticated]
+    def post(self, request, format=None):
+        try:
+            order_no = request.data.get('order_no', 0)
+            nonce_from_the_client = request.data.get('payment_method_nonce', '')
+            if order_no == '' or nonce_from_the_client == '':
+                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+            order = Order.objects.get(user=request.user, order_no=order_no)
+            if order is None:
+                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误"}, safe=False)
+
+            gateway = pp_gateway()
+            result = gateway.transaction.sale({
+                "amount": order.price_usd,
+                "payment_method_nonce": nonce_from_the_client,
+                # "device_data": device_data_from_the_client,
+                "options": {
+                    "submit_for_settlement": True
+                }
+            })
+            order.pp_transcation_id = result.transaction.id
+
+            print(result.transaction.status)
+            if result.is_success:
+                print("success!: " + result.transaction.id)
+                SaveWithSuccess(order)
+                return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "支付成功"}, safe=False)
+
+            elif result.transaction:
+                print("Error processing transaction:")
+                print("  code: " + result.transaction.processor_response_code)
+                print("  text: " + result.transaction.processor_response_text)
+
+                SaveWithFailed(order)
+                return JsonResponse({'errCode': '1001', 'data': {},
+                                     'msg': "支付失败:" + result.transaction.processor_response_code + "," + result.transaction.processor_response_text},
+                                    safe=False)
+            else:
+                msg = ""
+                for error in result.errors.deep_errors:
+                    print("attribute: " + error.attribute)
+                    print("  code: " + error.code)
+                    print("  message: " + error.message)
+                    msg += "," + error.code + ":" + error.message
+                SaveWithFailed(order)
+                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "支付失败" + msg}, safe=False)
+        except Exception as e:
+            print("e:" + e.__str__())
+            SaveWithFailed(order)
+            return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "支付失败：" + e.__str__()}, safe=False)
+
+
+def pp_gateway():
+    isSandbox = settings.PAYPAL_IS_SANEBOX
+    if isSandbox:
+        congfiguration = braintree.Configuration(
+            braintree.Environment.Sandbox,
+            merchant_id="b9mnrfpx5f9b73tj",
+            public_key="2ds4m93c5rfmbww5",
+            private_key="39d099e6e9fa98ecc83a7537370717d2"
+        )
+    else:
+        congfiguration = braintree.Configuration(
+            braintree.Environment.Production,
+            merchant_id="b9mnrfpx5f9b73tj",
+            public_key="2ds4m93c5rfmbww5",
+            private_key="39d099e6e9fa98ecc83a7537370717d2"
+        )
+
+    gateway = braintree.BraintreeGateway(congfiguration)
+    return gateway

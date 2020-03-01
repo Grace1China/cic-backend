@@ -13,7 +13,12 @@ router.register(r'iap/charges', views.IAPChargeViewSet)
 
 urlpatterns = [
     path('payments/', include(router.urls)),
-    path('payments/iap/verifyreceipt', views.IapVerifyReceipt.as_view()),
+    
     path('payments/orders', views.OrderCreateAPIView.as_view()),
+    path('payments/iap/verifyreceipt', views.IapVerifyReceipt.as_view()),
     # path('payments/iap/verify', views.IapVerification)
+    
+    
+    path('payments/paypal/client_token', views.ClientToken.as_view()),
+    path('payments/paypal/methon_nonce', views.PaymentMethodNonce.as_view()),
 ]

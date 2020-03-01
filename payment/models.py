@@ -37,7 +37,13 @@ class IAPCharge(models.Model):
     #     # ordering = ['product_id']
 
 #支付类型
+
 class PayType(models.Model):
+    IAP = 1
+    PAYPAL = 2
+    WECHAT = 3
+    ALIPAY = 4
+    
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name='创建时间')
@@ -61,14 +67,21 @@ class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, blank=False, null=False)
 
+    #UI显示用
     price = models.DecimalField(default=0, max_digits=9, decimal_places=2,
-                                verbose_name='人民币价格')
-    
+                                verbose_name='人民币价格') 
+    #paypal支付用
+    price_usd = models.DecimalField(default=0, max_digits=9, decimal_places=2,
+                                       verbose_name='美元价格')
+    #内购价格
     pay_type = models.ForeignKey(PayType, on_delete=models.DO_NOTHING, blank=False, null=False)
+    is_sandbox = models.BooleanField()
+    
     iap_charge = models.ForeignKey(IAPCharge, on_delete=models.DO_NOTHING, blank=True, null=True, verbose_name='内购价格')
     # iap_receipt = JSONField(default="")
-    iap_receipt = models.TextField()
-    iap_is_sandbox = models.BooleanField()
+    iap_receipt = models.TextField(verbose_name='内购支付凭证')
+    
+    pp_transcation_id = models.CharField(max_length=255, verbose_name='paypal交易id')
     
     status = models.IntegerField(choices=STATUS_ORDER, default=STATUS_CREATED,verbose_name='状态')
     desc = models.CharField(max_length=255, verbose_name='备注')

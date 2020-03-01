@@ -136,5 +136,5 @@ class CourseSerializer4API(serializers.ModelSerializer):
     
     class Meta:
         model = models.Course
-        fields = ['id','church','speaker','title','description','content','price','iap_charge','medias','create_time','update_time']
+        fields = ['id','church','speaker','title','description','content','price','price_usd','iap_charge','medias','create_time','update_time']
 

@@ -436,6 +436,7 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 
 APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
 IAP_IS_SANDBOX = True
+PAYPAL_IS_SANEBOX = True
 
 CKEDITOR_CONFIGS = {
     'default': {

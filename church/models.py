@@ -46,7 +46,8 @@ class Course(models.Model):
     # image = models.ImageField(u'图片', upload_to='images', null=True, blank=True)
     description = models.TextField(max_length=255, blank=True,verbose_name='描叙')
     content = RichTextField(null=True, blank=True,verbose_name='内容')
-    price = models.DecimalField(default=0,max_digits=9, decimal_places=2,verbose_name='价格')
+    price = models.DecimalField(default=0,max_digits=9, decimal_places=2,verbose_name='人民币价格')
+    price_usd = models.DecimalField(default=0,max_digits=9, decimal_places=2,verbose_name='美元价格')
     # s3video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
     import churchs.models as churchs_models
     medias = GenericRelation(churchs_models.Media, related_query_name='Course',verbose_name='视听媒体')

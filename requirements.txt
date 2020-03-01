@@ -20,3 +20,4 @@ oss2
 django-parsley
 httplib2
 django-mysql
+braintree
