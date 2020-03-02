@@ -268,7 +268,7 @@ class Media(models.Model):
                     retval = retval.split('?')[0]
                 return retval #self.alioss_pdf
             else:
-                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,setting.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_pdf))
+                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_pdf))
         else:
             return ''
 
@@ -321,6 +321,37 @@ class Sermon(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
+    def save(self, *args, **kwargs):
+        print('before save-------------------')
+        try:
+
+            import json
+            import requests
+            from api.serializers import SermonSerializer4API, MediaSerializer4API
+
+            szSermon = SermonSerializer4API(self)
+            data = {'study_name':szSermon.title,
+                    'study_date':szSermon.pub_time, 
+                    'publish_up':szSermon.pub_time,
+                    'published':1,
+                    'ministry':szSermon.church, 
+                    'video_link':szSermon.medias[0].SHD_URL if len(szSermon.medias)>0 else '', 
+                    'teacher':szSermon.speaker, 
+                    'imagelrg': szSermon.medias[0].image if len(szSermon.medias)>0 else '',
+                    'audio_link': szSermon.medias[0].audio if len(szSermon.medias)>0 else '',
+                    'slides_link': szSermon.medias[0].pdf if len(szSermon.medias)>0 else '',
+                    'notes_link': szSermon.medias[0].pdf if len(szSermon.medias)>0 else ''
+            }
+
+            r = requests.post('http://47.95.199.234/mainsite_api_v1/mst/MakeSermon', data)
+        except Exception as e:
+            # pprint.PrettyPrinter(4).pprint(e.__traceback__)
+            import traceback
+            import sys
+            loger = logging.getLogger('church.all')
+            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        # do_something_else()
 
 
 class WeeklyReport(models.Model):
