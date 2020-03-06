@@ -57,7 +57,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
         except Exception as e:
-            return JsonResponse({'errCode': '1001','msg': str(e), 'data':{}}, safe=False)
+            return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
 
     @transaction.atomic
     def perform_create(self, serializer):
@@ -94,7 +94,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         查找用户所属教会的最新周报 or 根据pk查找
         '''
         if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': {},'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
         try:
             wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
             serializer = self.get_serializer(wr)
@@ -103,7 +103,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
 
-            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': {},'sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':e.__str__()}, safe=False)
 
 
     @action(detail=True,methods=['POST'], format="json")
@@ -112,7 +112,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         查找用户所属教会的最新周报 or 根据pk查找
         '''
         if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': {},'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
         try:
             wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
             serializer = self.get_serializer(wr)
@@ -121,7 +121,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
 
-            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': {},'sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':e.__str__()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
     def GetL3Eweekly(self,request):
@@ -142,7 +142,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
-            return JsonResponse({'errCode': '1001', 'msg':'L3没有最新的周报','data': {},'sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':e.__str__()}, safe=False)
             
 
 
@@ -184,10 +184,10 @@ class SermonViewSet(viewsets.ModelViewSet):
         查找当前用户所在教会主日信息
         '''
         if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': {},'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
         try:
             if (request.user.church == None):
-                return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有教会信息','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有教会信息','sysErrMsg':''}, safe=False)
             now = datetime.datetime.now()
             last_sunday = now - timedelta(days=now.weekday()+1)
             last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
@@ -209,7 +209,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
     def GetDefaultLordsDayInfo(self,request):
@@ -220,7 +220,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             from django.conf import settings
             theCh = Church.objects.all().get(code = settings.DEFAULT_CHURCH_CODE)
             if (theCh == None):
-                return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有平台教会信息','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有平台教会信息','sysErrMsg':''}, safe=False)
             now = datetime.datetime.now()
             last_sunday = now - timedelta(days=now.weekday()+1)
             last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
@@ -234,7 +234,7 @@ class SermonViewSet(viewsets.ModelViewSet):
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
 
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'平台教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'平台教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
 
 
 from .serializers import CourseSerializer4API, MediaSerializer4API, CourseSerializer4APIPOST
@@ -289,9 +289,9 @@ class  CourseViewSet(viewsets.ModelViewSet):
             # church_code = data.get('church_code', '-1')
 
             if pagesize <=0 or pagesize >100 :
-                return JsonResponse({'errCode': '1002', 'data': {},'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1002', 'data': None,'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
             if page < 0 :
-                return JsonResponse({'errCode': '1003', 'data': {},'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1003', 'data': None,'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
 
             if orderby is not None:
                 orderpair = orderby.split(' ') 
@@ -299,14 +299,21 @@ class  CourseViewSet(viewsets.ModelViewSet):
             else:
                 orderby = '-update_time'
 
-            courseLis = None
             if keyword is not None:
                 courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by(orderby)
             else:
                 courseList = self.get_queryset().filter().order_by(orderby)
-
+            
+            # for course in courseList:
+            #     course.sales_num = course.users.all().count
+            #     if course.users.all().filter(pk=request.user.id):
+            #         course.is_buy = True
+            #     else:
+            #         course.is_buy = False
+            addSalesInfosOnList(courseList, request.user)
             paginator = Paginator(courseList, pagesize)
             coursePage = paginator.get_page(page)
+
             slzCourseList = CourseSerializer4API(coursePage, many=True)
             # 前端需要用来取页面 
             return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 'page':coursePage.number, 'totalPage':paginator.num_pages}, safe=False)
@@ -318,7 +325,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             traceback.print_exc(file=logger.handlers[0]._open())
             traceback.print_exc(file=sys.stdout)
             # logger.error()
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
     def GetCoursebyID(self,request,pk):
@@ -327,13 +334,20 @@ class  CourseViewSet(viewsets.ModelViewSet):
         '''
         try:
             course = self.get_queryset().filter(id=pk).order_by('-update_time')[0]
+
+            # course.sales_num = course.users.all().count
+            # if course.users.all().filter(pk=request.user.id):
+            #     course.is_buy = True
+            # else:
+            #     course.is_buy = False
+            addSalesInfosOn(course, request.user)
             slzCourse = CourseSerializer4API(course)
             return JsonResponse({'errCode': '0', 'data': slzCourse.data}, safe=False)
         except Exception as e:
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
     
     @action(detail=True,methods=['post'], format="json")
     def SearchCourse(self,request):
@@ -344,11 +358,19 @@ class  CourseViewSet(viewsets.ModelViewSet):
             data = request.data
             keyword = data.get('keyword', '')
             if keyword == '':
-                return JsonResponse({'errCode': '1001', 'data': {},'msg':'搜索关键词不能为空','sysErrMsg':e.__str__()}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'搜索关键词不能为空','sysErrMsg':e.__str__()}, safe=False)
 
             courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by('-update_time')
             # paginator = Paginator(courseList, pagesize)
             # coursePage = paginator.get_page(page)
+            
+            # for course in courseList:
+            #     course.sales_num = course.users.all().count
+            #     if course.users.all().filter(pk=request.user.id):
+            #         course.is_buy = True
+            #     else:
+            #         course.is_buy = False
+            addSalesInfosOnList(courseList,request.user)
             slzCourseList = CourseSerializer4API(courseList, many=True)
             # 前端需要用来取页面 
             return JsonResponse({'errCode': '0', 'data': slzCourseList.data}, safe=False)
@@ -356,10 +378,17 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
 
 
-
+def addSalesInfosOnList(courseList,user):
+    for course in courseList:
+        addSalesInfosOn(course,user)
    
-
+def addSalesInfosOn(course,user):
+    course.sales_num = course.users.all().count
+    if course.users.all().filter(pk=user.id):
+        course.is_buy = True
+    else:
+        course.is_buy = False
    

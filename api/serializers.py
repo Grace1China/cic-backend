@@ -13,6 +13,9 @@ from .import models
 class CustomUserSerializer(serializers.ModelSerializer):
     user=serializers.StringRelatedField(read_only=True)
     # church=serializers.StringRelatedField(read_only=True)
+    
+
+    
     class Meta:
         model=CustomUser
         fields='__all__'
@@ -30,7 +33,10 @@ class CustomUser4APISerializer(serializers.ModelSerializer):
     # creator = serializers.ForeignKey('CustomUser', on_delete=models.CASCADE,blank=True,null=True,verbose_name='创建者')
 
     # church=serializers.StringRelatedField(read_only=True)
-
+    
+    # 已购买课程
+    # courses = CourseSerializer(many=True, read_only=True)
+    
     def validate_password(self, value: str) -> str:
         """
         Hash value passed by user.
@@ -134,7 +140,12 @@ class CourseSerializer4API(serializers.ModelSerializer):
     # speaker = serializers.PrimaryKeyRelatedField(source='teacher', queryset=Speaker.objects.all())
     iap_charge = IAPChargeSerializer(read_only=True)
     
+    # users = CustomUser4APISerializer(many=True)
+    # users = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), many=True)
+    is_buy = serializers.BooleanField(required=False,default=None)
+    sales_num = serializers.IntegerField(default=0)
+    
     class Meta:
         model = models.Course
-        fields = ['id','church','speaker','title','description','content','price','price_usd','iap_charge','medias','create_time','update_time']
+        fields = ['id','church','speaker','title','description','content','price','price_usd','iap_charge','medias','sales_num','is_buy','create_time','update_time']
 

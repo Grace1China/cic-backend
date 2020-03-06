@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework import mixins
-from payment.models import IAPCharge, Order, PayType
+from payment.models import IAPCharge, Order, PayType,Users_Courses
 from payment.serializers import IAPChargeSerializer, IAPVerifiyRequestSerializer
 from rest_framework.decorators import action
 
@@ -18,7 +18,7 @@ import json
 import httplib2
 import uuid
 from django.conf import settings
-
+from django.db import transaction
 
 class IAPChargeViewSet(mixins.ListModelMixin,
                        viewsets.GenericViewSet):
@@ -36,7 +36,7 @@ class IAPChargeViewSet(mixins.ListModelMixin,
 
     def list(self, request):
         # if not request.user.is_authenticated:
-        #     return JsonResponse({'errCode': '403', 'data': {}, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
+        #     return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
         try:
             charges = IAPCharge.objects.all().order_by('price_code__price')
             slzCharges = self.get_serializer(charges, many=True)
@@ -46,7 +46,7 @@ class IAPChargeViewSet(mixins.ListModelMixin,
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'data': {}, 'msg': '没有充值产品', 'sysErrMsg': e.__str__()},
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有充值产品', 'sysErrMsg': e.__str__()},
                                 safe=False)
         pass
 
@@ -59,7 +59,7 @@ class OrderCreateAPIView(APIView):
 
     def post(self, request, format=None):
         # if not request.user.is_authenticated:
-        #     return JsonResponse({'errCode': '403', 'data': {}, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
+        #     return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
 
         try:
             # serializer = self.get_serializer(data=data)
@@ -68,7 +68,7 @@ class OrderCreateAPIView(APIView):
             data = self.request.data
             course_id = data.get('course_id', 0)
             if course_id == 0:
-                return JsonResponse({'errCode': '0', 'data': {}, "msg": "参数错误"}, safe=False)
+                return JsonResponse({'errCode': '0', 'data': None, "msg": "参数错误"}, safe=False)
 
             course = Course.objects.get(pk=course_id)
             payType = PayType.objects.get(pk=PayType.IAP)
@@ -81,7 +81,7 @@ class OrderCreateAPIView(APIView):
             return JsonResponse({'errCode': '0', 'data': {'order_no': order.order_no}}, safe=False)
 
         except Exception as e:
-            return JsonResponse({'errCode': '1001', 'msg': str(e), 'data': {}}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg': str(e), 'data': None}, safe=False)
         pass
 
 
@@ -97,7 +97,7 @@ class OrderCreateAPIView(APIView):
 # 
 #     # def list(self, request):
 #     #     if not request.user.is_authenticated:
-#     #         return JsonResponse({'errCode': '403', 'data': {}, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
+#     #         return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
 #     #     try:
 #     #         charges = IAPCharge.objects.all().order_by('price_code__price')
 #     #         slzCharges = self.get_serializer(charges, many=True)
@@ -107,13 +107,14 @@ class OrderCreateAPIView(APIView):
 #     #         import traceback
 #     #         import sys
 #     #         traceback.print_exc(file=sys.stdout)
-#     #         return JsonResponse({'errCode': '1001', 'data': {}, 'msg': '没有充值产品', 'sysErrMsg': e.__str__()},
+#     #         return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有充值产品', 'sysErrMsg': e.__str__()},
 #     #                             safe=False)
 #     #     pass
 
 
 # 文档网址
 # "https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW1"
+# @transaction.atomic
 class IapVerifyReceipt(APIView):
     """
     验证iapreceiptdata
@@ -122,7 +123,7 @@ class IapVerifyReceipt(APIView):
 
     def post(self, request, format=None):
         # if not request.user.is_authenticated:
-        #     return JsonResponse({'errCode': '403', 'data': {}, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
+        #     return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
 
         try:
             receipt = request.data.get('receipt', '')
@@ -131,11 +132,11 @@ class IapVerifyReceipt(APIView):
             pprint.PrettyPrinter(4).pprint('请求验证-order_no:' + order_no + 'receipt=xxx')
 
             if order_no == '' or receipt == '':
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
 
             order = Order.objects.get(user=request.user, order_no=order_no)
             if order is None:
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误"}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误"}, safe=False)
 
             iapurl = "https://buy.itunes.apple.com/verifyReceipt"
             if settings.IAP_IS_SANDBOX:
@@ -149,12 +150,12 @@ class IapVerifyReceipt(APIView):
 
             if resp.status != 200:
                 SaveWithFailed(order)
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "访问apple验证服务器错误"}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "访问apple验证服务器错误"}, safe=False)
 
             connect.close()
             if content is None:
                 SaveWithFailed(order)
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "验证失败,返回内容为空。"}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "验证失败,返回内容为空。"}, safe=False)
 
             decodedJson = json.loads(content)
             jsonString = json.dumps(decodedJson)
@@ -164,15 +165,20 @@ class IapVerifyReceipt(APIView):
             status = decodedJson.get('status')
             if status != 0:
                 SaveWithFailed(order)
-                return JsonResponse({'errCode': '0', 'data': {}, 'msg': "验证失败"}, safe=False)
+                return JsonResponse({'errCode': '0', 'data': None, 'msg': "验证失败"}, safe=False)
 
-            SaveWithSuccess(order)
+            course = Course.objects.get(pk=order.course.id)
+            usercourse = Users_Courses(user=request.user, course=course)
+            with transaction.atomic():
+                SaveWithSuccess(order)
+                usercourse.save()
+                
             return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "验证成功"}, safe=False)
 
         except Exception as e:
             print("e:" + e.__str__())
             SaveWithFailed(order)
-            return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "访问apple验证服务器错误：" + e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "访问apple验证服务器错误：" + e.__str__()}, safe=False)
 
 
 def SaveWithFailed(order):
@@ -193,7 +199,7 @@ def SaveWithSuccess(order):
 #     if request.method == 'POST':  # 当提交表单
 # 
 #     else:
-#         return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "请使用POST方法", 'sysErrMsg': ''}, safe=False)
+#         return JsonResponse({'errCode': '1001', 'data': None, 'msg': "请使用POST方法", 'sysErrMsg': ''}, safe=False)
 
 
 # --------paypal---------
@@ -211,10 +217,10 @@ class ClientToken(APIView):
         try:
             course_id = request.data.get('course_id', 0)
             if course_id == 0:
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
             course = Course.objects.get(pk=course_id)
             if course is None:
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
 
             payType = PayType.objects.get(pk=PayType.PAYPAL)
             isSandbox = settings.PAYPAL_IS_SANEBOX
@@ -230,9 +236,10 @@ class ClientToken(APIView):
                 safe=False)
         except Exception as e:
             print("e:" + e.__str__())
-            return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "请求client token失败：" + e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "请求client token失败：" + e.__str__()}, safe=False)
 
 
+# @transaction.atomic
 class PaymentMethodNonce(APIView):
     """
     paypal 支付
@@ -243,17 +250,18 @@ class PaymentMethodNonce(APIView):
         try:
             order_no = request.data.get('order_no', 0)
             nonce_from_the_client = request.data.get('payment_method_nonce', '')
-            if order_no == '' or nonce_from_the_client == '':
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+            device_data_from_the_client = request.data.get('device_data_from_the_client', '')
+            if order_no == '' or nonce_from_the_client == '' or device_data_from_the_client == '':
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
             order = Order.objects.get(user=request.user, order_no=order_no)
             if order is None:
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "参数错误"}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误"}, safe=False)
 
             gateway = pp_gateway()
             result = gateway.transaction.sale({
                 "amount": order.price_usd,
                 "payment_method_nonce": nonce_from_the_client,
-                # "device_data": device_data_from_the_client,
+                "device_data": device_data_from_the_client,
                 "options": {
                     "submit_for_settlement": True
                 }
@@ -263,7 +271,13 @@ class PaymentMethodNonce(APIView):
             print(result.transaction.status)
             if result.is_success:
                 print("success!: " + result.transaction.id)
-                SaveWithSuccess(order)
+                course = Course.objects.get(pk=order.course.id)
+                usercourse = Users_Courses(user=request.user, course=course)
+                
+                with transaction.atomic():
+                    SaveWithSuccess(order)
+                    usercourse.save()
+                    
                 return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "支付成功"}, safe=False)
 
             elif result.transaction:
@@ -272,7 +286,7 @@ class PaymentMethodNonce(APIView):
                 print("  text: " + result.transaction.processor_response_text)
 
                 SaveWithFailed(order)
-                return JsonResponse({'errCode': '1001', 'data': {},
+                return JsonResponse({'errCode': '1001', 'data': None,
                                      'msg': "支付失败:" + result.transaction.processor_response_code + "," + result.transaction.processor_response_text},
                                     safe=False)
             else:
@@ -283,11 +297,11 @@ class PaymentMethodNonce(APIView):
                     print("  message: " + error.message)
                     msg += "," + error.code + ":" + error.message
                 SaveWithFailed(order)
-                return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "支付失败" + msg}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "支付失败" + msg}, safe=False)
         except Exception as e:
             print("e:" + e.__str__())
             SaveWithFailed(order)
-            return JsonResponse({'errCode': '1001', 'data': {}, 'msg': "支付失败：" + e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "支付失败：" + e.__str__()}, safe=False)
 
 
 def pp_gateway():
@@ -299,7 +313,7 @@ def pp_gateway():
             public_key="2ds4m93c5rfmbww5",
             private_key="39d099e6e9fa98ecc83a7537370717d2"
         )
-    else:
+    else: #TODO: 正式环境配置
         congfiguration = braintree.Configuration(
             braintree.Environment.Production,
             merchant_id="b9mnrfpx5f9b73tj",

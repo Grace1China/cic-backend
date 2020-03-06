@@ -106,3 +106,9 @@ class Order(models.Model):
     # 
     #     def get_prep_value(self, value):
     #         return json.dumps({'v': value})
+
+class Users_Courses(models.Model):
+    user = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
+    course = models.ForeignKey("church.Course", on_delete=models.CASCADE)
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name='更新时间')

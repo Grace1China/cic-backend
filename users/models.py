@@ -21,6 +21,8 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
+    # courses = models.ManyToManyField("church.Course", through='payment.Users_Courses', related_name="owners", null=True, blank=True)
+    
     def groups_list(self):
         return ', '.join([a.name for a in self.groups.all()])
     groups_list.short_description = '所属组'
