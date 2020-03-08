@@ -172,7 +172,8 @@ class IapVerifyReceipt(APIView):
             with transaction.atomic():
                 SaveWithSuccess(order)
                 usercourse.save()
-                
+                course.sales_num += 1
+                course.save()
             return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "验证成功"}, safe=False)
 
         except Exception as e:
@@ -277,7 +278,8 @@ class PaymentMethodNonce(APIView):
                 with transaction.atomic():
                     SaveWithSuccess(order)
                     usercourse.save()
-                    
+                    course.sales_num += 1
+                    course.save()
                 return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "支付成功"}, safe=False)
 
             elif result.transaction:

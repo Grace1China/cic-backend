@@ -51,7 +51,7 @@ class Course(models.Model):
     # s3video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
 
     users = models.ManyToManyField("users.CustomUser", through='payment.Users_Courses', related_name="courses", null=True, blank=True)
-    # sales_num = models.IntegerField(default=0)
+    sales_num = models.IntegerField(default=0)
     
     import churchs.models as churchs_models
     medias = GenericRelation(churchs_models.Media, related_query_name='Course',verbose_name='视听媒体')

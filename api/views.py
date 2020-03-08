@@ -255,7 +255,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
     # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
     @action(detail=True,methods=['get','post'], format="json")
-    def GetCourseList(self,request,page=1,pagesize=10,keyword=None,orderby=None):
+    def GetCourseList(self,request,page=1,pagesize=10,keyword=None,orderby=None,bought=False):
         '''
         查找课程列表信息
         '''
@@ -299,17 +299,42 @@ class  CourseViewSet(viewsets.ModelViewSet):
             else:
                 orderby = '-update_time'
 
+            #查询已经购买新逻辑
+            
+            if data.get('bought', bought).lower() == 'true':
+                queryBought = True
+            else:
+                queryBought = False
+                
+            if queryBought:
+                from churchs.models import Media
+                from church.models import Course
+                from django.db.models import Prefetch
+                if request.user.is_authenticated:
+                    queryset = request.user.courses.all().prefetch_related(Prefetch('medias',
+                                                             queryset=Media.objects.order_by('kind')))
+                    courseList = queryset.order_by(orderby)
+                    for course in courseList:
+                        course.is_buy = True
+                    page = 1
+                    pagesize = 99999
+                    paginator = Paginator(courseList, pagesize)
+                    coursePage = paginator.get_page(page)
+    
+                    slzCourseList = CourseSerializer4API(coursePage, many=True)
+                    # 前端需要用来取页面 
+                    return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 'page': coursePage.number,
+                                         'totalPage': paginator.num_pages}, safe=False)
+                else:
+                    return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有课程列表'},
+                                        safe=False)
+            
+            #未购买逻辑
             if keyword is not None:
                 courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by(orderby)
             else:
                 courseList = self.get_queryset().filter().order_by(orderby)
             
-            # for course in courseList:
-            #     course.sales_num = course.users.all().count
-            #     if course.users.all().filter(pk=request.user.id):
-            #         course.is_buy = True
-            #     else:
-            #         course.is_buy = False
             addSalesInfosOnList(courseList, request.user)
             paginator = Paginator(courseList, pagesize)
             coursePage = paginator.get_page(page)
@@ -335,11 +360,6 @@ class  CourseViewSet(viewsets.ModelViewSet):
         try:
             course = self.get_queryset().filter(id=pk).order_by('-update_time')[0]
 
-            # course.sales_num = course.users.all().count
-            # if course.users.all().filter(pk=request.user.id):
-            #     course.is_buy = True
-            # else:
-            #     course.is_buy = False
             addSalesInfosOn(course, request.user)
             slzCourse = CourseSerializer4API(course)
             return JsonResponse({'errCode': '0', 'data': slzCourse.data}, safe=False)
@@ -364,12 +384,6 @@ class  CourseViewSet(viewsets.ModelViewSet):
             # paginator = Paginator(courseList, pagesize)
             # coursePage = paginator.get_page(page)
             
-            # for course in courseList:
-            #     course.sales_num = course.users.all().count
-            #     if course.users.all().filter(pk=request.user.id):
-            #         course.is_buy = True
-            #     else:
-            #         course.is_buy = False
             addSalesInfosOnList(courseList,request.user)
             slzCourseList = CourseSerializer4API(courseList, many=True)
             # 前端需要用来取页面 
@@ -386,7 +400,8 @@ def addSalesInfosOnList(courseList,user):
         addSalesInfosOn(course,user)
    
 def addSalesInfosOn(course,user):
-    course.sales_num = course.users.all().count
+    # course表自带sales_num，不再查询关联表了。用于orderby。
+    # course.sales_num = course.users.all().count
     if course.users.all().filter(pk=user.id):
         course.is_buy = True
     else:
