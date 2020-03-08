@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     "church.apps.ChurchConfig",
     'churchs.apps.ChurchsConfig',
+    'payment.apps.PaymentConfig', #支付
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     # 'photos.apps.PhotosConfig',
@@ -66,7 +67,8 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'djoser',
     'rest_framework_simplejwt',
-    'parsley'
+    'parsley',
+    'django_mysql'
 ]
 
 MIDDLEWARE = [
@@ -507,7 +509,7 @@ LOGGING = {
             'level': 'ERROR',
             'formatter':'verbose',
             'class': 'logging.FileHandler',
-            'filename': '/data/log/django/error.log',
+            'filename': '/data/log/django/error.log', #本机data/log/django/error.log
         },
     },
     'loggers': {

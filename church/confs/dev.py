@@ -4,17 +4,28 @@ from .base import *
 DEBUG = True 
 SECRET_KEY = '123dev'
 
+IAP_IS_SANDBOX = True
+PAYPAL_IS_SANEBOX = True
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
         'NAME': 'cic',  # 数据库名，先前创建的
-        'USER': 'backend_user',     # 用户名，可以自己创建用户
-        'PASSWORD': '11/28/2019',  # 密码
-        'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
+        
+        #本地 
+#        'USER': 'root',     # 用户名，可以自己创建用户
+#        'PASSWORD': '',  # 密码
+#        'HOST': '127.0.0.1',  # mysql服务所在的主机ip 54.169.143.92
+
+#测试
+         'USER': 'backend_user',     # 用户名，可以自己创建用户
+         'PASSWORD': '11/28/2019',  # 密码
+         'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
+        
         'PORT': '3306',         # mysql服务端口
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
+            # 'charset': 'utf8md4',
         },
         'TEST': {
             'NAME': 'test_cic',
