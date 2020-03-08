@@ -147,13 +147,74 @@ class MediaInline(GenericStackedInline):
     fields = (('alioss_video','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status',('alioss_audio','alioss_image','alioss_pdf'),'content')
     extra = 0
     max_num = 4
-    # formfield_overrides = {
-    #     Media.dist_HD_URL: {'widget': AliVideoWidgetExt},
-    # }
 
 
-# class MediaInline(GenericStackedInline):
-#     model = Media
+from django.db.models.signals import post_save
+# from django.dispatch import receiver
+from api.serializers import SermonSerializer4API, MediaSerializer4API
+import logging
+import json
+import requests
+from django.conf import settings
+import pprint
+
+
+def mainsite_api_v1_makesermon(sender,instance, **kwargs):
+    try:
+
+        loger = logging.getLogger('church.all')
+        inst1 = Sermon.objects.all().get(id=instance.id)
+        # {'_state': <django.db.models.base.ModelState object at 0x00000187B7344BA8>, 'id': 63, 'church_id': 2, 'user_id': 20, 'title': 'ims/IMS20200301.mp4', 'speaker_id': 192, 'scripture': 'empty', 'series_id': None, 'create_time': datetime.datetime(2020, 3, 2, 9, 43, 52, 231422, tzinfo=<UTC>), 'update_time': datetime.datetime(2020, 3, 2, 12, 43, 51, 112888, tzinfo=<UTC>), 'pub_time': datetime.datetime(2020, 3, 2, 17, 43, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>), 'status': 1}
+        # loger.info(instance.id)
+        SermonSerializer4API
+        szSermon = SermonSerializer4API(inst1)
+        loger.info("------------------mainsite_api_v1_makesermon--1--------------------------")
+        loger.info(inst1)
+        loger.info(szSermon.data.__dict__)
+        dt = szSermon.data
+
+        # loger.info(repr(szSermon))
+        loger.info("------------------mainsite_api_v1_makesermon--2--------------------------")
+
+
+        # loger.info(szSermon.__dict__)
+
+        data = {'study_name':dt["title"],
+            'study_date':dt["pub_time"], 
+            'publish_up':dt["pub_time"],
+            'published':0 if dt["status"]== Sermon.STATUS_DRAFT else 0,
+            'ministry':dt["church"]["id"], 
+            'video_link':dt["medias"][0]['SHD_URL'] if len(dt["medias"])>0 else '', 
+            'teacher':dt["speaker"]["id"], 
+            'imagelrg': '%s?x-oss-process=image/resize,m_fixed,h_100,w_100' % dt["medias"][0]['image'] if len(dt["medias"])>0 else '',
+            'audio_link': dt["medias"][0]['audio'] if len(dt["medias"])>0 else '',
+            'slides_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else '',
+            'notes_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else ''
+        }
+
+        loger.info(data)
+
+        if sender.status == Sermon.STATUS_DRAFT:
+            pass
+        else:
+            r = None
+            if settings.DEBUG:
+                r = requests.post(settings.MAINSITE_API_V1['DEVELOPMENT'], json=json.dumps(data))
+            else:
+                r = requests.post(settings.MAINSITE_API_V1['DEBUG'], json=json.dumps(data))
+            loger.info(pprint.PrettyPrinter(6).pprint(r))
+            if r.errCode != '0':
+                raise Exception('There is an err\n%s' % r.sysErrMsg)
+            
+    except Exception as e:
+        # pprint.PrettyPrinter(4).pprint(e.__traceback__)
+        import traceback
+        import sys
+        loger = logging.getLogger('church.all')
+        loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+        # do_something_else()
+
+post_save.connect(mainsite_api_v1_makesermon, sender=Sermon)
     
 from datetime import datetime
 

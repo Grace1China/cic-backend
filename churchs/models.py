@@ -283,11 +283,6 @@ class Media(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
-# class ossMedia(models.Model):
-#     '''
-#     存储oss相关信息，可能是s3,可能是alioss,有原文件信息，也有发布以后的媒体信息
-#     '''
-
 
 
 class Sermon(models.Model):
@@ -320,38 +315,8 @@ class Sermon(models.Model):
 
     def __str__(self):
         return '%s' % (self.title)
-
-    def save(self, *args, **kwargs):
-        print('before save-------------------')
-        try:
-
-            import json
-            import requests
-            from api.serializers import SermonSerializer4API, MediaSerializer4API
-
-            szSermon = SermonSerializer4API(self)
-            data = {'study_name':szSermon.title,
-                    'study_date':szSermon.pub_time, 
-                    'publish_up':szSermon.pub_time,
-                    'published':1,
-                    'ministry':szSermon.church, 
-                    'video_link':szSermon.medias[0].SHD_URL if len(szSermon.medias)>0 else '', 
-                    'teacher':szSermon.speaker, 
-                    'imagelrg': szSermon.medias[0].image if len(szSermon.medias)>0 else '',
-                    'audio_link': szSermon.medias[0].audio if len(szSermon.medias)>0 else '',
-                    'slides_link': szSermon.medias[0].pdf if len(szSermon.medias)>0 else '',
-                    'notes_link': szSermon.medias[0].pdf if len(szSermon.medias)>0 else ''
-            }
-
-            r = requests.post('http://47.95.199.234/mainsite_api_v1/mst/MakeSermon', data)
-        except Exception as e:
-            # pprint.PrettyPrinter(4).pprint(e.__traceback__)
-            import traceback
-            import sys
-            loger = logging.getLogger('church.all')
-            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
-        super().save(*args, **kwargs)  # Call the "real" save() method.
-        # do_something_else()
+                
+    
 
 
 class WeeklyReport(models.Model):
@@ -381,17 +346,7 @@ class WeeklyReport(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
-# class Member(models.Model):
-#     email = models.EmailField(max_length=64,verbose_name='email地址')
-#     phone = models.CharField(max_length=16,verbose_name='电话')
-#     password = models.CharField(max_length=256,verbose_name='密码')
-#     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-#     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-#     class Meta:
-#         verbose_name = "会友"
-#         verbose_name_plural = "会友"
-#     def __str__(self):
-#         return '%s' % (self.title)
+
 
 class Team(models.Model):
     STATUS_INITED = 1

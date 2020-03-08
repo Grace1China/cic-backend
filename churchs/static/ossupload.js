@@ -20,7 +20,7 @@ function UploaderFactory(
     var loc_fileurl = pfileurl //用来上传form里
     var loc_acl = pacl
     // var loc_widget_div = pwidget_div
-    var max_file_size = '4gb'
+    var max_file_size = '8gb'
     
     var accessid = ''
     var accesskey = ''

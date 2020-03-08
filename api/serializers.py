@@ -68,20 +68,7 @@ class SermonSeriesSerializer4API(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# media:
-# ----------------------
-# owner
-# kind 
-# title
-# video
-# video_status 
-# SHD_URL
-# HD_URL
-# SD_URL
-# audio
-# image
-# pdf
-# content
+
 class MediaSerializer4API(serializers.ModelSerializer):
     # image_presigned_url = serializers.SerializerMethodField()
     # pdf_presigned_url = serializers.SerializerMethodField()
