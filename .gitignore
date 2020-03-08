@@ -116,3 +116,4 @@ church/gunicorn.conf.py
 stop_site
 run_site
 ./church/settings.py
+./church/confs/dev.py
