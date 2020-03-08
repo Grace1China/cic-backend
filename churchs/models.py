@@ -439,7 +439,7 @@ class BibleStudy(models.Model):
     
 class BibleStudyComment(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser,null=True,  on_delete=models.CASCADE)
     content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
