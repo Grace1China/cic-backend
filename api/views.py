@@ -102,8 +102,8 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
+            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
 
-            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':e.__str__()}, safe=False)
 
 
     @action(detail=True,methods=['POST'], format="json")
@@ -120,8 +120,8 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
+            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
 
-            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':e.__str__()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
     def GetL3Eweekly(self,request):
@@ -142,7 +142,8 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
-            return JsonResponse({'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
+
             
 
 
@@ -209,7 +210,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
     def GetDefaultLordsDayInfo(self,request):
@@ -232,9 +233,13 @@ class SermonViewSet(viewsets.ModelViewSet):
             slzSermon = self.get_serializer(theSermon)
             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
         except Exception as e:
-            traceback.print_exc(file=sys.stdout)
 
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'平台教会没有最新讲道','sysErrMsg':e.__str__()}, safe=False)
+            import traceback
+            import sys
+            loger = logging.getLogger('church.all')
+            loger.exception('there is exceptin',exc_info=True,stack_info=True)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'平台教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
+
 
 
 from .serializers import CourseSerializer4API, MediaSerializer4API, CourseSerializer4APIPOST
@@ -350,7 +355,9 @@ class  CourseViewSet(viewsets.ModelViewSet):
             traceback.print_exc(file=logger.handlers[0]._open())
             traceback.print_exc(file=sys.stdout)
             # logger.error()
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
+
 
     @action(detail=True,methods=['POST'], format="json")
     def GetCoursebyID(self,request,pk):
@@ -367,7 +374,8 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
+
     
     @action(detail=True,methods=['post'], format="json")
     def SearchCourse(self,request):
@@ -378,7 +386,11 @@ class  CourseViewSet(viewsets.ModelViewSet):
             data = request.data
             keyword = data.get('keyword', '')
             if keyword == '':
-                return JsonResponse({'errCode': '1001', 'data': None,'msg':'搜索关键词不能为空','sysErrMsg':e.__str__()}, safe=False)
+                import traceback
+                import sys
+                traceback.print_exc(file=sys.stdout)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'搜索关键词不能为空','sysErrMsg':traceback.format_exc()()}, safe=False)
+
 
             courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by('-update_time')
             # paginator = Paginator(courseList, pagesize)
@@ -392,7 +404,8 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':e.__str__()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
+
 
 
 def addSalesInfosOnList(courseList,user):

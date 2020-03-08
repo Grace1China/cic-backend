@@ -3,7 +3,6 @@ simpleui
 django-cors-headers
 django-debug-toolbar
 djangorestframework
-django-rest-swagger
 django-rest-auth
 django-allauth
 mysqlclient 
@@ -21,3 +20,6 @@ django-parsley
 httplib2
 django-mysql
 braintree
+gunicorn
+drf-yasg
+qrcode

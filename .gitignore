@@ -59,6 +59,8 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
+settings.py
+
 db.sqlite3
 
 # Flask stuff:
@@ -110,3 +112,7 @@ venv.bak/
 todo
 /static
 **/daniel_*
+church/gunicorn.conf.py
+stop_site
+run_site
+./church/settings.py

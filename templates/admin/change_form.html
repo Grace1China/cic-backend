@@ -147,6 +147,13 @@
 
          new Vue({
             el: "#{{ opts.model_name }}_form",
+            mounted: function (){
+                /*
+                定时对服务器查找，是否已经转码成功。
+                要求：通过可设定查寻对象的api来处理查寻请求
+                */
+                
+            },
             methods:{
                 openMsg:function(value){
                     this.$alert(`<a href='${value}' target="_blank">${value}</a>`, '公共链接(Public Link)', {
@@ -162,6 +169,7 @@
                 //},
                 goBack:function () {
                     //找到上级
+                    console.log(location.pathname)
                     var array = location.pathname.split('/')
                     if (array.length == 5||array.length==6) {
                         window.location.href = '/' + array[1] + '/' + array[2];

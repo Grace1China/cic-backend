@@ -27,7 +27,7 @@ class AliOssSignature(APIView):
     # 请填写您的AccessKeySecret。
     access_key_secret = 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I'
     # host的格式为 bucketname.endpoint ，请替换为您的真实信息。
-    host = 'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
+    host = 'https://bicf-media-source.oss-accelerate.aliyuncs.com'#'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
     desthost = 'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
     # callback_url为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
     callback_url = "http://%s/rapi/alioss_directup_callback" %  settings.APP_SERVER_IP
@@ -43,59 +43,69 @@ class AliOssSignature(APIView):
 
 
     def get_token(self,request):
-        now = int(time.time())
-        expire_syncpoint = now + self.expire_time
-        # expire_syncpoint = 1612345678
-        expire = self.get_iso_8601(expire_syncpoint)
+        try:
+            import logging
+            logger = logging.getLogger('dev.error')
+            
+            now = int(time.time())
+            expire_syncpoint = now + self.expire_time
+            # expire_syncpoint = 1612345678
+            expire = self.get_iso_8601(expire_syncpoint)
 
-        policy_dict = {}
-        policy_dict['expiration'] = expire
-        condition_array = []
-        array_item = []
-        array_item.append('starts-with');
-        array_item.append('$key');
-        if (request.user.church == None):
-            import pprint
-            pprint.PrettyPrinter(6).pprint(request.user)
-            raise Exception('user or church of user is null')
-        array_item.append(request.user.church.code);
-        condition_array.append(array_item)
-        policy_dict['conditions'] = condition_array
-        policy = json.dumps(policy_dict).strip()
-        policy_encode = base64.b64encode(policy.encode())
-        h = hmac.new(self.access_key_secret.encode(), policy_encode, sha)
-        sign_result = base64.encodestring(h.digest()).strip()
+            policy_dict = {}
+            policy_dict['expiration'] = expire
+            condition_array = []
+            array_item = []
+            array_item.append('starts-with');
+            array_item.append('$key');
+            if (request.user.church == None):
+                import pprint
+                pprint.PrettyPrinter(6).pprint(request.user)
+                raise Exception('user or church of user is null')
+            array_item.append(request.user.church.code);
+            condition_array.append(array_item)
+            policy_dict['conditions'] = condition_array
+            policy = json.dumps(policy_dict).strip()
+            policy_encode = base64.b64encode(policy.encode())
+            h = hmac.new(self.access_key_secret.encode(), policy_encode, sha)
+            sign_result = base64.encodestring(h.digest()).strip()
 
-        callback_dict = {}
-        callback_dict['callbackUrl'] = self.callback_url;
-        callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
-                                        '&height=${imageInfo.height}&width=${imageInfo.width}';
-        callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
+            callback_dict = {}
+            callback_dict['callbackUrl'] = self.callback_url;
+            callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
+                                            '&height=${imageInfo.height}&width=${imageInfo.width}';
+            callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
 
-        import logging
-        logging.debug(callback_dict)
-        callback_param = json.dumps(callback_dict).strip()
-        base64_callback_body = base64.b64encode(callback_param.encode());
+            import logging
+            logging.debug(callback_dict)
+            callback_param = json.dumps(callback_dict).strip()
+            base64_callback_body = base64.b64encode(callback_param.encode());
 
-        token_dict = {}
-        token_dict['accessid'] = self.access_key_id
-        token_dict['host'] = self.host
-        token_dict['desthost'] = self.desthost
-        token_dict['policy'] = policy_encode.decode()
-        token_dict['signature'] = sign_result.decode()
-        token_dict['expire'] = expire_syncpoint
-        # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
+            token_dict = {}
+            token_dict['accessid'] = self.access_key_id
+            token_dict['host'] = self.host
+            token_dict['desthost'] = self.desthost
+            token_dict['policy'] = policy_encode.decode()
+            token_dict['signature'] = sign_result.decode()
+            token_dict['expire'] = expire_syncpoint
+            # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
 
-        if request.user.church == None:
-            token_dict['dir'] = 'l3/'
-        else:
-            token_dict['dir'] = '%s/' % request.user.church.code
+            if request.user.church == None:
+                token_dict['dir'] = 'l3/'
+            else:
+                token_dict['dir'] = '%s/' % request.user.church.code
 
 
 
-        token_dict['callback'] = base64_callback_body.decode()
-        result = json.dumps(token_dict)
-        return result
+            token_dict['callback'] = base64_callback_body.decode()
+            result = json.dumps(token_dict)
+            return result
+        except Exception as e:
+            import logging
+            logger = logging.getLogger('dev.error')
+            logger.exception("there is an exception")
+        finally:
+            pass
 
 
 
@@ -186,6 +196,11 @@ class AliMtsCallBack(APIView):
 
         logger = logging.getLogger('dev.error')
         logger.error('-------------------in post ----------------------')
+
+        # ERROR 2020-03-01 08:53:35,941 alioss_directup_views.py post 207 {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': '7775f8a5c9424ab4b56f39ba1f3607e8', 'State': 'Success', 'MediaWorkflowExecution': {'MediaWorkflowId': '68d8b00a315f42c3bcbb5854beb7f076', 'Name': 'workflow1578060577262', 'RunId': 'c7ba582242024d7e964e038c1078916b', 'MediaId': '84415b6989b0444f8f359b874abcaa67', 'Input': {'InputFile': {'Bucket': 'bicf-media-source', 'Location': 'oss-cn-beijing', 'Object': 'citychurch/City Church Connect   Mar 1.mp4'}}, 'State': 'Running', 'ActivityList': [{'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': '7775f8a5c9424ab4b56f39ba1f3607e8', 'State': 'Success', 'StartTime': '2020-03-01T00:53:34Z', 'EndTime': '2020-03-01T00:53:34Z'}], 'CreationTime': '2020-03-01T00:53:34Z', 'RequestId': '5E5AFF44A152389C6E7124CC'}}
+        # ERROR 2020-03-01 09:17:38,590 alioss_directup_views.py post 198 -------------------in post ----------------------
+        # ERROR 2020-03-01 09:17:38,590 alioss_directup_views.py post 207 {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'MediaWorkflowExecution': {'MediaWorkflowId': '68d8b00a315f42c3bcbb5854beb7f076', 'Name': 'workflow1578060577262', 'RunId': 'c7ba582242024d7e964e038c1078916b', 'MediaId': '84415b6989b0444f8f359b874abcaa67', 'Input': {'InputFile': {'Bucket': 'bicf-media-source', 'Location': 'oss-cn-beijing', 'Object': 'citychurch/City Church Connect   Mar 1.mp4'}}, 'State': 'Completed', 'ActivityList': [{'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'StartTime': '2020-03-01T01:17:38Z', 'EndTime': '2020-03-01T01:17:38Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Snapshot', 'Type': 'Snapshot', 'JobId': '315cd18a5a04484fa5ab490d94276b07', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T00:53:36Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-ss-mp4-hd', 'Type': 'Transcode', 'JobId': '20cb8b51ca264756a3390d65a5da1cd5', 'TemplateId': 'S00000001-200030', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T01:17:38Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-ss-mp4-ld', 'Type': 'Transcode', 'JobId': '840254f15237426ea8da286939c8f4c3', 'TemplateId': 'S00000001-200010', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T01:03:49Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-ss-mp4-sd', 'Type': 'Transcode', 'JobId': 'b18606d9033a40959f4e4323bba8f696', 'TemplateId': 'S00000001-200020', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T01:09:02Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': '7775f8a5c9424ab4b56f39ba1f3607e8', 'State': 'Success', 'StartTime': '2020-03-01T00:53:34Z', 'EndTime': '2020-03-01T00:53:35Z'}], 'CreationTime': '2020-03-01T00:53:34Z', 'RequestId': '5E5AFF44A152389C6E7124CC'}}
+
 
         # auth = request.META.get('Authorization')
         # logger.error(auth)
