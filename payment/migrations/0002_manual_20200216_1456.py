@@ -35,7 +35,7 @@ def forwards_func(apps, schema_editor):
                          proceeds=row['Proceeds_CNY'],
                          price_usd=row['Price_USD'],
                          proceeds_usd=row['Proceeds_USD'])
-            p.save()
+            # p.save()
 
     # init iap_charge   
     IAPPricem = apps.get_model("payment", "IAPPrice")
@@ -46,14 +46,14 @@ def forwards_func(apps, schema_editor):
 
     IAPCharge = apps.get_model("payment", "IAPCharge")
     db_alias = schema_editor.connection.alias
-    IAPCharge.objects.using(db_alias).bulk_create([
+    # IAPCharge.objects.using(db_alias).bulk_create([
 
-        IAPCharge(price_code=p1, product_id=productids[0], desc=descs[0], price=p1.price),
-        # 客户端根据price_code计算在apple上的product_id
-        IAPCharge(price_code=p2, product_id=productids[1], desc=descs[1], price=p2.price),
-        IAPCharge(price_code=p3, product_id=productids[2], desc=descs[2], price=p3.price),
-        IAPCharge(price_code=p4, product_id=productids[3], desc=descs[3], price=p4.price),
-    ])
+    #     IAPCharge(price_code=p1, product_id=productids[0], desc=descs[0], price=p1.price),
+    #     # 客户端根据price_code计算在apple上的product_id
+    #     IAPCharge(price_code=p2, product_id=productids[1], desc=descs[1], price=p2.price),
+    #     IAPCharge(price_code=p3, product_id=productids[2], desc=descs[2], price=p3.price),
+    #     IAPCharge(price_code=p4, product_id=productids[3], desc=descs[3], price=p4.price),
+    # ])
 
 
 #如何执行reverse？
