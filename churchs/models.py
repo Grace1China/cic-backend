@@ -423,7 +423,7 @@ class Meeting(models.Model):
     
 class BibleStudy(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
-    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
+    speaker = models.ForeignKey("Speaker",null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=255)
     # content = models.TextField(null=True, blank=True)
