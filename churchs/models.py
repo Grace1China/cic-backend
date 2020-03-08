@@ -357,7 +357,7 @@ class Team(models.Model):
         (STATUS_OFFLINE, '下线')
     )
     
-    church = models.ForeignKey(Church, on_delete=models.CASCADE)
+    church = models.ForeignKey(Church,null=True,  on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     description = models.CharField(max_length=255)
     status = models.IntegerField(
@@ -408,7 +408,7 @@ class Speaker(models.Model):
 
 class Meeting(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
-    speaker = models.ForeignKey("Speaker", on_delete=models.CASCADE)
+    speaker = models.ForeignKey("Speaker",null=True,  on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     time = models.DateTimeField
     description = models.CharField(max_length=255)
