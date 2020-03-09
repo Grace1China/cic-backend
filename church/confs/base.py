@@ -57,11 +57,6 @@ INSTALLED_APPS = [
     #'debug_toolbar',
     'rest_framework',
     'rest_framework.authtoken',
-<<<<<<< Updated upstream
-    # 'rest_framework_swagger', 
-=======
-    #'rest_framework_swagger',
->>>>>>> Stashed changes
     'rest_auth',
     'rest_auth.registration',
     'allauth',
@@ -606,17 +601,14 @@ LOGGING = {
             'level': 'INFO',
             'filters': ['InfoFilter'],
             'class': 'logging.FileHandler',
-<<<<<<< Updated upstream
             'filename': '/data/log/django/apiprj_info.log',
             'formatter': 'simple'
-=======
-            'filename': '/data/log/django/l3sandbox/error.log', #本机data/log/django/error.log
->>>>>>> Stashed changes
+            'filename': '/data/log/django/l3server/info.log', #本机data/log/django/error.log
         },
         'file_err': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '/data/log/django/apiprj_Error.log',
+            'filename': '/data/log/django/l3server/error.log',
             'formatter': 'verbose'
         },
         'mail_admins': {

@@ -52,7 +52,7 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
-        'NAME': 'cic',  # 数据库名，先前创建的
+        'NAME': 'test_cic',  # 数据库名，先前创建的
         'USER': 'backend_user',     # 用户名，可以自己创建用户
         'PASSWORD': '11/28/2019',  # 密码
         'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
@@ -144,12 +144,12 @@ LOGGING = {
             'filters': ['InfoFilter'],
             'class': 'logging.FileHandler',
             'formatter': 'simple'
-            'filename': '/data/log/django/l3prod/info.log', #本机data/log/django/error.log
+            'filename': '/data/log/django/l3sandbox/info.log', #本机data/log/django/error.log
         },
         'file_err': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '/data/log/django/l3prod/error.log',
+            'filename': '/data/log/django/l3sandbox/error.log',
             'formatter': 'verbose'
         },
         'mail_admins': {
