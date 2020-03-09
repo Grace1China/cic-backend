@@ -179,7 +179,7 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'ERROR',
             'propagate': False
-        }
+        },
         'church.all': {
             'handlers': ['console', 'console_err','file_info','file_err'],
             'level': 'INFO',
