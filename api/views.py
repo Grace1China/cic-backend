@@ -166,6 +166,9 @@ class ChurchViewSet(viewsets.ModelViewSet):
         '''
         查找用户所属教会
         '''
+        import logging 
+        loger = logging.getLogger('church.all')
+        loger.info(request.user)
         if request.user == AnonymousUser:
             ch = Church.objects.all().fillter(code=settings.DEFAULT_CHURCH)
             serializer = self.get_serializer(ch)
