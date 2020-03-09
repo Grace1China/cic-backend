@@ -176,7 +176,7 @@ LOGGING = {
             'propagate': False,
         },
          'dev.error': {
-            'handlers': ['file'],
+            'handlers': ['file_err'],#dev.error is the old version
             'level': 'ERROR',
             'propagate': False
         },
