@@ -169,7 +169,7 @@ class ChurchViewSet(viewsets.ModelViewSet):
         import logging 
         loger = logging.getLogger('church.all')
         loger.info(request.user)
-        if request.user == AnonymousUser:
+        if isinstance (request.user,AnonymousUser):
             ch = Church.objects.all().fillter(code=settings.DEFAULT_CHURCH)
             serializer = self.get_serializer(ch)
         else:
