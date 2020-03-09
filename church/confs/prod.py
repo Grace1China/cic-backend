@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 from .base import *
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'zkt!bwt)@1jx3#a&9d@65+3aqm^rru32s+-qamngqi8)8gn^-s'
 
@@ -75,6 +76,11 @@ DATABASES = {
     }
 }
 
+
+import os
+save_dir = "/data/log/django/l3prod/"
+if os.path.exists(save_dir) is False:
+    os.makedirs(save_dir)
 
 LOGGING = {
     #在调试的时候，要把信息log到console和文件； 不调试时只输出到文件；选定的消息，如上传视频成功，可以发送邮件

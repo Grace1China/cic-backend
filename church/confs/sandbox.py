@@ -76,6 +76,13 @@ DATABASES = {
 }
 
 
+
+import os
+save_dir = "/data/log/django/l3sandbox/"
+if os.path.exists(save_dir) is False:
+    os.makedirs(save_dir)
+
+
 LOGGING = {
     #在调试的时候，要把信息log到console和文件； 不调试时只输出到文件；选定的消息，如上传视频成功，可以发送邮件
     'version': 1,
