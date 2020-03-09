@@ -1,0 +1,6 @@
+source ./env/bin/activate
+nohup gunicorn  --worker-class=gevent --worker-connections=1000 --workers=2 -b 0:8200 church.wsgi > product.log 2>&1 &
+deactivate
+exit 0
+
+
