@@ -1,5 +1,5 @@
 from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIView,)
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from users.models import CustomUser
 from .permissions import IsOwnerProfileOrReadOnly
 from .serializers import CustomUser4APISerializer
@@ -25,8 +25,13 @@ from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 import traceback, sys 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.conf import settings
 
-
+def getPermissionClass():
+    if settings.RUNTIME == 'sandbox':
+        return AllowAny()
+    else:
+        return IsAuthenticated()
 
 # Create your views here.
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -38,7 +43,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     '''
     queryset=CustomUser.objects.all()
     serializer_class=CustomUser4APISerializer
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[getPermissionClass]
     @action(detail=True,methods=['POST'], format="json")
     def register(self,request):
         '''
@@ -87,7 +92,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     from churchs.models import WeeklyReport
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[getPermissionClass]
     @action(detail=True,methods=['POST'], format="json")
     def GetChurchEweekly_v2(self,request):
         '''
@@ -107,7 +112,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
 
     @action(detail=True,methods=['POST'], format="json")
-    def GetChurchEweekly(self,request,pk):
+    def del_GetChurchEweekly(self,request,pk):
         '''
         查找用户所属教会的最新周报 or 根据pk查找
         '''
@@ -155,13 +160,18 @@ class ChurchViewSet(viewsets.ModelViewSet):
     from .serializers import ChurchSerializer4API
     queryset=Church.objects.all()
     serializer_class=ChurchSerializer4API
-    permission_classes=[IsAuthenticated]
+    permission_classes=[getPermissionClass]
     @action(detail=True,methods=['POST'], format="json")
     def GetUserChurch(self,request):
         '''
         查找用户所属教会
         '''
-        serializer = self.get_serializer(request.user.church)
+        if request.user == AnonymousUser:
+            ch = Church.objects.all().fillter(code=settings.DEFAULT_CHURCH)
+            serializer = self.get_serializer(ch)
+        else:
+            serializer = self.get_serializer(request.user.church)
+
         return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
 
@@ -177,7 +187,8 @@ class SermonViewSet(viewsets.ModelViewSet):
     queryset = Sermon.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=SermonSerializer4API
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[getPermissionClass]
+
 
     @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
     def GetCurrentLordsDayInfo(self,request):
@@ -256,6 +267,8 @@ class  CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=CourseSerializer4APIPOST
+    permission_classes=[getPermissionClass]
+
     # schema = CustomSchema()
     # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 

@@ -15,7 +15,11 @@ from .base import *
 SECRET_KEY = 'zkt!bwt)@1jx3#a&9d@65+3aqm^rru32s+-qamngqi8)8gn^-s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+
+RUNTIME = 'sandbox'
+
+DEFAULT_CHURCH = 'L3'
 
 IAP_IS_SANDBOX = False
 PAYPAL_IS_SANEBOX = False

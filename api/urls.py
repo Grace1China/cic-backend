@@ -52,11 +52,11 @@ urlpatterns = [
     path("user_create",csrf_exempt(user_create),name="user_create"),
     path("user_list",user_list,name="user_list"),
     # path("userProfile/<int:pk>",userProfileDetailView.as_view(),name="userProfile"),
-    path("sermon/0",church_lorddayinfo,name="sermon"),
+    # path("sermon/0",church_lorddayinfo,name="sermon"),
     
     path("lorddayinfo/l3",l3_lorddayinfo,name="l3_lorddayinfo"),
     path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
-    path("eweekly/<int:pk>",church_eweekly,name="church_eweekly"),
+    # path("eweekly/<int:pk>",church_eweekly,name="church_eweekly"),
     path("eweekly",v2_church_eweekly,name="church_eweekly"),
 
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),

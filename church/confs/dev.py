@@ -2,6 +2,8 @@
 from .base import *
 
 DEBUG = True 
+RUNTIME = 'development'
+
 SECRET_KEY = '123dev'
 
 IAP_IS_SANDBOX = True
