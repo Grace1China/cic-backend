@@ -3,7 +3,6 @@ sleep 2
 
 if [ ! -d "/env" ];then
     python3 -m venv env
-else
 fi
 sleep 2
 source ./env/bin/activate
