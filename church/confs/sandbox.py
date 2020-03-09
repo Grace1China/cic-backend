@@ -150,7 +150,7 @@ LOGGING = {
             'level': 'INFO',
             'filters': ['InfoFilter'],
             'class': 'logging.FileHandler',
-            'formatter': 'simple'
+            'formatter': 'simple',
             'filename': '/data/log/django/l3sandbox/info.log', #本机data/log/django/error.log
         },
         'file_err': {
