@@ -171,7 +171,10 @@ class ChurchViewSet(viewsets.ModelViewSet):
         loger.info(request.user)
         if isinstance (request.user,AnonymousUser):
             ch = Church.objects.all().filter(code=settings.DEFAULT_CHURCH)
-            serializer = self.get_serializer(ch)
+            if ch == None or len(ch)<=0:
+                raise Exception('default church was not find')
+            else:
+                serializer = self.get_serializer(ch[0])
         else:
             serializer = self.get_serializer(request.user.church)
 
