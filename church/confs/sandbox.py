@@ -130,7 +130,7 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugTrue',
         },
         'InfoFilter':{
-            '()':'church.settings.InfoFilter'
+            '()':'church.confs.base.InfoFilter'
         }
     },
     'handlers': {
