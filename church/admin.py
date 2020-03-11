@@ -11,6 +11,7 @@ from churchs.models import Media
 from parsley.mixins import ParsleyAdminMixin
 
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
+from churchs.forms import MeidaForm2
 
 class ChurchAdmin(admin.ModelAdmin):
     list_display = ('name','promot_cover', 'status') 
@@ -29,14 +30,23 @@ class MediaInline(GenericStackedInline):
 
     extra = 1
 
+class MediaInline1(GenericStackedInline):
+    form = MeidaForm2
+    model = Media
+    readonly_fields = ('dist_video','dist_video_status','dist_audio','dist_image','dist_pdf')
+    fields = (('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status','alioss_audio_f','alioss_image_f','alioss_pdf_f','content')
+   
+    extra = 0
+    max_num = 4
+
 class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
     inlines = [
-        MediaInline,
+        MediaInline1,
     ]
 
     list_display = ('title', 'teacher') 
     search_fields = ('teacher', 'title')
-    fields = ('church','title', 'teacher','description','content','price')
+    fields = ('church','title', 'teacher','description','content','iap_charge','price')
 
     change_form_template ="admin/churchs/sermon_change_form.html"
     

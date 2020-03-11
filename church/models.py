@@ -50,7 +50,7 @@ class Course(models.Model):
     price_usd = models.DecimalField(default=0,max_digits=9, decimal_places=2,verbose_name='美元价格')
     # s3video = models.FileField(u'视频', storage=PrivateMediaStorage(), null=True, blank=True) 
 
-    users = models.ManyToManyField("users.CustomUser", through='payment.Users_Courses', related_name="courses", null=True, blank=True)
+    users = models.ManyToManyField("users.CustomUser", through='payment.Users_Courses', related_name="courses", blank=True)
     sales_num = models.IntegerField(default=0)
     
     import churchs.models as churchs_models

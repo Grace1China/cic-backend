@@ -31,6 +31,9 @@ class IAPCharge(models.Model):
     desc = models.CharField(max_length=255,verbose_name='充值产品文案描述')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name='更新时间')
+    def __str__(self):
+        return '%s-%s-%s' % (self.price_code,self.price,self.desc)
+
 
     # class Meta:
     #     order_with_respect_to = 'price_code_price'
