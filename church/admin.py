@@ -46,7 +46,7 @@ class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
 
     list_display = ('title', 'teacher') 
     search_fields = ('teacher', 'title')
-    fields = ('church','title', 'teacher','description','content','iap_charge','price')
+    fields = ('church','title', 'teacher','description','content','iap_charge','price','price_usd')
 
     change_form_template ="admin/churchs/sermon_change_form.html"
     
