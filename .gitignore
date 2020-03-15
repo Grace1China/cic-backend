@@ -118,5 +118,7 @@ stop_site
 run_site
 runsite
 stopsite
+redeploy
+restart
 ./church/settings.py
 ./church/confs/dev.py
