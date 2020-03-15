@@ -78,6 +78,8 @@ DATABASES = {
     }
 }
 
+MAINSITE_API_V1 = 'https://api.bicf.org/mainsite_api_v1/mst/MakeSermon'
+
 
 import os
 save_dir = "/data/log/django/l3prod/"

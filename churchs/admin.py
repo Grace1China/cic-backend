@@ -100,62 +100,63 @@ from django.conf import settings
 import pprint
 
 
-def mainsite_api_v1_makesermon(sender,instance, **kwargs):
-    try:
+# def mainsite_api_v1_makesermon(sender,instance, **kwargs):
+#     try:
 
-        loger = logging.getLogger('church.all')
-        inst1 = Sermon.objects.all().get(id=instance.id)
-        # {'_state': <django.db.models.base.ModelState object at 0x00000187B7344BA8>, 'id': 63, 'church_id': 2, 'user_id': 20, 'title': 'ims/IMS20200301.mp4', 'speaker_id': 192, 'scripture': 'empty', 'series_id': None, 'create_time': datetime.datetime(2020, 3, 2, 9, 43, 52, 231422, tzinfo=<UTC>), 'update_time': datetime.datetime(2020, 3, 2, 12, 43, 51, 112888, tzinfo=<UTC>), 'pub_time': datetime.datetime(2020, 3, 2, 17, 43, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>), 'status': 1}
-        # loger.info(instance.id)
-        SermonSerializer4API
-        szSermon = SermonSerializer4API(inst1)
-        loger.info("------------------mainsite_api_v1_makesermon--1--------------------------")
-        loger.info(inst1)
-        loger.info(szSermon.data.__dict__)
-        dt = szSermon.data
+#         loger = logging.getLogger('church.all')
+#         inst1 = Sermon.objects.all().get(id=instance.id)
+#         # {'_state': <django.db.models.base.ModelState object at 0x00000187B7344BA8>, 'id': 63, 'church_id': 2, 'user_id': 20, 'title': 'ims/IMS20200301.mp4', 'speaker_id': 192, 'scripture': 'empty', 'series_id': None, 'create_time': datetime.datetime(2020, 3, 2, 9, 43, 52, 231422, tzinfo=<UTC>), 'update_time': datetime.datetime(2020, 3, 2, 12, 43, 51, 112888, tzinfo=<UTC>), 'pub_time': datetime.datetime(2020, 3, 2, 17, 43, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>), 'status': 1}
+#         # loger.info(instance.id)
 
-        # loger.info(repr(szSermon))
-        loger.info("------------------mainsite_api_v1_makesermon--2--------------------------")
+#         SermonSerializer4API
+#         szSermon = SermonSerializer4API(inst1)
+#         loger.info("------------------mainsite_api_v1_makesermon--1--------------------------")
+#         loger.info(inst1)
+#         loger.info(szSermon.data.__dict__)
+#         dt = szSermon.data
+
+#         # loger.info(repr(szSermon))
+#         loger.info("------------------mainsite_api_v1_makesermon--2--------------------------")
 
 
-        # loger.info(szSermon.__dict__)
+#         # loger.info(szSermon.__dict__)
 
-        data = {'study_name':dt["title"],
-            'study_date':dt["pub_time"], 
-            'publish_up':dt["pub_time"],
-            'published':0 if dt["status"]== Sermon.STATUS_DRAFT else 0,
-            'ministry':dt["church"]["id"], 
-            'video_link':dt["medias"][0]['SHD_URL'] if len(dt["medias"])>0 else '', 
-            'teacher':dt["speaker"]["id"], 
-            'imagelrg': '%s?x-oss-process=image/resize,m_fixed,h_100,w_100' % dt["medias"][0]['image'] if len(dt["medias"])>0 else '',
-            'audio_link': dt["medias"][0]['audio'] if len(dt["medias"])>0 else '',
-            'slides_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else '',
-            'notes_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else ''
-        }
+#         data = {'study_name':dt["title"],
+#             'study_date':dt["pub_time"], 
+#             'publish_up':dt["pub_time"],
+#             'published':0 if dt["status"]== Sermon.STATUS_DRAFT else 0,
+#             'ministry':dt["church"]["id"], 
+#             'video_link':dt["medias"][0]['SHD_URL'] if len(dt["medias"])>0 else '', 
+#             'teacher':dt["speaker"]["id"], 
+#             'imagelrg': '%s?x-oss-process=image/resize,m_fixed,h_100,w_100' % dt["medias"][0]['image'] if len(dt["medias"])>0 else '',
+#             'audio_link': dt["medias"][0]['audio'] if len(dt["medias"])>0 else '',
+#             'slides_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else '',
+#             'notes_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else ''
+#         }
 
-        loger.info(data)
+#         loger.info(data)
 
-        if sender.status == Sermon.STATUS_DRAFT:
-            pass
-        else:
-            r = None
-            if settings.DEBUG:
-                r = requests.post(settings.MAINSITE_API_V1['DEVELOPMENT'], json=json.dumps(data))
-            else:
-                r = requests.post(settings.MAINSITE_API_V1['DEBUG'], json=json.dumps(data))
-            loger.info(pprint.PrettyPrinter(6).pprint(r))
-            if r.errCode != '0':
-                raise Exception('There is an err\n%s' % r.sysErrMsg)
+#         if sender.status == Sermon.STATUS_DRAFT:
+#             pass
+#         else:
+#             r = None
+#             if settings.DEBUG:
+#                 r = requests.post(settings.MAINSITE_API_V1['DEVELOPMENT'], json=json.dumps(data))
+#             else:
+#                 r = requests.post(settings.MAINSITE_API_V1['DEBUG'], json=json.dumps(data))
+#             loger.info(pprint.PrettyPrinter(6).pprint(r))
+#             if r.errCode != '0':
+#                 raise Exception('There is an err\n%s' % r.sysErrMsg)
             
-    except Exception as e:
-        # pprint.PrettyPrinter(4).pprint(e.__traceback__)
-        import traceback
-        import sys
-        loger = logging.getLogger('church.all')
-        loger.exception('There is and exceptin',exc_info=True,stack_info=True)
-        # do_something_else()
+#     except Exception as e:
+#         # pprint.PrettyPrinter(4).pprint(e.__traceback__)
+#         import traceback
+#         import sys
+#         loger = logging.getLogger('church.all')
+#         loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+#         # do_something_else()
 
-post_save.connect(mainsite_api_v1_makesermon, sender=Sermon)
+# post_save.connect(mainsite_api_v1_makesermon, sender=Sermon)
     
 from datetime import datetime
 
@@ -188,6 +189,65 @@ class SermonAdmin(admin.ModelAdmin):
             'status':Sermon.STATUS_DRAFT,
             'user':request.user
         }
+
+    actions = ['mainsite_api_v1_makesermon']
+
+    def mainsite_api_v1_makesermon(self, request, queryset):
+        try:
+
+            loger = logging.getLogger('church.all')
+
+            loger.info(request)
+            for qr in queryset:
+                inst1 = Sermon.objects.all().get(id=qr.id)
+                # {'_state': <django.db.models.base.ModelState object at 0x00000187B7344BA8>, 'id': 63, 'church_id': 2, 'user_id': 20, 'title': 'ims/IMS20200301.mp4', 'speaker_id': 192, 'scripture': 'empty', 'series_id': None, 'create_time': datetime.datetime(2020, 3, 2, 9, 43, 52, 231422, tzinfo=<UTC>), 'update_time': datetime.datetime(2020, 3, 2, 12, 43, 51, 112888, tzinfo=<UTC>), 'pub_time': datetime.datetime(2020, 3, 2, 17, 43, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>), 'status': 1}
+                # loger.info(instance.id)
+                SermonSerializer4API
+                szSermon = SermonSerializer4API(inst1)
+                loger.info("------------------mainsite_api_v1_makesermon--1--------------------------")
+                loger.info(inst1)
+                loger.info(szSermon.data.__dict__)
+                dt = szSermon.data
+
+                # loger.info(repr(szSermon))
+                loger.info("------------------mainsite_api_v1_makesermon--2--------------------------")
+
+
+                # loger.info(szSermon.__dict__)
+
+                data = {'study_name':dt["title"],
+                    'study_date':dt["pub_time"], 
+                    'publish_up':dt["pub_time"],
+                    'published':0 if dt["status"]== Sermon.STATUS_DRAFT else 1,
+                    'ministry':dt["church"]["id"], 
+                    'video_link':dt["medias"][0]['SHD_URL'] if len(dt["medias"])>0 else '', 
+                    'teacher':dt["speaker"]["id"], 
+                    'imagelrg': '%s' % dt["medias"][0]['image'] if len(dt["medias"])>0 else '',
+                    'audio_link': dt["medias"][0]['audio'] if len(dt["medias"])>0 else '',
+                    'slides_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else '',
+                    'notes_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else ''}
+
+                data['imagelrg'] = (data['imagelrg'] if data['imagelrg'] != '' else szSermon.data['church']['promot_cover'])
+                loger.info(data)
+
+                if dt['status'] == Sermon.STATUS_DRAFT:
+                    pass
+                else:
+                    r = None
+                    r = requests.post(settings.MAINSITE_API_V1, json=json.dumps(data))
+                    loger.info(r.__dict__)
+                    if eval(r.content).errCode != '0':
+                        raise Exception('There is an err\n%s' % r.sysErrMsg)
+                    
+        except Exception as e:
+            # pprint.PrettyPrinter(4).pprint(e.__traceback__)
+            import traceback
+            import sys
+            loger = logging.getLogger('church.all')
+            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+
+        
+    mainsite_api_v1_makesermon.short_description = "make sermon in mainsite"
     
 admin.site.register(churchs_models.Sermon, SermonAdmin)
 admin.site.register(churchs_models.Team)  
