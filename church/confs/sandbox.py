@@ -21,7 +21,7 @@ RUNTIME = 'sandbox'
 
 DEFAULT_CHURCH = 'L3'
 
-APP_SERVER_IP = "http://test.l3.bicf.org/"  #singpore 54.169.143.92
+APP_SERVER_IP = "test.l3.bicf.org"  #singpore 54.169.143.92
 
 
 IAP_IS_SANDBOX = False
