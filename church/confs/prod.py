@@ -79,6 +79,8 @@ DATABASES = {
 }
 
 MAINSITE_API_V1 = 'http://47.95.199.234/mainsite_api_v1/mst/MakeSermon'
+APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
+
 
 
 import os

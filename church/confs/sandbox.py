@@ -21,6 +21,9 @@ RUNTIME = 'sandbox'
 
 DEFAULT_CHURCH = 'L3'
 
+APP_SERVER_IP = "http://test.l3.bicf.org/"  #singpore 54.169.143.92
+
+
 IAP_IS_SANDBOX = False
 PAYPAL_IS_SANEBOX = False
 
@@ -135,6 +138,9 @@ LOGGING = {
         },
         'InfoFilter':{
             '()':'church.confs.base.InfoFilter'
+        },
+        'DebugFilter':{
+            '()':'church.confs.base.DebugFilter'
         }
     },
     'handlers': {
@@ -157,6 +163,13 @@ LOGGING = {
             'formatter': 'simple',
             'filename': '/data/log/django/l3sandbox/info.log', #本机data/log/django/error.log
         },
+        'file_debug': {
+            'level': 'DEBUG',
+            'filters': ['DebugFilter'],
+            'class': 'logging.FileHandler',
+            'formatter': 'simple',
+            'filename': '/data/log/django/l3sandbox/debug.log', #本机data/log/django/error.log
+        },
         'file_err': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
@@ -171,7 +184,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console','file_debug'],
             'propagate': True,
         },
         'django.request': {
