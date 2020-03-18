@@ -14,8 +14,10 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 import oss2
+from rest_framework.decorators import api_view, authentication_classes,permission_classes
+import logging
 
-
+theLogger = logging.getLogger('church.all')
 
 
 class AliOssSignature(APIView):
@@ -117,17 +119,8 @@ class AliOssSignature(APIView):
         :return:
         """
         print("********************* do_GET ")
-        
-
         token = self.get_token(request)
-        # server.send_response(200)
-        # server.send_header('Access-Control-Allow-Methods', 'POST')
-        # server.send_header('Access-Control-Allow-Origin', '*')
-        # server.send_header('Content-Type', 'text/html; charset=UTF-8')
-        # server.end_headers()
-        # server.wfile.write(token.encode())
         return JsonResponse({'errCode': '0', 'token': token}, safe=False)
-
 
 import pprint
 class AliOssCallBack(APIView):
@@ -163,14 +156,10 @@ class AliOssCallBack(APIView):
 
         auth = request.META.get('Authorization')
         logger.error(auth)
-        # if not request:
-        #     return None
         logger.error(request)
         logger.error(request.headers)
-        # X-Oss-Bucket
         logger.error(request.POST)
         data = request.data
-        # filename
         ret_dict = {}
         ret_dict['filename'] = data.get('filename', '')
         ret_dict['mimeType'] = data.get('mimeType','')
@@ -186,7 +175,6 @@ class AliMtsCallBack(APIView):
     def post(self,request,*args,**kwargs):
         '''
         用post方法
-
         用原文件来定位media,
         用计算的方法，来求得目标文件，存储在相应的记录里面
         '''
@@ -197,24 +185,12 @@ class AliMtsCallBack(APIView):
         logger = logging.getLogger('dev.error')
         logger.error('-------------------in post ----------------------')
 
-        # ERROR 2020-03-01 08:53:35,941 alioss_directup_views.py post 207 {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': '7775f8a5c9424ab4b56f39ba1f3607e8', 'State': 'Success', 'MediaWorkflowExecution': {'MediaWorkflowId': '68d8b00a315f42c3bcbb5854beb7f076', 'Name': 'workflow1578060577262', 'RunId': 'c7ba582242024d7e964e038c1078916b', 'MediaId': '84415b6989b0444f8f359b874abcaa67', 'Input': {'InputFile': {'Bucket': 'bicf-media-source', 'Location': 'oss-cn-beijing', 'Object': 'citychurch/City Church Connect   Mar 1.mp4'}}, 'State': 'Running', 'ActivityList': [{'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': '7775f8a5c9424ab4b56f39ba1f3607e8', 'State': 'Success', 'StartTime': '2020-03-01T00:53:34Z', 'EndTime': '2020-03-01T00:53:34Z'}], 'CreationTime': '2020-03-01T00:53:34Z', 'RequestId': '5E5AFF44A152389C6E7124CC'}}
-        # ERROR 2020-03-01 09:17:38,590 alioss_directup_views.py post 198 -------------------in post ----------------------
-        # ERROR 2020-03-01 09:17:38,590 alioss_directup_views.py post 207 {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'MediaWorkflowExecution': {'MediaWorkflowId': '68d8b00a315f42c3bcbb5854beb7f076', 'Name': 'workflow1578060577262', 'RunId': 'c7ba582242024d7e964e038c1078916b', 'MediaId': '84415b6989b0444f8f359b874abcaa67', 'Input': {'InputFile': {'Bucket': 'bicf-media-source', 'Location': 'oss-cn-beijing', 'Object': 'citychurch/City Church Connect   Mar 1.mp4'}}, 'State': 'Completed', 'ActivityList': [{'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'StartTime': '2020-03-01T01:17:38Z', 'EndTime': '2020-03-01T01:17:38Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Snapshot', 'Type': 'Snapshot', 'JobId': '315cd18a5a04484fa5ab490d94276b07', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T00:53:36Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-ss-mp4-hd', 'Type': 'Transcode', 'JobId': '20cb8b51ca264756a3390d65a5da1cd5', 'TemplateId': 'S00000001-200030', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T01:17:38Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-ss-mp4-ld', 'Type': 'Transcode', 'JobId': '840254f15237426ea8da286939c8f4c3', 'TemplateId': 'S00000001-200010', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T01:03:49Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-ss-mp4-sd', 'Type': 'Transcode', 'JobId': 'b18606d9033a40959f4e4323bba8f696', 'TemplateId': 'S00000001-200020', 'State': 'Success', 'StartTime': '2020-03-01T00:53:35Z', 'EndTime': '2020-03-01T01:09:02Z'}, {'RunId': 'c7ba582242024d7e964e038c1078916b', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': '7775f8a5c9424ab4b56f39ba1f3607e8', 'State': 'Success', 'StartTime': '2020-03-01T00:53:34Z', 'EndTime': '2020-03-01T00:53:35Z'}], 'CreationTime': '2020-03-01T00:53:34Z', 'RequestId': '5E5AFF44A152389C6E7124CC'}}
-
-
-        # auth = request.META.get('Authorization')
-        # logger.error(auth)
-        # logger.error(request)
-        # logger.error(request.headers)
-        # logger.error(request.body)
         topic = json.loads(request.body)
         msg = json.loads(topic['Message'])
         logger.error(msg)
 
         if msg['MediaWorkflowExecution']['State'] != 'Completed':
             return Response(data='',status=status.HTTP_204_NO_CONTENT)
-
-        #  {'status': 404, 'x-oss-request-id': '5E2F0786980F8F36369B0A7B', 'details': {'Code': 'NoSuchKey', 'Message': 'The specified key does not exist.', 'RequestId': '5E2F0786980F8F36369B0A7B', 'HostId': 'bicf-media-destination.oss-cn-beijing.aliyuncs.com', 'Key': 'citychurch/video 4 - make impact 2.0.jpg'}}
 
         Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
         Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
@@ -225,20 +201,11 @@ class AliMtsCallBack(APIView):
 
         quotedfn = urllib.parse.quote(filename_arr[0])
 
-
-
-        # alioss_video = 'http://%s.%s/%s' % (Bucket,settings.ALIOSS_SOURCE_LOCATION,Object)
-        # alioss_SHD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4'))
-        # alioss_HD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4'))
-        # alioss_SD_URL = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4'))
-        # alioss_image = 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME , settings.ALIOSS_DESTINATION_LOCATION,'%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg'))
-
         alioss_video = '%s/%s.%s' % (key_arr[0],quotedfn,filename_arr[1])
         alioss_SHD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4')
         alioss_HD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4')
         alioss_SD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4')
         alioss_image = '%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg')
-
 
         logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
         qrset = md.Media.objects.filter(alioss_video__iexact=alioss_video)
@@ -251,8 +218,34 @@ class AliMtsCallBack(APIView):
         bucket.put_object_acl(alioss_image, oss2.OBJECT_ACL_PUBLIC_READ)
         bucket.put_object_acl(alioss_HD_URL, oss2.OBJECT_ACL_PUBLIC_READ)
 
-        
-
         return Response(data='',status=status.HTTP_204_NO_CONTENT)
+
+from .utill import CICUtill
+
+@api_view(['GET'])
+@permission_classes([CICUtill.getPermissionClass])
+def oss_object_exists(request,key=''):
+    ret = {'errCode': '0', 'msg': 'media exists'}
+    try:
+        if request.method == 'GET':
+            # data = request.data
+            # key = data.get('key', '')
+            if key != '':
+                auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+                bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+                if bucket.object_exists(key):
+                    ret = {'errCode': '0', 'msg': 'media exists'}
+                    # return JsonResponse({'errCode': '0', 'msg': 'media exists'}, safe=False)
+                else:
+                    ret = {'errCode': '1001', 'msg': 'media not exists'}
+            else:
+                ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
+                raise Exception('key must not null.')   
+    except Exception as e:
+        import traceback
+        import sys
+        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+    finally:
+        return JsonResponse(ret, safe=False)
+         
         
-      

@@ -10,12 +10,14 @@ from django.db import models
 from rest_framework import serializers
 from .import models
 
+class CustomUser4Info(serializers.ModelSerializer):
+    class Meta:
+        model=CustomUser
+        exclude = ('password',)
+
 class CustomUserSerializer(serializers.ModelSerializer):
     user=serializers.StringRelatedField(read_only=True)
     # church=serializers.StringRelatedField(read_only=True)
-    
-
-    
     class Meta:
         model=CustomUser
         fields='__all__'

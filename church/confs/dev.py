@@ -59,10 +59,12 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.redirects.RedirectsPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
 ]
-MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 INSTALLED_APPS += [
     'debug_toolbar',
 ]
+MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+INTERNAL_IPS = ('127.0.0.1',)
 
 MAINSITE_API_V1 = 'http://127.0.0.1:8200/mainsite_api_v1/mst/MakeSermon'
 APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92

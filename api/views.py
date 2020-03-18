@@ -27,63 +27,18 @@ import traceback, sys
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.conf import settings
 
+theLogger = logging.getLogger('church.all')
+
+
 def getPermissionClass():
-    if settings.RUNTIME == 'sandbox':
-        return AllowAny()
-    else:
-        return IsAuthenticated()
+    from .utill import CICUtill
+    return CICUtill.getPermissionClass
+    # if settings.RUNTIME == 'sandbox':
+    #     return AllowAny()
+    # else:
+    #     return IsAuthenticated()
 
 # Create your views here.
-class CustomUserViewSet(viewsets.ModelViewSet):
-    '''
-    "email": "daniel_2@bicf.org",
-    "username": "d2",
-    "password": "2wsx3edc",
-    "church_code": "086-010-0001" 同时加入教会。要做一个二维码，有app的用户扫码出现注册页。码就自动填入
-    '''
-    queryset=CustomUser.objects.all()
-    serializer_class=CustomUser4APISerializer
-    permission_classes=[getPermissionClass]
-    @action(detail=True,methods=['POST'], format="json")
-    def register(self,request):
-        '''
-        1 注册用户
-        2 同时加入教会。要做一个二维码，有app的用户扫码出现注册页。码就自动填入教会
-        '''
-        try:
-            data = self.request.data
-            church_code = data.get('church_code', '-1')
-            # pp.pprint(church_code)
-
-            theChurch = Church.objects.get(Q(code=church_code))
-            serializer = self.get_serializer(data=data)
-            if serializer.is_valid():
-                serializer.save(church=theChurch,is_active=True)
-            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
-
-        except Exception as e:
-            return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
-
-    @transaction.atomic
-    def perform_create(self, serializer):
-        '''
-        这个方法，可能有来自，djoser创建系统用户时，signal通知生成的。
-        2 有可能又是前端发过来注册信息
-        '''
-        try:
-            data = self.request.data
-            church_code = data.get('church_code', '-1')
-            pp.pprint(church_code)
-
-            theChurch = Church.objects.get(Q(code=church_code))
-            
-            serializer.save(church=theChurch)
-            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
-
-        except Exception as e:
-            return JsonResponse({'errCode': '1001','msg': str(e), 'data': serializer.data}, safe=False)
-            
-
 
 class EweeklyViewSet(viewsets.ModelViewSet):
     '''
@@ -438,4 +393,157 @@ def addSalesInfosOn(course,user):
         course.is_buy = True
     else:
         course.is_buy = False
+
+
+
+from rest_framework.decorators import api_view, authentication_classes,permission_classes
+from churchs.models import *
+from church.models import *
+from api.models import *
+from payment.models import *
+# from .utill import CICUtill
+from .utill import CICUtill
+from urllib.parse import unquote
+
+from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
+from drf_yasg.utils import swagger_auto_schema
+from django.db.models.fields import CharField
+
+@api_view(['GET'])
+@permission_classes([CICUtill.getPermissionClass])
+@swagger_auto_schema(operation_description="partial_update description override")
+def getinfo(request,path=''):
+    '''
+    path格式如下：
+    '{"model":"CustomUser","filter":"email","filter_v":"daniel@bicf.org"}'
+    model是模型的名称
+    filter是查找条件字段 filter_v 是条件值
+    '''
+    theLogger.info(path)
+    ret = {'errCode': '0'}
+    try:
+        if request.method == 'GET':
+            # data = request.data
+            # key = data.get('key', '')
+            if path != '':
+                # {"model":"Sermon","field":'id',"value":"1"}
+                theLogger.info(path)
+                import json
+                path = unquote(path)
+                theLogger.info(path)
+                path = eval(path)
+
+                path = json.loads(path)
+                theLogger.info(path)
+
+                import ast
+                model = eval(path['model'])
+                
+                qry = 'SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model'].lower()),path['filter'],('"%s"' % path['filter_v'] if  isinstance(model._meta.get_field(path['filter']),CharField) else path['filter_v']))
+                inst1 = model.objects.raw(qry)
+                 
+
+                theLogger.info(inst1)
+                theLogger.info(inst1[0].id)
+
+
+                from rest_framework import serializers
+
+                Meta = type('Meta', (object,), dict(model=model, fields='__all__'))
+                theSerializer = type('theSerializer', (serializers.ModelSerializer,), dict(Meta=Meta))
+                thesz = None
+                if len(inst1) == 1 :
+                    thesz = theSerializer(inst1[0])
+                else:
+                    thesz = theSerializer(inst1,many=True)
+
+                ret = {'errCode': '0','msg':'success','data':thesz.data}
+
+                # >>> inst1 = model.objects.raw('SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model']),path['field'],path['value']))
+
+            else:
+                raise Exception('key must not null.')   
+    except Exception as e:
+        import traceback
+        import sys
+        ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
+        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+    finally:
+        return JsonResponse(ret, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([CICUtill.getPermissionClass])
+def updateInfo(request,path=''):
+    '''
+    path格式如下：
+    '{"model":"CustomUser","filter":"email","filter_v":"daniel@bicf.org","field":"username","field_v":"DQ"}'
+    model是模型的名称
+    filter是查找条件字段 filter_v 是条件值
+    field是要更新的字段 field_v 是要更新的值
+    '''
+    theLogger.info(path)
+    ret = {'errCode': '0'}
+    try:
+        if request.method == 'GET':
+            # data = request.data
+            # key = data.get('key', '')
+            if path != '':
+                # {"model":"CosmterUser","field":'username',"value":"Daniel Q"}
+                theLogger.info(path)
+                import json
+                path = unquote(path)
+                theLogger.info(path)
+                path = eval(path)
+
+                path = json.loads(path)
+                theLogger.info(path)
+
+                import ast
+                model = eval(path['model'])
+                
+                qry = 'SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model'].lower()),path['filter'],('"%s"' % path['filter_v'] if  isinstance(model._meta.get_field(path['filter']),CharField) else path['filter_v']))
+                inst1 = model.objects.raw(qry)
+                 
+
+                theLogger.info(inst1)
+                theLogger.info(inst1[0].id)
+
+
+                from rest_framework import serializers
+
+                Meta = type('Meta', (object,), dict(model=model, fields='__all__'))
+                theSerializer = type('theSerializer', (serializers.ModelSerializer,), dict(Meta=Meta))
+                thesz = None
+                if len(inst1) == 1 :
+                    # thesz = theSerializer(inst1[0])
+                    inst1[0].__dict__[path['field']] = path['field_v'] 
+                    inst1[0].save()
+                    thesz = theSerializer(inst1[0])
+
+                else:
+                    for md in inst1:
+                        md.__dict__[path['field']] = path['field_v'] 
+                        md.save()
+                    thesz = theSerializer(inst1,many=True)
+
+                ret = {'errCode': '0','msg':'success','data':thesz.data}
+
+                # >>> inst1 = model.objects.raw('SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model']),path['field'],path['value']))
+
+            else:
+                raise Exception('key must not null.')   
+    except Exception as e:
+        import traceback
+        import sys
+        ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
+        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+    finally:
+        return JsonResponse(ret, safe=False)
+
+
+
+
+
+         
    

@@ -5,6 +5,8 @@
 from rest_framework.renderers import BrowsableAPIRenderer
 import oss2
 from django.conf import settings
+from rest_framework.permissions import IsAuthenticated,AllowAny
+
 
 class BrowsableAPIRendererWithoutForms(BrowsableAPIRenderer):
     """Renders the browsable api, but excludes the forms."""
@@ -74,5 +76,12 @@ class CICUtill():
     def redirectWith(dest="destination",url=''):
         url = url.replace('%s.%s' % (settings.ALIOSS_DESTINATIONS[dest]['bucket'],settings.ALIOSS_DESTINATIONS[dest]['location']),settings.ALIOSS_DESTINATIONS[dest]['redirecturl'])
         return url
+    
+    def getPermissionClass():
+        from django.conf import settings
+        if settings.RUNTIME == 'sandbox' or settings.RUNTIME =='development':
+            return AllowAny()
+        else:
+            return IsAuthenticated()
 
 
