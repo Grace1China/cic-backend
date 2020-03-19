@@ -26,6 +26,8 @@ from django.core.exceptions import PermissionDenied
 import traceback, sys 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.conf import settings
+import traceback
+
 
 theLogger = logging.getLogger('church.all')
 
@@ -89,8 +91,6 @@ class EweeklyViewSet(viewsets.ModelViewSet):
             ret = {'errCode': '0', 'data': serializer.data}
 
         except Exception as e:
-            import traceback
-            import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
         finally:
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
