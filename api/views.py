@@ -92,7 +92,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
             serializer = self.get_serializer(wr)
             ret = {'errCode': '0', 'data': serializer.data}
-
+            return JsonResponse(ret, safe=False)
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': {},'sysErrMsg':traceback.format_exc()}
