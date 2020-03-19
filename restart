@@ -1,6 +1,0 @@
-./stopsite
-sleep 2
-./runsite
-sleep 2
-tail product.log
-exit 0
