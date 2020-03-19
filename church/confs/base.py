@@ -36,6 +36,8 @@ AUTH_USER_MODEL = 'users.CustomUser'
 SIMPLEUI_HOME_INFO = False
 # Application definition
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 def getPermissionClass():
     from django.conf import settings
     if settings.RUNTIME == 'sandbox' or settings.RUNTIME =='development':

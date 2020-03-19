@@ -27,6 +27,8 @@ APP_SERVER_IP = "test.l3.bicf.org"  #singpore 54.169.143.92
 IAP_IS_SANDBOX = True
 PAYPAL_IS_SANEBOX = True
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=7),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),

@@ -23,6 +23,8 @@ RUNTIME = 'product'
 IAP_IS_SANDBOX = False
 PAYPAL_IS_SANEBOX = False
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=7),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
