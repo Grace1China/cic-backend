@@ -1,3 +1,0 @@
-pkill -f '/data/test-server/cic-backend/env/bin/gunicorn --worker-class=gevent --worker-connections=1000 --workers=2 -b 0:8200 church.wsgi'
-exit 0
-
