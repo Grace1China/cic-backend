@@ -38,7 +38,7 @@ SIMPLEUI_HOME_INFO = False
 
 # X_FRAME_OPTIONS = 'SAMEORIGIN' 
 
-X_FRAME_OPTIONS = 'ALLOW-FROM *.l3.bicf.org'
+# X_FRAME_OPTIONS = 'ALLOW-FROM *.l3.bicf.org'
 #
 
 def getPermissionClass():
@@ -91,7 +91,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
 ]
 
