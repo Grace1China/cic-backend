@@ -67,7 +67,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()}, safe=False)
         
 
 
@@ -94,7 +94,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
         finally:
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
-            ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}
+            ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()}
             return JsonResponse(ret, safe=False)
 
             
@@ -131,7 +131,7 @@ class ChurchViewSet(viewsets.ModelViewSet):
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
-            return JsonResponse({'errCode': '1001', 'msg':'没有找到用户的教会','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'没有找到用户的教会','data': None,'sysErrMsg':traceback.format_exc()}, safe=False)
 
 
 class SermonViewSet(viewsets.ModelViewSet):
@@ -324,7 +324,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
     @action(detail=True,methods=['POST'], format="json")
@@ -342,7 +342,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
 
     
     @action(detail=True,methods=['post'], format="json")
@@ -357,7 +357,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
                 import traceback
                 import sys
                 traceback.print_exc(file=sys.stdout)
-                return JsonResponse({'errCode': '1001', 'data': None,'msg':'搜索关键词不能为空','sysErrMsg':traceback.format_exc()()}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'搜索关键词不能为空','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
             courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by('-update_time')
@@ -372,7 +372,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
 
