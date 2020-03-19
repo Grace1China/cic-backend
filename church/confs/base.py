@@ -36,7 +36,9 @@ AUTH_USER_MODEL = 'users.CustomUser'
 SIMPLEUI_HOME_INFO = False
 # Application definition
 
-X_FRAME_OPTIONS = 'SAMEORIGIN' 
+# X_FRAME_OPTIONS = 'SAMEORIGIN' 
+
+X_FRAME_OPTIONS = 'ALLOWALL *.l3.bicf.org'
 #
 
 def getPermissionClass():
