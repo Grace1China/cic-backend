@@ -80,8 +80,8 @@ class CICUtill():
     def getPermissionClass():
         from django.conf import settings
         if settings.RUNTIME == 'sandbox' or settings.RUNTIME =='development':
-            return AllowAny()
+            return AllowAny
         else:
-            return IsAuthenticated()
+            return IsAuthenticated
 
 
