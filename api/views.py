@@ -411,7 +411,6 @@ from django.db.models.fields import CharField
 
 @api_view(['GET'])
 @permission_classes([CICUtill.getPermissionClass])
-@swagger_auto_schema(operation_description="partial_update description override")
 def getinfo(request,path=''):
     '''
     path格式如下：
