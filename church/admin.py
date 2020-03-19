@@ -13,6 +13,13 @@ from parsley.mixins import ParsleyAdminMixin
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 from churchs.forms import MeidaForm2
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.clickjacking import (
+    xframe_options_exempt, xframe_options_deny, xframe_options_sameorigin,
+)
+
+xframe_options_exempt_m = method_decorator(xframe_options_exempt, name='dispatch')
+
 class ChurchAdmin(admin.ModelAdmin):
     list_display = ('name','promot_cover', 'status') 
     search_fields = ('name','status')
@@ -38,7 +45,7 @@ class MediaInline1(GenericStackedInline):
    
     extra = 0
     max_num = 4
-
+@xframe_options_sameorigin
 class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
     inlines = [
         MediaInline1,
