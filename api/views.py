@@ -82,19 +82,22 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         try:
             # data = self.request.data
             ch = Church.objects.filter(Q(code__iexact='l3'))[0]
-            pprint.PrettyPrinter(indent=4).pprint(ch)
-      
+            # pprint.PrettyPrinter(indent=4).pprint(ch)
+            theLogger.info(ch)
             wr = self.get_queryset().filter(church=ch, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')
             # pprint.PrettyPrinter(indent=4).pprint(wr)
+            
+            theLogger.info(wr)
             wr = wr[0]
+
             serializer = self.get_serializer(wr)
             ret = {'errCode': '0', 'data': serializer.data}
 
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': {},'sysErrMsg':traceback.format_exc()}
         finally:
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
-            ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': {},'sysErrMsg':traceback.format_exc()}
             return JsonResponse(ret, safe=False)
 
             
