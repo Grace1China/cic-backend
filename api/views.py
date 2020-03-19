@@ -53,34 +53,22 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         '''
         查找用户所属教会的最新周报 or 根据pk查找
         '''
-        if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
         try:
+
+            if not request.user.is_authenticated :
+                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
             wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
             serializer = self.get_serializer(wr)
             return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
         except Exception as e:
-            traceback.print_exc(file=sys.stdout)
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
+        
 
 
-
-    @action(detail=True,methods=['POST'], format="json")
-    def del_GetChurchEweekly(self,request,pk):
-        '''
-        查找用户所属教会的最新周报 or 根据pk查找
-        '''
-        if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
-        try:
-            wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
-            serializer = self.get_serializer(wr)
-            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
-
-        except Exception as e:
-            traceback.print_exc(file=sys.stdout)
-            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
 
 
     @action(detail=True,methods=['POST'], format="json")
@@ -88,11 +76,12 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         '''
         查找L3平台最新周报
         '''
-        # data = self.request.data
-        ch = Church.objects.filter(Q(code__iexact='l3'))[0]
-        pprint.PrettyPrinter(indent=4).pprint(ch)
-        
         try:
+            # data = self.request.data
+            ch = Church.objects.filter(Q(code__iexact='l3'))[0]
+            pprint.PrettyPrinter(indent=4).pprint(ch)
+        
+      
             wr = self.get_queryset().filter(church=ch, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')
             # pprint.PrettyPrinter(indent=4).pprint(wr)
             wr = wr[0]
@@ -100,7 +89,9 @@ class EweeklyViewSet(viewsets.ModelViewSet):
             return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
         except Exception as e:
-            traceback.print_exc(file=sys.stdout)
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
             return JsonResponse({'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
 
@@ -121,19 +112,24 @@ class ChurchViewSet(viewsets.ModelViewSet):
         '''
         查找用户所属教会
         '''
-        import logging 
-        loger = logging.getLogger('church.all')
-        loger.info(request.user)
-        if isinstance (request.user,AnonymousUser):
-            ch = Church.objects.all().filter(code=settings.DEFAULT_CHURCH)
-            if ch == None or len(ch)<=0:
-                raise Exception('default church was not find')
+        try:
+            theLogger.info(request.user)
+            if isinstance (request.user,AnonymousUser):
+                ch = Church.objects.all().filter(code=settings.DEFAULT_CHURCH)
+                if ch == None or len(ch)<=0:
+                    raise Exception('default church was not find')
+                else:
+                    serializer = self.get_serializer(ch[0])
             else:
-                serializer = self.get_serializer(ch[0])
-        else:
-            serializer = self.get_serializer(request.user.church)
+                serializer = self.get_serializer(request.user.church)
 
-        return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+        except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            # pprint.PrettyPrinter(indent=4).pprint(IndexError)
+            return JsonResponse({'errCode': '1001', 'msg':'没有找到用户的教会','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
 
 
 class SermonViewSet(viewsets.ModelViewSet):
@@ -156,9 +152,10 @@ class SermonViewSet(viewsets.ModelViewSet):
         '''
         查找当前用户所在教会主日信息
         '''
-        if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
         try:
+            if not request.user.is_authenticated :
+                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
+        
             if (request.user.church == None):
                 return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有教会信息','sysErrMsg':''}, safe=False)
             now = datetime.datetime.now()
@@ -178,10 +175,9 @@ class SermonViewSet(viewsets.ModelViewSet):
             # print(slzSermon.medias)
             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
         except Exception as e:
-            # pprint.PrettyPrinter(4).pprint(e.__traceback__)
             import traceback
             import sys
-            traceback.print_exc(file=sys.stdout)
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
@@ -208,8 +204,7 @@ class SermonViewSet(viewsets.ModelViewSet):
 
             import traceback
             import sys
-            loger = logging.getLogger('church.all')
-            loger.exception('there is exceptin',exc_info=True,stack_info=True)
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'平台教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
@@ -325,10 +320,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             # pprint.PrettyPrinter(4).pprint(e.__traceback__)
             import traceback
             import sys
-            logger = logging.getLogger('dev.error')
-            traceback.print_exc(file=logger.handlers[0]._open())
-            traceback.print_exc(file=sys.stdout)
-            # logger.error()
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
 
@@ -347,7 +339,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
         except Exception as e:
             import traceback
             import sys
-            traceback.print_exc(file=sys.stdout)
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
 
     
@@ -377,22 +369,32 @@ class  CourseViewSet(viewsets.ModelViewSet):
         except Exception as e:
             import traceback
             import sys
-            traceback.print_exc(file=sys.stdout)
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()()}, safe=False)
 
 
 
 def addSalesInfosOnList(courseList,user):
-    for course in courseList:
-        addSalesInfosOn(course,user)
+    try:
+        for course in courseList:
+            addSalesInfosOn(course,user)
+    except Exception as e:
+        import traceback
+        import sys
+        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
    
 def addSalesInfosOn(course,user):
     # course表自带sales_num，不再查询关联表了。用于orderby。
     # course.sales_num = course.users.all().count
-    if course.users.all().filter(pk=user.id):
-        course.is_buy = True
-    else:
-        course.is_buy = False
+    try:
+        if course.users.all().filter(pk=user.id):
+            course.is_buy = True
+        else:
+            course.is_buy = False
+    except Exception as e:
+        import traceback
+        import sys
+        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
 
 
