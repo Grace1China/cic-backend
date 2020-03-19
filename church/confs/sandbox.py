@@ -165,6 +165,12 @@ LOGGING = {
             'formatter': 'simple',
             'filename': '/data/log/django/l3sandbox/info.log', #本机data/log/django/error.log
         },
+        'file_all': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'simple',
+            'filename': '/data/log/django/l3sandbox/all.log', #本机data/log/django/error.log
+        },
         'file_debug': {
             'level': 'DEBUG',
             'filters': ['DebugFilter'],
@@ -186,7 +192,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console','file_debug'],
+            'handlers': ['console','file_debug','file_all'],
             'propagate': True,
         },
         'django.request': {
@@ -200,7 +206,7 @@ LOGGING = {
             'propagate': False
         },
         'church.all': {
-            'handlers': ['console', 'console_err','file_info','file_err'],
+            'handlers': ['console', 'console_err','file_info','file_err','file_all'],
             'level': 'INFO',
             'propagate': False,
         }
