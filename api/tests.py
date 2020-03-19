@@ -77,6 +77,32 @@ class ApiTestCase(APITestCase):
         print(response.content)
 
     def test_sermon(self):
+        pass
+
+
+class ViewSetTest(TestCase):
+    def test_view_set(self):
+        # response = APIClient().get(reverse('cat-detail', args=(cat.pk,)))
+        # self.assertEqual(response.status_code, 200)   
+
+
+        request = APIRequestFactory().get("")
+        # cat_detail = CatViewSet.as_view({'get': 'retrieve'})
+        # cat = Cat.objects.create(name="bob")
+        # response = cat_detail(request, pk=cat.pk)
+        # self.assertEqual(response.status_code, 200)
+
+        factory = APIRequestFactory()
+        view = EweeklyViewSet.as_view({'get':'GetL3Eweekly'})
+        # request = factory.get('http://test.l3.bicf.org/rapi/eweekly/l3'))
+        # request = factory.get(reverse(view))
+        response = view(request)
+        pprint.PrettyPrinter(6).pprint(response.content)
+        pprint.PrettyPrinter(6).pprint(eval(response.content))
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(eval(response.content)['errCode'],'0')
+
+        
 
 
     

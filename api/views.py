@@ -76,24 +76,26 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         '''
         查找L3平台最新周报
         '''
+        ret = {'errCode': '0'}
         try:
             # data = self.request.data
             ch = Church.objects.filter(Q(code__iexact='l3'))[0]
             pprint.PrettyPrinter(indent=4).pprint(ch)
-        
       
             wr = self.get_queryset().filter(church=ch, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')
             # pprint.PrettyPrinter(indent=4).pprint(wr)
             wr = wr[0]
             serializer = self.get_serializer(wr)
-            return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
+            ret = {'errCode': '0', 'data': serializer.data}
 
         except Exception as e:
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+        finally:
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
-            return JsonResponse({'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}, safe=False)
+            ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()()}
+            return JsonResponse(ret, safe=False)
 
             
 
