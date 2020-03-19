@@ -114,11 +114,11 @@ todo
 /church/static
 **/daniel_*
 church/gunicorn.conf.py
-stop_site*
-run_site*
+stop_site
+run_site
 runsite*
-stopsite*
-redeploy*
-restart*
+stopsite
+redeploy
+restart
 ./church/settings.py
 ./church/confs/dev.py
