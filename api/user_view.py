@@ -37,7 +37,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     '''
     queryset=CustomUser.objects.all()
     serializer_class=CustomUser4APISerializer
-    permission_classes=[CICUtill.getPermissionClass]
+    permission_classes=[CICUtill.getPermissionClass()]
     @action(detail=True,methods=['POST'], format="json")
     def register(self,request):
         '''
