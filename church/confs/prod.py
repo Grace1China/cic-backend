@@ -166,6 +166,12 @@ LOGGING = {
             'filename': '/data/log/django/l3prod/error.log',
             'formatter': 'verbose'
         },
+        'file_all': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'simple',
+            'filename': '/data/log/django/l3prod/all.log', #本机data/log/django/error.log
+        },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
@@ -174,7 +180,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console','file_all'],
             'propagate': True,
         },
         'django.request': {
@@ -188,7 +194,7 @@ LOGGING = {
             'propagate': False
         },
         'church.all': {
-            'handlers': ['console', 'console_err','file_info','file_err'],
+            'handlers': ['console', 'console_err','file_info','file_err','file_all'],
             'level': 'INFO',
             'propagate': False,
         }
