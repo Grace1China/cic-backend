@@ -14,8 +14,8 @@ function UploaderFactory(
     var loc_browse_button = pbrowse_button
     var loc_container = pcontainer
     var loc_ossfile = possfile //用来显示链接
-    var loc_postfiles = ppostfiles
-    var loc_console = pconsole
+    var loc_postfiles = ppostfiles //没有什么作用，下次删除
+    var loc_console = pconsole //显示错误信息
     var loc_myradio = pmyradio
     var loc_fileurl = pfileurl //用来上传form里
     var loc_acl = pacl
@@ -260,6 +260,8 @@ function UploaderFactory(
                     console.log(up)
                     res = JSON.parse(info.response)
                     console.log(res.signedurl)
+                    console.log(res)
+
                     if (info.status == 200)
                     {
                         document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${(res.signedurl)}">${(res.filename)}</a>`     
@@ -267,8 +269,10 @@ function UploaderFactory(
                         loc_ossfile.href =`${(res.signedurl)}`
                         loc_ossfile.innerText  =`${(res.filename)}`
 
-
-                        document.getElementsByName('title')[0].value = (res.filename)
+                        if ((document.getElementsByName('title')[0].value||'')==''){
+                            var thefn = res.filename.replace(/^.*\//g,'').replace(/\..*$/,'')
+                            document.getElementsByName('title')[0].value = (thefn)
+                        }
                         document.getElementsByName('_continue')[0].click()
                     }
                     else if (info.status == 203)

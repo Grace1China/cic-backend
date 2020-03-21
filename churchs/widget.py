@@ -12,6 +12,10 @@ import pprint
 import urllib
 import django.conf
 # from urllib import urlencode
+from api.utill import CICUtill
+
+import logging 
+theLogger = logging.getLogger('church.all')
 
 class S3DirectWidgetExt(TextInput):
     class Media:
@@ -75,32 +79,25 @@ class AliOssDirectWidgetExt(TextInput):
 
 
     def render(self, name, value, **kwargs):
-        from api.utill import CICUtill
+        # from api.utill import CICUtill
         file_url = value or ''  #目前这个是bucket的key
         file_url = urllib.parse.unquote(file_url)
-        signed_url = CICUtill.signurl1(file_url,dest=self.dest)
-        
+        theLogger.info(self.fieldname)
+        theLogger.info(file_url)
+        theLogger.info(name)
+
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
-        
-        bPublic = CICUtill.isReadable(file_url,dest=self.dest)
-        if bPublic :
-            sPublic_url = signed_url.split('?')[0]
-        else:
-            sPublic_url = None
-
-        
-
         
 
         ctx = {
-            'file_url': urllib.parse.unquote(file_url),
-            'signed_url':signed_url,
+            'file_url': CICUtill.getObjectKey(file_url),#urllib.parse.unquote(file_url), file_url is an url here get the key
+            'signed_url':file_url,#if a public not signed but give it so
             'name':name,
             'vbn':self.vbn,
             'fieldname':self.fieldname,
             'acl':settings.ALIOSS_DESTINATIONS[self.dest]['x-oss-object-acl'],
-            'public':bPublic,   
-            'public_url':sPublic_url,
+            'public':(file_url != '') and (not file_url.find('Expires=')>=0) ,  
+            'public_url':file_url,#if an signed url give it so
 
 
         }
@@ -161,22 +158,21 @@ class AliVideoWidgetExt(TextInput):
 
 
     def render(self, name, value, **kwargs):
-        from api.utill import CICUtill
-        file_url = value or ''  #目前这个是bucket的key
-        file_url = urllib.parse.unquote(file_url)
         
-        signed_url = CICUtill.signurl1(file_url,dest=self.dest)
+        file_url = value or ''  #目前这个是bucket的key
+        # file_url = urllib.parse.unquote(file_url)
+        
+        # signed_url = CICUtill.signurl1(file_url,dest=self.dest)
         
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
-        # pprint.PrettyPrinter(6).pprint(signed_url)
 
         ctx = {
-            'file_url': urllib.parse.unquote(file_url),
-            'signed_url':signed_url,
+            'file_url': file_url,
+            'signed_url':file_url,
             'name':name,
             'fieldname':self.fieldname,
-            'public': CICUtill.isReadable(file_url.split('?')[0],dest=self.dest),
-            'public_url':signed_url.split('?')[0] if CICUtill.isReadable(file_url.split('?')[0],dest=self.dest) else '' ,
+            'public': not file_url.find('Expires=')>=0,
+            'public_url':file_url ,
             'label':self.label,
             'class':self.attrs['class']
 ,

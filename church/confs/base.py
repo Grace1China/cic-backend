@@ -405,7 +405,7 @@ ALIOSS_DESTINATIONS = {
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
-        'x-oss-object-acl':'private'   #public-read、private、public-read-write
+        'x-oss-object-acl':'public-read'   #public-read、private、public-read-write
     },
     'source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
@@ -426,7 +426,7 @@ ALIOSS_DESTINATIONS = {
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
-        'x-oss-object-acl':'private'   #public-read、private、public-read-write
+        'x-oss-object-acl':'public-read'   #public-read、private、public-read-write
     }
 }
 

@@ -63,6 +63,8 @@ urlpatterns = [
     
     path('rapi/', include('payment.urls')),
 
+    path('blog/', include('blog.urls')),
+
 ]
 
 if settings.DEBUG:

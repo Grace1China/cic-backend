@@ -23,6 +23,8 @@ class CICUtill():
         #https://bicf-media-source.oss-cn-beijing.aliyuncs.com/l3/ddd.mp3
         import re
         obj = re.sub('^.*(https://|http://)(.*?)/','',obj,count=1)
+        obj = re.sub(r'\?.*$','',obj,count=1)
+        # https://bicf-media-source.oss-cn-beijing.aliyuncs.com/L3/f6.mp4?OSSAccessKeyId=LTAI4Fd1JMHM3WSUN4vrHcj8&Expires=1584879612&Signature=rJmz9enxjtuY0y9qwgV1OLhaW5U=
         # obj = str.replace(obj, '%s.' % settings.ALIOSS_DESTINATION_BUCKET_NAME,'')
         # obj = str.replace(obj, '%s/' % settings.ALIOSS_DESTINATION_ENDPOINT,'')
         return obj

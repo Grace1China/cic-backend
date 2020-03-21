@@ -13,6 +13,10 @@ from django.contrib.contenttypes.fields import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 import oss2
 import urllib
+import re
+
+import logging 
+theLogger = logging.getLogger('church.all')
 
 
 
@@ -103,8 +107,8 @@ class Media(models.Model):
     s3_image = S3DirectField(dest='images', blank=True,verbose_name='AWS S3 封面')
     s3_pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='AWS S3 讲义')
 
-    # alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
-    alioss_video = models.CharField(max_length=400, blank=True,verbose_name='视频')
+    alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
+    # alioss_video = models.CharField(max_length=400, blank=True,verbose_name='视频')
     alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='视频状态')
     alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='高清链接')
     alioss_HD_URL = models.CharField(max_length=400, blank=True,verbose_name='标清链接')
@@ -125,13 +129,11 @@ class Media(models.Model):
 
     def save(self, *args, **kwargs):
         # do_something()
-        print('before save-------------------')
-        print(self.alioss_video)
-        print(self.alioss_image)
-        self.alioss_video = urllib.parse.quote(self.alioss_video) #存储成为url比较，用于后台查找
+        theLogger.info(self.alioss_video)
+        # self.alioss_video = urllib.parse.quote(self.alioss_video) #存储成为url比较，用于后台查找
+        theLogger.info(self.alioss_video)
         super().save(*args, **kwargs)  # Call the "real" save() method.
         # do_something_else()
-        print(self.alioss_video)
 
 
     
@@ -146,7 +148,9 @@ class Media(models.Model):
         if self.s3_video is not None and self.s3_video!='' :
             return self.s3_video
         elif self.alioss_video is not None and self.alioss_video != '':
-            return self.alioss_video
+            # return self.alioss_video
+            retval = self.getMediaUrl(self.alioss_video)
+            return retval
         else:
             return ''
     @property
@@ -170,12 +174,80 @@ class Media(models.Model):
         obj = str.replace(obj, '%s.' % settings.ALIOSS_DESTINATION_BUCKET_NAME,'')
         obj = str.replace(obj, '%s/' % settings.ALIOSS_DESTINATION_ENDPOINT,'')
         obj = urllib.parse.unquote(obj)
-        # pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
-        # pprint.PrettyPrinter(4).pprint(obj)
         return obj
 
+    def getMediaUrl(self,key,dest="source"):
+        auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+        bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
+        theLogger.info(bucket)
+
+        theLogger.info(key)
+        # key = re.sub(r'(^[^\/]*/)', r'\1mp4-hd/',key)  #"ci/p4/3.jpg"
+        # key = re.sub(r'\..*$', r'.mp4/',key)
+        # theLogger.info(key)
+        # key = urllib.parse.unquote(key)
+
+            #如果是视频在目标存储桶中，就要把转码的目录加入进来
+
+        if not bucket.object_exists(key) :
+            return "" #不存在文件 返回空
+
+        retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+
+        if bucket.get_object_acl(key).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+            retval = retval.split('?')[0]
+        else:
+            pass
+            #通过nginx来转发，国内国外请求，可以减少费用。但是目前还不是很稳定，所以等后台有了动态配置功能后再实施？
+
+        return retval
+            
+
+    def getTransCodedMediaUrl(self,key,coderatio='mp4-hd'):
+        '''
+        转码的媒体的url找出来。
+        '''
+        dest = 'destination'
+        auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+        bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
+        theLogger.info(bucket)
+        if coderatio == '':
+            raise Exception('bucket and transcode directory not right.')
+        theLogger.info(key)
+        key = re.sub(r'(^[^\/]*/)', (r'\1%s/' % coderatio),key)  #"ci/p4/3.jpg"
+        key = re.sub(r'\..*$', r'.mp4',key)
+        theLogger.info(key)
+        key = urllib.parse.unquote(key)
+        theLogger.info(key)
+
+        theLogger.info(bucket.object_exists(key))
+
+            #如果是视频在目标存储桶中，就要把转码的目录加入进来
+
+        if not bucket.object_exists(key) :
+            return "" #不存在文件 返回空
+
+        retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+        theLogger.info(retval)
+        theLogger.info(bucket.get_object_acl(key).acl)
+        theLogger.info(oss2.OBJECT_ACL_PUBLIC_READ)
+        if bucket.get_object_acl(key).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+            retval = retval.split('?')[0]
+        else:
+            pass
+            #通过nginx来转发，国内国外请求，可以减少费用。但是目前还不是很稳定，所以等后台有了动态配置功能后再实施？
+        theLogger.info(retval)
+        
+
+        return retval
+            
+        
+
+
+
+    #----------------------------------------------------------------------------------------------------------------------------------------------
     @property
-    def dist_SHD_URL(self):
+    def dist_SHD_URL_deprecate(self):
         pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
         pprint.PrettyPrinter(4).pprint(self.s3_SHD_URL)
         pprint.PrettyPrinter(4).pprint(self.alioss_SHD_URL)
@@ -192,18 +264,29 @@ class Media(models.Model):
             return retval #self.alioss_SHD_URL
         else:
             return ''
+    @property
+    def dist_SHD_URL(self):
+        if self.s3_SHD_URL is not None and self.s3_SHD_URL != '':
+            return self.s3_SHD_URL
+        elif self.alioss_video is not None and self.alioss_video != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            theLogger.info('self.alioss_video:%s' % self.alioss_video)
+            retval = self.getTransCodedMediaUrl(self.alioss_video,coderatio='mp4-hd')
+            theLogger.info('retval:%s' % retval)
+
+            return retval #self.alioss_SHD_URL
+        else:
+            return ''
+    #-----------------------------------------------------------------------------------------------------------------------------------------------
     def prop_dist_HD_URL(self):
         if self.s3_HD_URL is not None and self.s3_HD_URL != '':
             return self.s3_HD_URL
-        elif self.alioss_HD_URL is not None and self.alioss_HD_URL != '':
-            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_HD_URL), settings.ALIOSS_EXPIRES)
-            if bucket.get_object_acl(self.getObjectKey(self.alioss_HD_URL)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
-                retval = retval.split('?')[0]
-            # 'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
-            retval = retval.replace('%s.%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_ENDPOINT),settings.MEDIABASE_PREFIX )
-            return retval #self.alioss_HD_URL
+        elif self.alioss_video is not None and self.alioss_video != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = self.getTransCodedMediaUrl(self.alioss_video,coderatio='mp4-sd')
+            theLogger.info('retval:%s' % retval)
+
+            return retval #self.alioss_SHD_URL
         else:
             return ''
     prop_dist_HD_URL.short_description = "转码后视频(transcoded video)"
@@ -215,15 +298,12 @@ class Media(models.Model):
         # pprint.PrettyPrinter(4).pprint(self.alioss_SD_URL)
         if self.s3_SD_URL is not None and self.s3_SD_URL != '':
             return self.s3_SD_URL
-        elif self.alioss_SD_URL is not None and self.alioss_SD_URL != '':
-            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_SD_URL), settings.ALIOSS_EXPIRES)
-            # pprint.PrettyPrinter(4).pprint(retval)
-            # pprint.PrettyPrinter(4).pprint(bucket.get_object_acl(self.getObjectKey(self.alioss_SD_URL)).acl)
-            if bucket.get_object_acl(self.getObjectKey(self.alioss_SD_URL)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
-                retval = retval.split('?')[0]
-            return retval #self.alioss_SD_URL
+        elif self.alioss_video is not None and self.alioss_video != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = self.getTransCodedMediaUrl(self.alioss_video,coderatio='mp4-ld')
+            theLogger.info('retval:%s' % retval)
+
+            return retval #self.alioss_SHD_URL
         else:
             return ''
     @property
@@ -231,12 +311,9 @@ class Media(models.Model):
         if self.s3_audio is not None and self.s3_audio != '':
             return self.s3_audio
         elif self.alioss_audio is not None and self.alioss_audio != '':
-            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_audio), settings.ALIOSS_EXPIRES)
-            if bucket.get_object_acl(self.getObjectKey(self.alioss_audio)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
-                retval = retval.split('?')[0]
-            return retval  #self.alioss_audio
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = self.getMediaUrl(self.alioss_audio,dest='audios')
+            return retval 
         else:
             return ''
     @property
@@ -244,35 +321,19 @@ class Media(models.Model):
         if self.s3_image is not None and self.s3_image != '':
             return self.s3_image
         elif self.alioss_image is not None and self.alioss_image != '':
-            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            if bucket.get_object_acl(self.getObjectKey(self.alioss_image)).acl == 'private':
-                bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-                retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_image), settings.ALIOSS_EXPIRES)
-                if bucket.get_object_acl(self.getObjectKey(self.alioss_image)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
-                    retval = retval.split('?')[0]
-                return retval #self.alioss_pdf
-            else:
-                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_image))
-            
-            return retval #self.alioss_image
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = self.getMediaUrl(self.alioss_image,dest='images')
+            return retval 
         else:
             return ''
     @property
     def dist_pdf(self):
         if self.s3_pdf is not None and self.s3_pdf != '':
             return self.s3_pdf
-        elif self.alioss_pdf is not None and self.alioss_pdf !='':
-            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl == 'private':
-                bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-                retval = bucket.sign_url('GET', self.getObjectKey(self.alioss_pdf), settings.ALIOSS_EXPIRES)
-                if bucket.get_object_acl(self.getObjectKey(self.alioss_pdf)).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
-                    retval = retval.split('?')[0]
-                return retval #self.alioss_pdf
-            else:
-                return 'http://%s.%s/%s' % (settings.ALIOSS_DESTINATION_BUCKET_NAME,settings.ALIOSS_DESTINATION_LOCATION,self.getObjectKey(self.alioss_pdf))
+        elif self.alioss_pdf is not None and self.alioss_pdf != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = self.getMediaUrl(self.alioss_pdf,dest='pdfs')
+            return retval 
         else:
             return ''
 
