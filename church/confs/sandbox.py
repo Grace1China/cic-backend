@@ -206,7 +206,7 @@ LOGGING = {
             'propagate': False
         },
         'church.all': {
-            'handlers': ['console', 'console_err','file_info','file_err','file_all'],
+            'handlers': ['file_err','file_all'],#'console', 'console_err','file_info',
             'level': 'INFO',
             'propagate': False,
         }
