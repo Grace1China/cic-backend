@@ -1,7 +1,37 @@
+<html>
+<head>
+<style>
+.sermoninfo{
+    width:100%;
+    margin:0;
+}
+.sermoninfo p ,.sermoninfo img, .sermoninfo video{
+    max-width:100%;
+    width:100% !important;
+}
+.fixtop{
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000;
+    z-index: 1000!important;
+    
+}
+</style>
+
+</head>
+<body>
 {% if sermoninfo %}
-    <div>
+    <div class="sermoninfo">
     {{ sermoninfo|safe }}
     </div>
 {% else %}
     <p>No sermon now.</p>
 {% endif %}
+</body>
+<script>
+document.getElementsByTagName('video')[0].classList.add('fixtop')
+</script>
+</html>

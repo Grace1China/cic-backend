@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "church.apps.ChurchConfig",
     'churchs.apps.ChurchsConfig',
     'payment.apps.PaymentConfig', #支付
+    'blog.apps.BlogConfig', 
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     # 'photos.apps.PhotosConfig',
