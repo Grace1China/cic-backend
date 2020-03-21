@@ -116,7 +116,11 @@ class Media(models.Model):
     alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
     alioss_pdf = models.CharField(max_length=400,blank=True,verbose_name='讲义')
     
-    content = models.TextField(blank=True,verbose_name='摘要') 
+    content = RichTextUploadingField(blank=True,verbose_name='摘要',external_plugin_resources=[('html5video',
+    '/static/ckeditor/ckeditor/plugins/html5video/',
+    'plugin.js'
+    ),
+    ]) 
 
 
     def save(self, *args, **kwargs):

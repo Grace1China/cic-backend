@@ -2,6 +2,7 @@ from django.forms import ModelForm
 from django import forms
 from .models import Media
 from .widget import AliVideoWidgetExt,AliOssDirectWidgetExt
+from ckeditor.widgets import CKEditorWidget
 
 class MeidaForm2(forms.ModelForm):
     dist_SHD_URL = forms.CharField(label="",widget=AliVideoWidgetExt(dest="destination",label="超清视频"),required=False)
@@ -20,6 +21,9 @@ class MeidaForm2(forms.ModelForm):
         # widgets = {
         #     dist_HD_URL: AliVideoWidgetExt,
         # }
+        formfield_overrides = {
+            Media.content: {'widget': CKEditorWidget()},
+        }
 
 
     def __init__(self, *args, **kwargs):

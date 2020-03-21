@@ -19,6 +19,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files.storage import Storage
 from oss2.api import _normalize_endpoint
+import traceback, sys 
 
 import logging
 theLogger = logging.getLogger('church.all')
@@ -80,21 +81,21 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
             # 当启用了RAM访问策略，是不允许list和create bucket的
             self.bucket = self._get_bucket(self.auth)
 
-    # def _get_config(self, name):
-    #     """
-    #     Get configuration variable from environment variable
-    #     or django setting.py
-    #     """
-    #     config = os.environ.get(name, getattr(settings, name, None))
-    #     if config is not None:
-    #         if isinstance(config, six.string_types):
-    #             return config.strip()
-    #         else:
-    #             return config
-    #     else:
-    #         raise ImproperlyConfigured(
-    #             "Can't find config for '%s' either in environment"
-    #             "variable or in setting.py" % name)
+    def _get_config(self, name):
+        """
+        Get configuration variable from environment variable
+        or django setting.py
+        """
+        config = os.environ.get(name, getattr(settings, name, None))
+        if config is not None:
+            if isinstance(config, six.string_types):
+                return config.strip()
+            else:
+                return config
+        else:
+            raise ImproperlyConfigured(
+                "Can't find config for '%s' either in environment"
+                "variable or in setting.py" % name)
 
     def _clean_name(self, name):
         """
@@ -117,11 +118,16 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         work. We check to make sure that the path pointed to is not outside
         the directory specified by the LOCATION setting.
         """
-
+        theLogger.info(name)
         base_path = force_text(self.location)
         base_path = base_path.rstrip('/')
 
-        final_path = urljoin(base_path.rstrip('/') + "/", name)
+        theLogger.info(base_path)
+
+
+        final_path = '%s/%s' % (base_path.rstrip('/'),name.lstrip('/')) #urljoin(base_path.rstrip('/') + "/", name)
+        theLogger.info(final_path)
+
 
         base_path_len = len(base_path)
         if (not final_path.startswith(base_path) or
@@ -137,6 +143,7 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         return name
 
     def _open(self, name, mode='rb'):
+        theLogger.info(name)
         return AliyunFile(name, self, mode)
 
     def _save(self, name, content):
@@ -166,31 +173,39 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         return datetime.datetime.fromtimestamp(file_info.last_modified)
 
     def listdir(self, name):
-        name = self._normalize_name(self._clean_name(name))
-        if name and name.endswith('/'):
-            name = name[:-1]
+        try:
+            theLogger.info(name)
+            # name = self._normalize_name(self._clean_name(name))
+            if name and name.endswith('/'):
+                name = name[:-1]
 
-        files = []
-        dirs = set()
+            files = []
+            dirs = set()
 
-        theLogger.info(name)
-        theLogger.info(self.bucket)
+            theLogger.info(name)
+            theLogger.info(self.bucket)
 
 
-        for obj in ObjectIterator(self.bucket, prefix=name ):#/, delimiter='/'
-            if obj.is_prefix():
-                dirs.add(obj.key)
-            else:
-                files.append(obj.key)
+            for obj in ObjectIterator(self.bucket, prefix=name ):#/, delimiter='/'
+                if obj.is_prefix():
+                    dirs.add(obj.key)
+                else:
+                    files.append(obj.key.replace(name,'',1))
+            # raise Exception('listdir')
 
-        theLogger.info(dirs)
-        theLogger.info(files)
-
-        return list(dirs), files
+            theLogger.info(dirs)
+            theLogger.info(files)
+        except Exception as e:
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+        finally:
+            return list(dirs), files
 
     def url(self, name):
+        theLogger.info(name)
+
         name = self._normalize_name(self._clean_name(name))
         # name = filepath_to_uri(name) # 这段会导致二次encode
+        theLogger.info(name)
         name = name.encode('utf8') 
         # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
         return self.bucket._make_url(self.bucket_name, name)
@@ -216,9 +231,10 @@ class AliyunStaticStorage(AliyunBaseStorage):
 class AliyunFile(File):
     def __init__(self, name, storage, mode):
         self._storage = storage
+        theLogger.info('self._storage.location')
         theLogger.info(self._storage.location)
-        self._name = name[len(self._storage.location):]
-        # self._name= self._storage.location[1:]+ name
+        # self._name = name[len(self._storage.location):]
+        self._name= self._storage.location[1:]+ name
         theLogger.info(self._name)
         self._mode = mode
         self.file = six.BytesIO()

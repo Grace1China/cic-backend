@@ -24,3 +24,4 @@ gunicorn
 drf-yasg
 qrcode
 gevent
+django-aliyun-oss2-storage

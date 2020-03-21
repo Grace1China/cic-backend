@@ -214,7 +214,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
-MEDIA_ROOT = 'uploads/'
+MEDIA_ROOT =  'uploads/'  #os.path.join(BASE_DIR, "uploads/")
 MEDIA_URL = '/uploads/'
 
 
@@ -380,6 +380,17 @@ ALIOSS_RedirectUrl = {
     'destination':'api.bicf.org/mediabase'
 }
 
+#为后端上传配置阿里云oss
+ALI_STORAGE_BACKEND = {
+    'ACCESS_KEY_ID' : ALIOSS_ACCESS_KEY_ID,
+    'ACCESS_KEY_SECRET' : ALIOSS_SECRET_ACCESS_KEY,
+    'END_POINT' :ALIOSS_DESTINATION_ENDPOINT,
+    'BUCKET_NAME' :ALIOSS_DESTINATION_BUCKET_NAME,
+    'ALIYUN_OSS_CNAME' : "" ,# 自定义域名，如果不需要可以不填写
+    'BUCKET_ACL_TYPE' : "public-read-write" # private, public-read, public-read-write
+}
+
+
 # from django.conf import settings
 ALIOSS_DESTINATIONS = {
     'images':{
@@ -420,19 +431,21 @@ ALIOSS_DESTINATIONS = {
 }
 
 
-DEFAULT_FILE_STORAGE = 'church.storage_backends.MediaStorage'
 AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
-DEFAULT_FILE_STORAGE = 'church.storage_backends.PublicMediaStorage'
+# DEFAULT_FILE_STORAGE = 'church.storage_backends.PublicMediaStorage'
+DEFAULT_FILE_STORAGE = 'church.alioss_storage_backends.AliyunMediaStorage'
+
 
 AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
-PRIVATE_FILE_STORAGE = 'church.storage_backends.PrivateMediaStorage'
+# PRIVATE_FILE_STORAGE = 'church.storage_backends.PrivateMediaStorage'
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
+# CKEDITOR_IMAGE_BACKEND = 'pillow'
 # AWS_QUERYSTRING_AUTH = False
 
 APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
 
-
+CKEDITOR_BROWSE_SHOW_DIRS = True
 CKEDITOR_CONFIGS = {
     'default': {
         'skin': 'moono-lisa',
@@ -458,7 +471,7 @@ CKEDITOR_CONFIGS = {
                        'Language', 'CodeSnippet', 'CodeSnippetGeshi']},
             {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
             {'name': 'insert',
-             'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
+             'items': ['Image','Html5video', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
             '/',
             {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
             {'name': 'colors', 'items': ['TextColor', 'BGColor']},
@@ -484,6 +497,7 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': ','.join([
             'uploadimage', # the upload image feature
             # your extra plugins here
+            'html5video',
             'div',
             'autolink',
             'autoembed',
@@ -497,6 +511,71 @@ CKEDITOR_CONFIGS = {
             'dialogui',
             'elementspath',
             'codesnippet',
+            'iframe',
+            'embed',
+            'div',
+            'clipboard',
+            'widgetselection', 
+
+#             'a11yhelp',
+# 'about',
+# 'adobeair',
+# 'ajax',
+# 'autoembed',
+# 'autogrow',
+# 'autolink',
+# 'bbcode',
+# 'clipboard',
+# 'codesnippet',
+# 'codesnippetgeshi',
+# 'colordialog',
+# 'devtools',
+# 'dialog',
+# 'div',
+# 'divarea',
+# 'docprops',
+# 'embed',
+# 'embedbase',
+# 'embedsemantic',
+# 'filetools',
+# 'find',
+# 'flash',
+# 'forms',
+# 'iframe',
+# 'iframedialog',
+# 'image',
+# 'image2',
+# 'language',
+# 'lineutils',
+# 'link',
+# 'liststyle',
+# 'magicline',
+# 'mathjax',
+# 'menubutton',
+# 'notification',
+# 'notificationaggregator',
+# 'pagebreak',
+# 'pastefromword',
+# 'placeholder',
+# 'preview',
+# 'scayt',
+# 'sharedspace',
+# 'showblocks',
+# 'smiley',
+# 'sourcedialog',
+# 'specialchar',
+# 'stylesheetparser',
+# 'table',
+# 'tableresize',
+# 'tabletools',
+# 'templates',
+# 'uicolor',
+# 'uploadimage',
+# 'uploadwidget',
+# 'widget',
+# 'wsc',
+# 'xml'
+            
         ]),
     }
 }

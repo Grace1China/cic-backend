@@ -110,7 +110,7 @@ LOGGING = {
             'style': '{',
         },
         'simple': {
-            'format': '{levelname} {module} {lineno:d} {message}',
+            'format': '{levelname} {module} {lineno:d} {message} {pathname}',
             'style': '{',
         },
     },
