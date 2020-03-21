@@ -192,7 +192,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console','file_debug','file_all'],
+            'handlers': ['file_debug'],#'console','file_all'
             'propagate': True,
         },
         'django.request': {
@@ -206,7 +206,7 @@ LOGGING = {
             'propagate': False
         },
         'church.all': {
-            'handlers': ['file_err','file_all'],#'console', 'console_err','file_info',
+            'handlers': ['file_err'],#'console', 'console_err','file_info','file_all'
             'level': 'INFO',
             'propagate': False,
         }
