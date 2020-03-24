@@ -265,15 +265,15 @@ function UploaderFactory(
                     if (info.status == 200)
                     {
                         document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${(res.signedurl)}">${(res.filename)}</a>`     
-                        loc_fileurl.value =`${(res.filename)}`
-                        loc_ossfile.href =`${(res.signedurl)}`
+                        loc_fileurl.value =`${(res.filename)}`//key
+                        loc_ossfile.href =`${(res.signedurl)}`//签名url
                         loc_ossfile.innerText  =`${(res.filename)}`
 
                         if ((document.getElementsByName('title')[0].value||'')==''){
-                            var thefn = res.filename.replace(/^.*\//g,'').replace(/\..*$/,'')
+                            var thefn = res.filename.replace(/^.*\//g,'').replace(/\..*$/,'')//这里是为了去掉目录和文件扩展名
                             document.getElementsByName('title')[0].value = (thefn)
                         }
-                        document.getElementsByName('_continue')[0].click()
+                        // document.getElementsByName('_continue')[0].click()
                     }
                     else if (info.status == 203)
                     {

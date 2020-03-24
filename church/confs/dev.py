@@ -12,7 +12,7 @@ PAYPAL_IS_SANEBOX = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
-        'NAME': 'test_cic',  # 数据库名，先前创建的
+        'NAME': 'cic',  # test_cic数据库名，先前创建的
         
         #本地 
 #        'USER': 'root',     # 用户名，可以自己创建用户

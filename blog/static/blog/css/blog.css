@@ -1,0 +1,36 @@
+
+
+    @media screen and (max-width: 900px) {
+
+    .wechatpromt video{
+        max-width:100%;
+        width:100% !important;
+    }
+    
+    .fixtop_center{
+        position: fixed;
+        top: 0;
+        background-color: #000;
+        z-index: 1000!important;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    body.wechatpromt{
+        font-size: 35px;
+        line-height: 1em;
+        word-break: break-word;
+    }
+  }
+
+  @media screen and (min-width: 900px) {
+
+    
+    video{
+      width:75%;  
+    }
+    body.wechatpromt{
+        line-height: 1em;
+        word-break: break-word;
+    }
+  }

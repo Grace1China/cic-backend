@@ -1,0 +1,38 @@
+{% load i18n static  %}
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+</head>
+<body class ="wechatpromt">
+{% if sermoninfo %}
+    <div class="sermoninfo">
+    {{ sermoninfo|safe }}
+    </div>
+{% else %}
+    <p>No info found now.</p>
+{% endif %}
+</body>
+<script>
+
+if(document.getElementsByTagName('wechatpromt').length>0){
+    if(document.getElementsByTagName('video').length>0){
+        document.getElementsByTagName('video')[0].classList.add('fixtop')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('webkit-playsinline','webkit-playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('x5-playsinline','x5-playsinline')
+        }
+        
+    }
+
+
+window.onresize = function(){
+    console.log('re')
+    vh = document.getElementsByTagName('video').length>0?document.getElementsByTagName('video')[0].offsetHeight:0
+    container_v = document.getElementsByClassName('ckeditor-html5-video').length>0 ? document.getElementsByClassName('ckeditor-html5-video')[0]:{}
+    container_v.style.height=vh
+}
+</script>
+</html>

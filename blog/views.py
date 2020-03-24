@@ -21,7 +21,7 @@ def index(request,pk=0):
     theLogger.info(sm)
     sz = SermonSerializer4API(sm)
     sermoninfo = sz.data['medias'][0]['content']
-    template = loader.get_template('blog/index.html')
+    template = loader.get_template('blog/premote.html')
     context = {
         'sermoninfo': sermoninfo,
     }

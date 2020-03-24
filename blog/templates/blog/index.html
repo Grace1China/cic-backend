@@ -1,35 +1,41 @@
+{% load i18n static  %}
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  @media screen and (max-width: 900px) {
+    {% comment %} video{
+      width:100%;  
+    } {% endcomment %}
+    .sermoninfo p ,.sermoninfo img, .sermoninfo video{
+        max-width:100%;
+        width:100% !important;
+    }
+  }
+
+  @media screen and (min-width: 900px) {
+    //pc
+    video{
+      width:75%;  
+    }
+  }
+</style>
 <style>
 .sermoninfo{
     width:100%;
     margin:0;
 }
-.sermoninfo p ,.sermoninfo img, .sermoninfo video{
-    max-width:100%;
-    width:100% !important;
-}
-.fixtop{
 
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #000;
-    z-index: 1000!important;
-    
-}
-playsinline="" webkit-playsinline="" x5-playsinline="" 
 </style>
-
+<link rel="stylesheet" href="{% static 'blog/css/template.css' %}">
 </head>
 <body>
 {% if sermoninfo %}
-    <div class="sermoninfo">
+    <div class="sermoninfo ">
     {{ sermoninfo|safe }}
     </div>
 {% else %}
-    <p>No sermon now.</p>
+    <p>No info found now.</p>
 {% endif %}
 </body>
 <script>
@@ -38,6 +44,8 @@ document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinlin
 document.getElementsByTagName('video')[0].setAttribute('webkit-playsinline','webkit-playsinline')
 document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
 document.getElementsByTagName('video')[0].setAttribute('x5-playsinline','x5-playsinline')
-
+vh = document.getElementsByTagName('video').length>0?document.getElementsByTagName('video')[0].offsetHeight:0
+container_v = document.getElementsByClassName('ckeditor-html5-video').length>0 ? document.getElementsByClassName('ckeditor-html5-video')[0]:{}
+container_v.style.height=vh
 </script>
 </html>
