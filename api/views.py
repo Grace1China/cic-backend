@@ -49,7 +49,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     from churchs.models import WeeklyReport
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
-    permission_classes=[getPermissionClass()]
+    permission_classes=IsAuthenticated #[getPermissionClass()]
     @action(detail=True,methods=['POST'], format="json")
     def GetChurchEweekly_v2(self,request):
         '''
@@ -111,7 +111,7 @@ class ChurchViewSet(viewsets.ModelViewSet):
     from .serializers import ChurchSerializer4API
     queryset=Church.objects.all()
     serializer_class=ChurchSerializer4API
-    permission_classes=[getPermissionClass()]
+    permission_classes=IsAuthenticated #[getPermissionClass()]
     @action(detail=True,methods=['POST'], format="json")
     def GetUserChurch(self,request):
         '''
@@ -149,7 +149,7 @@ class SermonViewSet(viewsets.ModelViewSet):
     queryset = Sermon.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=SermonSerializer4API
-    permission_classes=[getPermissionClass()]
+    permission_classes=IsAuthenticated #[getPermissionClass()]
 
 
     @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
@@ -228,7 +228,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=CourseSerializer4APIPOST
-    permission_classes=[getPermissionClass()]
+    # permission_classes=[getPermissionClass()]
 
     # schema = CustomSchema()
     # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
