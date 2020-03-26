@@ -111,7 +111,6 @@ class ChurchViewSet(viewsets.ModelViewSet):
     from .serializers import ChurchSerializer4API
     queryset=Church.objects.all()
     serializer_class=ChurchSerializer4API
-    permission_classes=IsAuthenticated #[getPermissionClass()]
     @action(detail=True,methods=['POST'], format="json")
     def GetUserChurch(self,request):
         '''
