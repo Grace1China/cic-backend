@@ -149,9 +149,6 @@ class SermonViewSet(viewsets.ModelViewSet):
     queryset = Sermon.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=SermonSerializer4API
-    permission_classes=IsAuthenticated #[getPermissionClass()]
-
-
     @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
     def GetCurrentLordsDayInfo(self,request):
         '''
