@@ -150,7 +150,33 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
 
-
+    '''
+    修改密码
+    '''
+    @action(detail=True, methods=['POST'], format="json")
+    def updateUserPWD(self, request):
+        try:
+            user = request.user
+            if user is None or user is AnonymousUser:
+                return JsonResponse({'errCode': '1001', 'msg': 'User not find', 'data': None}, safe=False)
+    
+            oldpwd = request.data.get('oldpwd', None)
+            newpwd = request.data.get('newpwd', None)
+            confirmpwd = request.data.get('confirmpwd', None)
+            if oldpwd is None or oldpwd == "" or newpwd is None or newpwd == "" or confirmpwd is None or confirmpwd == "":
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+    
+            if not user.check_password(oldpwd):
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "老密码输入错误", 'sysErrMsg': ''}, safe=False)
+            if newpwd != confirmpwd:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "两次输入新密码不同", 'sysErrMsg': ''}, safe=False)
+            
+            user.set_password(newpwd)
+            user.save()
+    
+            return JsonResponse({'errCode': '0', 'data': None, 'msg': "success", 'sysErrMsg': ''}, safe=False)
+        except Exception as e:
+            return JsonResponse({'errCode': '1001', 'msg': str(e), 'data': None}, safe=False)
 
 
 

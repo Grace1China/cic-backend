@@ -25,6 +25,7 @@ user_list = CustomUserViewSet.as_view({
 #----userInfo----new---zk-----
 user_getUserInfo = CustomUserInfoViewSet.as_view({'get':'getUserInfo'})
 user_updateUserInfo = CustomUserInfoViewSet.as_view({'post':'updateUserInfo'})
+user_updateUserPWD = CustomUserInfoViewSet.as_view({'post':'updateUserPWD'})
 
 user_church = ChurchViewSet.as_view({
     'get':'GetUserChurch'
@@ -68,7 +69,7 @@ urlpatterns = [
     
     path("users/getuserinfo",user_getUserInfo,name="users_getUserInfo"),
     path("users/updateuserinfo",user_updateUserInfo,name="users_updateUserInfo"),
-
+    path("users/updateuserpwd",user_updateUserPWD,name="users_updateUserPWD"),
     
     path("lorddayinfo/l3",l3_lorddayinfo,name="l3_lorddayinfo"),
     path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
