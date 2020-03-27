@@ -58,7 +58,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         try:
 
             if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': {},'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
             wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
             serializer = self.get_serializer(wr)
             return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
@@ -67,7 +67,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': {},'sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'教会没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()}, safe=False)
         
 
 
@@ -95,7 +95,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
             return JsonResponse(ret, safe=False)
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': {},'sysErrMsg':traceback.format_exc()}
+            ret = {'errCode': '1001', 'msg':'L3没有最新的周报','data': None,'sysErrMsg':traceback.format_exc()}
         finally:
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
             return JsonResponse(ret, safe=False)
@@ -133,7 +133,7 @@ class ChurchViewSet(viewsets.ModelViewSet):
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
-            return JsonResponse({'errCode': '1001', 'msg':'没有找到用户的教会','data': {},'sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'msg':'没有找到用户的教会','data': None,'sysErrMsg':traceback.format_exc()}, safe=False)
 
 
 class SermonViewSet(viewsets.ModelViewSet):
@@ -155,10 +155,10 @@ class SermonViewSet(viewsets.ModelViewSet):
         '''
         try:
             if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': {},'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
         
             if (request.user.church == None):
-                return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有教会信息','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有教会信息','sysErrMsg':''}, safe=False)
             now = datetime.datetime.now()
             last_sunday = now - timedelta(days=now.weekday()+1)
             last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
@@ -179,7 +179,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
 
     @action(detail=True,methods=['POST'], format="json")
     def GetDefaultLordsDayInfo(self,request):
@@ -190,7 +190,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             from django.conf import settings
             theCh = Church.objects.all().get(code = settings.DEFAULT_CHURCH_CODE)
             if (theCh == None):
-                return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有平台教会信息','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有平台教会信息','sysErrMsg':''}, safe=False)
             now = datetime.datetime.now()
             last_sunday = now - timedelta(days=now.weekday()+1)
             last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
@@ -206,7 +206,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'平台教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'平台教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
 
@@ -264,9 +264,9 @@ class  CourseViewSet(viewsets.ModelViewSet):
             # church_code = data.get('church_code', '-1')
 
             if pagesize <=0 or pagesize >100 :
-                return JsonResponse({'errCode': '1002', 'data': {},'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1002', 'data': None,'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
             if page < 0 :
-                return JsonResponse({'errCode': '1003', 'data': {},'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
+                return JsonResponse({'errCode': '1003', 'data': None,'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
 
             if orderby is not None:
                 orderpair = orderby.split(' ') 
@@ -301,7 +301,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
                     return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 'page': coursePage.number,
                                          'totalPage': paginator.num_pages}, safe=False)
                 else:
-                    return JsonResponse({'errCode': '1001', 'data': {}, 'msg': '没有课程列表'},
+                    return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有课程列表'},
                                         safe=False)
             
             #未购买逻辑
@@ -323,7 +323,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
     @action(detail=True,methods=['POST'], format="json")
@@ -341,7 +341,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
 
     
     @action(detail=True,methods=['post'], format="json")
@@ -356,7 +356,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
                 import traceback
                 import sys
                 traceback.print_exc(file=sys.stdout)
-                return JsonResponse({'errCode': '1001', 'data': {},'msg':'搜索关键词不能为空','sysErrMsg':traceback.format_exc()}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None,'msg':'搜索关键词不能为空','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
             courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by('-update_time')
@@ -371,7 +371,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': {},'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
 
