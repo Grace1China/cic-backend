@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
 from .views import ChurchViewSet,EweeklyViewSet,SermonViewSet
-from .user_view import CustomUserViewSet
+from .user_view import CustomUserViewSet,CustomUserInfoViewSet
 from . import views
 from .alioss_directup_views import AliOssSignature, AliOssCallBack
 from . import alioss_directup_views
@@ -18,9 +18,14 @@ user_create = CustomUserViewSet.as_view({
 })
 
 user_getInfo = CustomUserViewSet.as_view({'get':'getInfo'})
+
 user_list = CustomUserViewSet.as_view({
     'get': 'list'
 })
+#----userInfo----new---zk-----
+user_getUserInfo = CustomUserInfoViewSet.as_view({'get':'getUserInfo'})
+user_updateUserInfo = CustomUserInfoViewSet.as_view({'post':'updateUserInfo'})
+
 user_church = ChurchViewSet.as_view({
     'get':'GetUserChurch'
 })
@@ -60,6 +65,10 @@ urlpatterns = [
     path("user_list",user_list,name="user_list"),
     # path("userProfile/<int:pk>",userProfileDetailView.as_view(),name="userProfile"),
     # path("sermon/0",church_lorddayinfo,name="sermon"),
+    
+    path("users/getuserinfo",user_getUserInfo,name="users_getUserInfo"),
+    path("users/updateuserinfo",user_updateUserInfo,name="users_updateUserInfo"),
+
     
     path("lorddayinfo/l3",l3_lorddayinfo,name="l3_lorddayinfo"),
     path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),

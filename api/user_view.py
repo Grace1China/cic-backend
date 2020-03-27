@@ -95,8 +95,72 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return JsonResponse(ret, safe=False)
 
 
+class CustomUserInfoViewSet(viewsets.ModelViewSet):
+    '''
+    用户信息正式类
+    '''
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUser4APISerializer
+    permission_classes=[IsAuthenticated] #401,{ "detail": "身份认证信息未提供。"}
 
+    '''
+    获取用户信息
+    '''
+    @action(detail=True, methods=['GET'], format="json")
+    def getUserInfo(self, request):
+        ret = {'errCode': '1001', 'msg': '', 'data': None}
+        try:
+            user = request.user
+            if user is None:
+                return JsonResponse({'errCode': '1001', 'msg': 'User not find', 'data': None}, safe=False)
+            if user is AnonymousUser:
+                return JsonResponse({'errCode': '1001', 'msg': 'User not find', 'data': None}, safe=False)
+            # if user is CustomUser: #判断不出来。
+            szUser = CustomUser4Info(instance=user)
+            ret = {'errCode': '0', 'msg': 'success', 'data': szUser.data}
+        except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
+            ret = {'errCode': '1001', 'msg': 'there is an exception', 'data': None}
+        finally:
+            return JsonResponse(ret, safe=False)
         
+    '''
+    修改用户信息
+    '''
+    @action(detail=True,methods=['POST'], format="json")
+    def updateUserInfo(self,request):
+
+        try:
+            user = request.user
+            if user is None or user is AnonymousUser:
+                return JsonResponse({'errCode': '1001', 'msg': 'User not find', 'data': None}, safe=False)
+            
+            username = request.data.get('username', None)
+            if username is None or username == "":
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+            
+            user.username = username
+            user.save()
+
+            szUser = CustomUser4Info(instance=user)
+            
+            return JsonResponse({'errCode': '0', 'data': szUser.data, 'msg': "success", 'sysErrMsg': ''}, safe=False)
+        except Exception as e:
+            return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
+
+
+
+
+
+
+
+
+
+
+
+
 
             
 

@@ -49,7 +49,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     from churchs.models import WeeklyReport
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
-    permission_classes=IsAuthenticated #[getPermissionClass()]
+    permission_classes=[IsAuthenticated] #[getPermissionClass()]
     @action(detail=True,methods=['POST'], format="json")
     def GetChurchEweekly_v2(self,request):
         '''

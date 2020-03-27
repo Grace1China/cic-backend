@@ -212,7 +212,7 @@ class ClientToken(APIView):
     paypal请求client token
     """
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
         try:
@@ -246,7 +246,7 @@ class PaymentMethodNonce(APIView):
     paypal 支付
     """
 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
         try:
             order_no = request.data.get('order_no', 0)
