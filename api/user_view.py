@@ -28,6 +28,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.conf import settings
 import logging
 from .utill import CICUtill
+from rest_framework_simplejwt.tokens import RefreshToken
 
 theLogger = logging.getLogger('church.all')
 
@@ -46,8 +47,20 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         '''
         try:
             data = self.request.data
+
+            email = data.get("email",None)
+            pwd = data.get('password', None)
+            confirmpwd = data.get('confirmpwd', None)
             church_code = data.get('church_code', '-1')
-            # pp.pprint(church_code)
+            
+            if email is None or email == "" or pwd is None or pwd == "" or confirmpwd is None or confirmpwd == "":
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+            if pwd != confirmpwd:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "两次输入新密码不同", 'sysErrMsg': ''}, safe=False)
+            
+            existUser = self.get_queryset().filter(email=email).first()
+            if existUser is not None:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "该邮箱已被使用", 'sysErrMsg': ''}, safe=False)
 
             theChurch = Church.objects.get(Q(code=church_code))
             serializer = self.get_serializer(data=data)
@@ -58,6 +71,55 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
 
+    @action(detail=True, methods=['POST'], format="json")
+    def login(self,request):
+        
+        data = request.data
+        email = data.get("email", None)
+        password = data.get('password', None)
+
+        if email is None or email == "" or password is None or password == "":
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+
+        existUser = self.get_queryset().filter(email=email).first()
+        if existUser is None:
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "账号未注册", 'sysErrMsg': ''}, safe=False)
+        
+        if not existUser.check_password(password):
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "密码错误", 'sysErrMsg': ''}, safe=False)
+        
+        import httplib2
+        import json
+        
+        connect = httplib2.Http()
+        resp, content = connect.request("http://localhost:8000/rapi/auth/jwt/create",
+                                        "POST",
+                                        body=json.dumps({'email': email,'password':password}),
+                                        headers={"Content-type": "application/json"})
+
+        if resp.status != 200:
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "创建token错误"}, safe=False)
+
+        connect.close()
+        if content is None:
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "创建token错误"}, safe=False)
+
+        decodedJson = json.loads(content)
+        # jsonString = json.dumps(decodedJson)
+
+        detail = decodedJson.get('detail')
+        if detail is not None:
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': detail}, safe=False)
+        
+        refresh = decodedJson.get('refresh')
+        access = decodedJson.get('access')
+        
+        # refresh = RefreshToken.for_user(user)
+        
+        return JsonResponse({'errCode': '0', 
+                             'data': {'refresh': refresh,'access': access}, 
+                             'msg': "success"}, safe=False)
+    
     @transaction.atomic
     def perform_create(self, serializer):
         '''
