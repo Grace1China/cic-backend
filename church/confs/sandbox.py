@@ -27,6 +27,7 @@ APP_SERVER_IP = "test.l3.bicf.org"  #singpore 54.169.143.92
 
 IAP_IS_SANDBOX = True
 PAYPAL_IS_SANEBOX = True
+DEFAULT_CHURCH_CODE = 'ims'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 

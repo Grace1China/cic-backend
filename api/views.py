@@ -49,7 +49,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     from churchs.models import WeeklyReport
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
-    permission_classes=[IsAuthenticated] #[getPermissionClass()]
+    # permission_classes=[IsAuthenticated] #[getPermissionClass()]
     @action(detail=True,methods=['POST'], format="json")
     def GetChurchEweekly_v2(self,request):
         '''
@@ -57,7 +57,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         '''
         try:
 
-            if not request.user.is_authenticated :
+            if not request.user.is_authenticated:
                 return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
             wr = self.get_queryset().filter(church=request.user.church, status=WeeklyReport.STATUS_PUBLISHED).order_by('-pub_time')[0]
             serializer = self.get_serializer(wr)
@@ -72,7 +72,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
 
 
-
+    #可以无token直接访问。
     @action(detail=True,methods=['POST'], format="json")
     def GetL3Eweekly(self,request):
         '''
@@ -119,7 +119,7 @@ class ChurchViewSet(viewsets.ModelViewSet):
         try:
             theLogger.info(request.user)
             if isinstance (request.user,AnonymousUser):
-                ch = Church.objects.all().filter(code=settings.DEFAULT_CHURCH)
+                ch = Church.objects.all().filter(code=settings.DEFAULT_CHURCH_CODE)
                 if ch == None or len(ch)<=0:
                     raise Exception('default church was not find')
                 else:

@@ -8,6 +8,7 @@ SECRET_KEY = '123dev'
 
 IAP_IS_SANDBOX = True
 PAYPAL_IS_SANEBOX = True
+DEFAULT_CHURCH_CODE = 'ims'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
