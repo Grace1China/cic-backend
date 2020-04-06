@@ -25,3 +25,9 @@ drf-yasg
 qrcode
 gevent
 django-aliyun-oss2-storage
+django-filer
+django-mptt
+easy_thumbnails
+django-polymorphic
+django-ckeditor-filebrowser-filer
+django-crequest

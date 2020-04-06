@@ -20,9 +20,11 @@ from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.files.storage import Storage
 from oss2.api import _normalize_endpoint
 import traceback, sys 
+from crequest.middleware import CrequestMiddleware
 
 import logging
 theLogger = logging.getLogger('church.all')
+lg = logging.getLogger('church.all')
 
 
 class AliyunOperationError(Exception):
@@ -118,15 +120,15 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         work. We check to make sure that the path pointed to is not outside
         the directory specified by the LOCATION setting.
         """
-        theLogger.info(name)
+        #theLogger.info(name)
         base_path = force_text(self.location)
         base_path = base_path.rstrip('/')
 
-        theLogger.info(base_path)
+        #theLogger.info(base_path)
 
 
         final_path = '%s/%s' % (base_path.rstrip('/'),name.lstrip('/')) #urljoin(base_path.rstrip('/') + "/", name)
-        theLogger.info(final_path)
+        #theLogger.info(final_path)
 
 
         base_path_len = len(base_path)
@@ -143,16 +145,25 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         return name
 
     def _open(self, name, mode='rb'):
-        theLogger.info(name)
+        #theLogger.info(name)
         return AliyunFile(name, self, mode)
 
     def _save(self, name, content):
         # 为保证django行为的一致性，保存文件时，应该返回相对于`media path`的相对路径。
-        target_name = self._get_target_name(name)
+        
+        current_request = CrequestMiddleware.get_request()
+        if current_request is None:
+            raise Exception('There is now requests user found')
+        
+        tname = self._get_target_name(name)
+        tname = '%s/%s' % (current_request.user.church.code, tname)
+
+
+        theLogger.info('save location:%s' % (tname))
 
         content.open()
         content_str = b''.join(chunk for chunk in content.chunks())
-        self.bucket.put_object(target_name, content_str)
+        self.bucket.put_object(tname, content_str)
         content.close()
 
         return self._clean_name(name)
@@ -174,19 +185,22 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
 
     def listdir(self, name):
         try:
-            theLogger.info(name)
+            #theLogger.info(name)
             # name = self._normalize_name(self._clean_name(name))
-            if name and name.endswith('/'):
-                name = name[:-1]
+            if name and name.startswith('/'):
+                name = name[1:]
+            if name and not name.endswith('/'):
+                name = '%s/' % name
 
             files = []
             dirs = set()
+            # dirs.add(name)  不能把自已加入
 
-            theLogger.info(name)
-            theLogger.info(self.bucket)
+            #theLogger.info(name)
+            #theLogger.info(self.bucket)
 
-
-            for obj in ObjectIterator(self.bucket, prefix=name ):#/, delimiter='/'
+            
+            for obj in ObjectIterator(self.bucket, prefix=name, delimiter='/' ):#/, delimiter='/'
                 if obj.is_prefix():
                     dirs.add(obj.key)
                 else:
@@ -200,24 +214,47 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         finally:
             return list(dirs), files
 
+    def __url(self, bucket_name, key, safe='/'):
+        # self.type = _determine_endpoint_type(self.netloc, self.is_cname, bucket_name)
+
+        # safe = '/' if slash_safe is True else ''
+        from oss2.compat import urlquote,urlparse
+        key = urlquote(key, safe=safe)
+
+        p = urlparse(self.end_point)
+
+
+        return '{0}://{1}.{2}/{3}'.format(p.scheme, bucket_name, p.netloc, key)
+
     def url(self, name):
         try:
             # theLogger.info(name)
 
             name = self._normalize_name(self._clean_name(name))
-            # name = filepath_to_uri(name) # 这段会导致二次encode
+
+            current_request = CrequestMiddleware.get_request()
+            if current_request is None or current_request.user is None or current_request.user.church is None or current_request.user.church.code == '':
+                raise Exception('There is now requests user found or church code is not setting for user')
+
             theLogger.info(name)
+
+            # name = filepath_to_uri(name) # 这段会导致二次encode
+            #theLogger.info(name)
+            name = '%s/%s' % (current_request.user.church.code,name)
             name = name.encode('utf8') 
+            theLogger.info(name)
             # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
             # return self.bucket._make_url(self.bucket_name, name)
 
             # raise Exception('url %s error' % name)
+            retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
+            # theLogger.info(retUrl)
 
         except:
             import traceback
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
         finally:
-            return self.bucket._make_url(self.bucket_name, name) 
+            return retUrl
 
     def read(self, name):
         pass
@@ -228,22 +265,157 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         if result.status >= 400:
             raise AliyunOperationError(result.resp)
 
+    def create_thumbnail(self, name):
+        pass
 
+    def _get_user_path(self,user):
+        user_path = ''
+
+        # If CKEDITOR_RESTRICT_BY_USER is True upload file to user specific path.
+        RESTRICT_BY_USER = getattr(settings, 'CKEDITOR_RESTRICT_BY_USER', False)
+        if RESTRICT_BY_USER:
+            try:
+                user_prop = getattr(user, RESTRICT_BY_USER)
+            except (AttributeError, TypeError):
+                user_prop = getattr(user, 'get_username')
+
+            if callable(user_prop):
+                user_path = user_prop()
+            else:
+                user_path = user_prop
+
+        return str(user_path)
+
+    def get_image_files(self,user=None, path=''):
+        """
+        Recursively walks all dirs under upload dir and generates a list of
+        full paths for each file found.
+        """
+        # If a user is provided and CKEDITOR_RESTRICT_BY_USER is True,
+        # limit images to user specific path, but not for superusers.
+        STORAGE_DIRECTORIES = 0
+        STORAGE_FILES = 1
+
+        # allow browsing from anywhere if user is superuser
+        # otherwise use the user path
+        if user and not user.is_superuser:
+            user_path = self._get_user_path(user)
+        else:
+            user_path = ''
+        lg.info('user_path : %s' % user_path)
+        lg.info('path : %s' % path)
+
+        if path=='':
+            #path 等于空时，就是第一次设置browse_path
+            browse_path = '%s%s%s' % (settings.CKEDITOR_UPLOAD_PATH, user_path, path)
+        else:
+            #path就是从oss里面取出来的路径，不用再设置了
+            browse_path = path
+            
+        lg.info('b u p browse_path: %s, %s, %s, %s' % (settings.CKEDITOR_UPLOAD_PATH, user_path, path, browse_path))
+
+
+        try:
+            storage_list = self.listdir(browse_path)
+        except NotImplementedError:
+            return
+        except OSError:
+            return
+        lg.info('storage_list:')
+        lg.info(storage_list)
+        for filename in storage_list[STORAGE_FILES]:
+            if os.path.splitext(filename)[0].endswith('_thumb') or os.path.basename(filename).startswith('.'):
+                continue
+
+            filename = '%s%s' % (browse_path, filename) if browse_path.endswith('/') else '%s/%s' % (browse_path, filename)
+            yield {'name':filename,'isdir':False}
+        
+        for directory in storage_list[STORAGE_DIRECTORIES]:
+            if directory.startswith('.'):
+                continue
+            else:
+                yield  {'name':directory,'isdir':True}
+
+        for directory in storage_list[STORAGE_DIRECTORIES]:
+            if directory.startswith('.'):
+                continue
+            # directory_path = os.path.join(path, directory)
+            for element in self.get_image_files(user=user, path=directory):
+                yield element
+
+
+    def get_files_browse_urls(self,user=None,typ=None,path=''):
+        """
+        Recursively walks all dirs under upload dir and generates a list of
+        thumbnail and full image URL's for each file found.
+        """
+        from  ckeditor_uploader import utils 
+        from ..utils import is_valid_image_extension
+        lg.info(typ)
+        files = []
+        dirs = set()
+        for el in self.get_image_files(user=user,path=path):
+            if isinstance(el,dict) and el['isdir'] ==True:
+                dirs.add(el['name'])
+                continue
+            filename = el['name']
+            src = utils.get_media_url(filename)
+            if getattr(settings, 'CKEDITOR_IMAGE_BACKEND', None):
+                if is_valid_image_extension(src):
+                    thumb = utils.get_media_url(utils.get_thumb_filename(filename))
+                else:
+                    thumb = utils.get_icon_filename(filename)
+                visible_filename = os.path.split(filename)[1]
+                if len(visible_filename) > 20:
+                    visible_filename = visible_filename[0:19] + '...'
+            else:
+                thumb = src
+                visible_filename = os.path.split(filename)[1]
+            if ((typ == 'images' and is_valid_image_extension(src)) or (('.%s' % typ) == os.path.splitext(src.lower())[1])):
+                # lg.info(context)
+                files.append({
+                    'thumb': thumb,
+                    'src': src,
+                    'is_image': is_valid_image_extension(src),
+                    'visible_filename': visible_filename,
+                })
+            
+        lg.info('last dirs:')
+        lg.info(dirs)
+        return (files,dirs)
+
+from django.utils.deconstruct import deconstructible
+@deconstructible
 class AliyunMediaStorage(AliyunBaseStorage):
-    location = settings.MEDIA_URL
+    
+    location = settings.MEDIA_ROOT
+    def get_files_browse_urls(self,user=None,typ=None,path=''):
+        return super().get_files_browse_urls(user=user,typ=typ,path=path)
+    def get_image_files(self,user=None, path=''):
+        return super().get_image_files(user=user,path=path)
+    
+    # def getLocation():
+    #     current_request = CrequestMiddleware.get_request()
+    #     if current_request is None:
+    #         raise Exception('There is now requests user found')
+    #     return current_request.user.church.code
+        
 
 
+
+@deconstructible
 class AliyunStaticStorage(AliyunBaseStorage):
     location = settings.STATIC_URL
 
-
+@deconstructible
 class AliyunFile(File):
     def __init__(self, name, storage, mode):
         self._storage = storage
-        theLogger.info('self._storage.location')
-        theLogger.info(self._storage.location)
+        #theLogger.info('self._storage.location')
+        #theLogger.info(self._storage.location)
         # self._name = name[len(self._storage.location):]
         self._name= self._storage.location[1:]+ name
+        theLogger.info('AliyunFile self._name')
         theLogger.info(self._name)
         self._mode = mode
         self.file = six.BytesIO()

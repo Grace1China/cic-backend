@@ -39,7 +39,7 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
-        'NAME': 'cic',  # test_cic数据库名，先前创建的
+        'NAME': 'test_cic',  # test_cic数据库名，先前创建的
         
         #本地 
 #        'USER': 'root',     # 用户名，可以自己创建用户
@@ -170,7 +170,7 @@ LOGGING = {
             'level': 'INFO',
             'filters': ['InfoFilter'],
             'class': 'logging.FileHandler',
-            'formatter': 'simple',
+            'formatter': 'verbose',
             'filename': '/data/log/django/l3dev/info.log', #本机data/log/django/error.log
             'encoding': 'utf8',
         },
@@ -203,7 +203,7 @@ LOGGING = {
             'propagate': False
         },
         'church.all': {
-            'handlers': ['console', 'console_err','file_info','file_err'],
+            'handlers': ['file_info','file_err'],#'console', 'console_err',,
             'level': 'INFO',
             'propagate': False,
         }

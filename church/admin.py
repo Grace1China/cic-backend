@@ -17,7 +17,7 @@ from churchs.forms import MeidaForm2
 class ChurchAdmin(admin.ModelAdmin):
     list_display = ('name','promot_cover', 'status') 
     search_fields = ('name','status')
-    fields = ('name', 'code','description', 'address', 'promot_cover', 'promot_video','status','venue','creator','manager')
+    fields = ('name', 'code','description', 'address', 'promot_cover', 'giving_qrcode', 'promot_video','status','venue','creator','manager')
     def get_changeform_initial_data(self, request):
         return {'creator': request.user}
     

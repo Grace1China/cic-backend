@@ -37,7 +37,8 @@ class Venue(models.Model):
 class SermonSeries(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
-    title = models.CharField(max_length=32, default='',verbose_name='标题')
+    title = models.CharField(max_length=250, default='',verbose_name='标题')
+    res_path = models.CharField(max_length=250, default='',blank=True,verbose_name='资源路径')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
@@ -56,6 +57,43 @@ class SermonSeries(models.Model):
 
     def __str__(self):
         return '%s' % (self.title)
+from django.db.models.signals import pre_save  
+def create_oss_dir(sender,instance,update_fields,**kwargs):
+    '''
+    要在创建系列实例之前，把oss的目录先创建好。先分配资源，然后生成对象。分配了资源，没有保存对象,下次对象生成，依然用这个资源
+    '''
+    try:
+        if instance.res_path  == '' or instance.res_path is None:
+            ct = SermonSeries.objects.filter(church__exact = instance.church).count()
+            instance.res_path = 'series_%d' % ct
+
+            path = '%s/%s' % (instance.church.code,instance.res_path)
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            d = settings.ALIOSS_DESTINATIONS
+            theLogger.info('-----------create_oss_dir------------')
+            theLogger.info(path)
+            for k,v in d.items():
+                # 每一个类型的文件都有一个系列存储位置
+                b = oss2.Bucket(auth, v['endpoint'], v['bucket'])
+                r  = b.list_objects(path,max_keys=1)
+                l = len(r.object_list)
+                if l <= 0 :
+                    # 不存在这个prefix，可以保存一个readme,来建立这个前缀
+                    b.put_object('%s/readme.md' % path,'this is for series:%s' % instance.res_path)
+                else:
+                    # 存在 检测一下 有没有readme, 以及是不是这个sereis的readme
+                    if not b.object_exists('%s/readme.md' % path):
+                        raise Exception('the resource path:%s is exists but no readme setting for sereis: %s' % (path, instance.res_path))   
+                    r = b.get_object('%s/readme.md' % path) 
+                    cnt = str(r.read(), encoding = "utf-8")
+                    if cnt != 'this is for series:%s' % instance.res_path:
+                        raise Exception('the resource path:%s is exists and it is not for series: %s' % (path, instance.res_path))                
+    except:
+        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+    finally:
+        pass
+
+pre_save.connect(create_oss_dir, sender=SermonSeries)
 
 from .widget import S3DirectField,AliOssDirectField
 

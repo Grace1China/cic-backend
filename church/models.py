@@ -8,6 +8,10 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
+# from filer.fields.image import FilerImageField
+# from filer.fields.file import FilerFileField
+from church.alioss_storage_backends_v2 import AliyunMediaStorage,AliyunStaticStorage
+
 class Church(models.Model):
     STATUS_INITED = 1
     STATUS_OFFLINE = 2
@@ -20,7 +24,9 @@ class Church(models.Model):
     code = models.CharField(max_length=32,unique=True,blank=False,default='086-010-0001',verbose_name='代码',help_text='只能含有字母，数字, _和-, 不要超过 254个字符',validators=[validate_slug])
     description = models.CharField(max_length=255,verbose_name='描叙')
     address = models.CharField(max_length=32,verbose_name='地址')
-    promot_cover =  models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报封面')
+    promot_cover =  models.ImageField(storage=AliyunMediaStorage(), null=True, blank=True,verbose_name='海报封面')
+    giving_qrcode =  models.ImageField(storage=AliyunMediaStorage(), null=True, blank=True,verbose_name='奉献二维码')
+    #FilerImageField(on_delete=models.CASCADE,null=True, blank=True,verbose_name='海报封面',related_name="logo_company")#models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报封面')
     promot_video =  models.FileField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报短片')
     venue = models.ManyToManyField(to="churchs.Venue",default=None,  blank=True,verbose_name='场地')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_INITED,verbose_name='状态')

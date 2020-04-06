@@ -30,6 +30,10 @@ class CustomUser(AbstractUser):
     def first_group(self):
         self.groups.all().first() 
 
+    @property
+    def get_church_path(self):
+        return self.church.code
+
 
     def __str__(self):
         return self.email

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import WeeklyReport, Sermon, Media
+from .models import WeeklyReport, Sermon, Media,SermonSeries
 from . import models as churchs_models
 from django.db import models as sysmodels
 from ckeditor.widgets import CKEditorWidget
@@ -248,12 +248,20 @@ class SermonAdmin(admin.ModelAdmin):
 
         
     mainsite_api_v1_makesermon.short_description = "make sermon in mainsite"
+
+class SermonSeriesAdmin(admin.ModelAdmin):
+    model = SermonSeries
+    readonly_fields = ('res_path',)
+    list_display = ('title','church','res_path','status')
+    # search_fields = ('pub_time', 'title','status','user')
+    # fields = ('title','speaker','scripture','series','church','pub_time','status','user')
+
     
 admin.site.register(churchs_models.Sermon, SermonAdmin)
 admin.site.register(churchs_models.Team)  
 admin.site.register(churchs_models.Donation)
 admin.site.register(churchs_models.Venue)
-admin.site.register(churchs_models.SermonSeries)
+admin.site.register(churchs_models.SermonSeries,SermonSeriesAdmin)
 
 admin.site.register(churchs_models.Speaker, SpeakerAdmin)
 admin.site.register(churchs_models.Meeting)

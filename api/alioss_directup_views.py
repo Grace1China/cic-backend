@@ -15,11 +15,12 @@ from rest_framework import status
 from rest_framework.response import Response
 import oss2
 from rest_framework.decorators import api_view, authentication_classes,permission_classes
+from rest_framework.permissions import IsAuthenticated,AllowAny
 import logging
 
 theLogger = logging.getLogger('church.all')
-
-
+from .utill import CICUtill
+# permission_classes=CICUtill.getPermissionClass()
 class AliOssSignature(APIView):
     '''
     给aliyun oss直传提供签名
@@ -111,7 +112,10 @@ class AliOssSignature(APIView):
 
 
 
-
+    # @permission_classes([CICUtill.getPermissionClass()])
+    # @permission_classes([IsAuthenticated])
+    from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
+    @permission_classes([IsAdminUser])
     def get(self, request, *args, **kwargs):
         """
         启用 Get 调用处理逻辑
@@ -220,10 +224,14 @@ class AliMtsCallBack(APIView):
 
         return Response(data='',status=status.HTTP_204_NO_CONTENT)
 
-from .utill import CICUtill
+# from .utill import CICUtill
+
+# @api_view(['GET'])
+# @permission_classes([CICUtill.getPermissionClass()])
+
 
 @api_view(['GET'])
-@permission_classes([CICUtill.getPermissionClass])
+@permission_classes([IsAuthenticated])
 def oss_object_exists(request,key=''):
     ret = {'errCode': '0', 'msg': 'media exists'}
     try:

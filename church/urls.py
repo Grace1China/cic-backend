@@ -64,6 +64,8 @@ urlpatterns = [
     path('rapi/', include('payment.urls')),
 
     path('blog/', include('blog.urls')),
+    # url(r'^filer/', include('filer.urls')),
+    # url(r'^filebrowser_filer/', include('ckeditor_filebrowser_filer.urls')),
 
 ]
 

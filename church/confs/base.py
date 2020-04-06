@@ -79,12 +79,17 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework_simplejwt',
     'parsley',
-    'django_mysql'
+    'django_mysql',
+    # 'easy_thumbnails',
+    # 'filer',
+    # 'mptt',
+    # 'ckeditor_filebrowser_filer',
+    'crequest',
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    
+    'crequest.middleware.CrequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -231,6 +236,9 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'api.utill.BrowsableAPIRendererWithoutForms',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
     
 }
 
@@ -436,6 +444,45 @@ AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
 # DEFAULT_FILE_STORAGE = 'church.storage_backends.PublicMediaStorage'
 DEFAULT_FILE_STORAGE = 'church.alioss_storage_backends.AliyunMediaStorage'
 
+# FILER_STORAGES = {
+#     'public': {
+#         'main': {
+#             'ENGINE': DEFAULT_FILE_STORAGE,
+#             'OPTIONS': {
+#                 'location': '/path/to/media/filer',
+#                 'base_url': '/media/filer/',
+#             },
+#             'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
+#             'UPLOAD_TO_PREFIX': 'filer_public',
+#         },
+#         'thumbnails': {
+#             'ENGINE': DEFAULT_FILE_STORAGE,
+#             'OPTIONS': {
+#                 'location': '/path/to/media/filer_thumbnails',
+#                 'base_url': '/media/filer_thumbnails/',
+#             },
+#         },
+#     },
+#     # 'private': {
+#     #     'main': {
+#     #         'ENGINE': 'filer.storage.PrivateFileSystemStorage',
+#     #         'OPTIONS': {
+#     #             'location': '/path/to/smedia/filer',
+#     #             'base_url': '/smedia/filer/',
+#     #         },
+#     #         'UPLOAD_TO': 'filer.utils.generate_filename.randomized',
+#     #         'UPLOAD_TO_PREFIX': 'filer_public',
+#     #     },
+#     #     'thumbnails': {
+#     #         'ENGINE': 'filer.storage.PrivateFileSystemStorage',
+#     #         'OPTIONS': {
+#     #             'location': '/path/to/smedia/filer_thumbnails',
+#     #             'base_url': '/smedia/filer_thumbnails/',
+#     #         },
+#     #     },
+#     # },
+# }
+
 
 AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
 # PRIVATE_FILE_STORAGE = 'church.storage_backends.PrivateMediaStorage'
@@ -447,6 +494,7 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
 
 CKEDITOR_BROWSE_SHOW_DIRS = True
+CKEDITOR_RESTRICT_BY_USER = True
 CKEDITOR_CONFIGS = {
     'default': {
         'skin': 'moono-lisa',
@@ -484,8 +532,12 @@ CKEDITOR_CONFIGS = {
                 'Preview',
                 'Maximize',
 
-            ]},
+            ],
+            },
+            ['FilerImage']
+
         ],
+        
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
         # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
         # 'height': 291,
@@ -517,6 +569,7 @@ CKEDITOR_CONFIGS = {
             'div',
             'clipboard',
             'widgetselection', 
+            'filerimage',
 
 #             'a11yhelp',
 # 'about',
@@ -578,6 +631,7 @@ CKEDITOR_CONFIGS = {
 # 'xml'
             
         ]),
+        'extraAllowedContent': 'video [*]{*}(*);p [*]{*}(*); script [*]{*}(*);',
     }
 }
 
