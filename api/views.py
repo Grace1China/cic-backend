@@ -2,7 +2,7 @@ from rest_framework.generics import (ListCreateAPIView,RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from users.models import CustomUser
 from .permissions import IsOwnerProfileOrReadOnly
-from .serializers import CustomUser4APISerializer
+from .serializers import CustomUser4APISerializer 
 from churchs.models import Sermon, WeeklyReport
 from churchs.serializers import SermonSerializer, EweeklySerializer
 import boto3
@@ -49,7 +49,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     from churchs.models import WeeklyReport
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
-    # permission_classes=[IsAuthenticated] #[getPermissionClass()]
+    permission_classes=[AllowAny]
     @action(detail=True,methods=['POST'], format="json")
     def GetChurchEweekly_v2(self,request):
         '''
@@ -111,6 +111,7 @@ class ChurchViewSet(viewsets.ModelViewSet):
     from .serializers import ChurchSerializer4API
     queryset=Church.objects.all()
     serializer_class=ChurchSerializer4API
+    permission_classes = [AllowAny]
     @action(detail=True,methods=['POST'], format="json")
     def GetUserChurch(self,request):
         '''
@@ -148,6 +149,8 @@ class SermonViewSet(viewsets.ModelViewSet):
     queryset = Sermon.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=SermonSerializer4API
+    permission_classes = [AllowAny]
+    
     @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
     def GetCurrentLordsDayInfo(self,request):
         '''
@@ -181,7 +184,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
 
-    @action(detail=True,methods=['POST'], format="json")
+    @action(detail=True,methods=['POST'], format="json",permission_classes=[AllowAny])
     def GetDefaultLordsDayInfo(self,request):
         '''
         查找当前用户所在教会主日信息
@@ -224,7 +227,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=CourseSerializer4APIPOST
-    # permission_classes=[getPermissionClass()]
+    permission_classes=[AllowAny]
 
     # schema = CustomSchema()
     # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -412,136 +415,136 @@ from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models.fields import CharField
 
-@api_view(['GET'])
-@permission_classes([CICUtill.getPermissionClass()])
-def getinfo(request,path=''):
-    '''
-    path格式如下：
-    '{"model":"CustomUser","filter":"email","filter_v":"daniel@bicf.org"}'
-    model是模型的名称
-    filter是查找条件字段 filter_v 是条件值
-    '''
-    theLogger.info(path)
-    ret = {'errCode': '0'}
-    try:
-        if request.method == 'GET':
-            # data = request.data
-            # key = data.get('key', '')
-            if path != '':
-                # {"model":"Sermon","field":'id',"value":"1"}
-                theLogger.info(path)
-                import json
-                path = unquote(path)
-                theLogger.info(path)
-                path = eval(path)
-
-                path = json.loads(path)
-                theLogger.info(path)
-
-                import ast
-                model = eval(path['model'])
-                
-                qry = 'SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model'].lower()),path['filter'],('"%s"' % path['filter_v'] if  isinstance(model._meta.get_field(path['filter']),CharField) else path['filter_v']))
-                inst1 = model.objects.raw(qry)
-                 
-
-                theLogger.info(inst1)
-                theLogger.info(inst1[0].id)
-
-
-                from rest_framework import serializers
-
-                Meta = type('Meta', (object,), dict(model=model, fields='__all__'))
-                theSerializer = type('theSerializer', (serializers.ModelSerializer,), dict(Meta=Meta))
-                thesz = None
-                if len(inst1) == 1 :
-                    thesz = theSerializer(inst1[0])
-                else:
-                    thesz = theSerializer(inst1,many=True)
-
-                ret = {'errCode': '0','msg':'success','data':thesz.data}
-
-                # >>> inst1 = model.objects.raw('SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model']),path['field'],path['value']))
-
-            else:
-                raise Exception('key must not null.')   
-    except Exception as e:
-        import traceback
-        import sys
-        ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
-        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-    finally:
-        return JsonResponse(ret, safe=False)
-
-
-@api_view(['GET'])
-@permission_classes([CICUtill.getPermissionClass()])
-def updateInfo(request,path=''):
-    '''
-    path格式如下：
-    '{"model":"CustomUser","filter":"email","filter_v":"daniel@bicf.org","field":"username","field_v":"DQ"}'
-    model是模型的名称
-    filter是查找条件字段 filter_v 是条件值
-    field是要更新的字段 field_v 是要更新的值
-    '''
-    theLogger.info(path)
-    ret = {'errCode': '0'}
-    try:
-        if request.method == 'GET':
-            # data = request.data
-            # key = data.get('key', '')
-            if path != '':
-                # {"model":"CosmterUser","field":'username',"value":"Daniel Q"}
-                theLogger.info(path)
-                import json
-                path = unquote(path)
-                theLogger.info(path)
-                path = eval(path)
-
-                path = json.loads(path)
-                theLogger.info(path)
-
-                import ast
-                model = eval(path['model'])
-                
-                qry = 'SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model'].lower()),path['filter'],('"%s"' % path['filter_v'] if  isinstance(model._meta.get_field(path['filter']),CharField) else path['filter_v']))
-                inst1 = model.objects.raw(qry)
-                 
-
-                theLogger.info(inst1)
-                theLogger.info(inst1[0].id)
-
-
-                from rest_framework import serializers
-
-                Meta = type('Meta', (object,), dict(model=model, fields='__all__'))
-                theSerializer = type('theSerializer', (serializers.ModelSerializer,), dict(Meta=Meta))
-                thesz = None
-                if len(inst1) == 1 :
-                    # thesz = theSerializer(inst1[0])
-                    inst1[0].__dict__[path['field']] = path['field_v'] 
-                    inst1[0].save()
-                    thesz = theSerializer(inst1[0])
-
-                else:
-                    for md in inst1:
-                        md.__dict__[path['field']] = path['field_v'] 
-                        md.save()
-                    thesz = theSerializer(inst1,many=True)
-
-                ret = {'errCode': '0','msg':'success','data':thesz.data}
-
-                # >>> inst1 = model.objects.raw('SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model']),path['field'],path['value']))
-
-            else:
-                raise Exception('key must not null.')   
-    except Exception as e:
-        import traceback
-        import sys
-        ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
-        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-    finally:
-        return JsonResponse(ret, safe=False)
+# @api_view(['GET'])
+# @permission_classes([CICUtill.getPermissionClass()])
+# def getinfo(request,path=''):
+#     '''
+#     path格式如下：
+#     '{"model":"CustomUser","filter":"email","filter_v":"daniel@bicf.org"}'
+#     model是模型的名称
+#     filter是查找条件字段 filter_v 是条件值
+#     '''
+#     theLogger.info(path)
+#     ret = {'errCode': '0'}
+#     try:
+#         if request.method == 'GET':
+#             # data = request.data
+#             # key = data.get('key', '')
+#             if path != '':
+#                 # {"model":"Sermon","field":'id',"value":"1"}
+#                 theLogger.info(path)
+#                 import json
+#                 path = unquote(path)
+#                 theLogger.info(path)
+#                 path = eval(path)
+# 
+#                 path = json.loads(path)
+#                 theLogger.info(path)
+# 
+#                 import ast
+#                 model = eval(path['model'])
+#                 
+#                 qry = 'SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model'].lower()),path['filter'],('"%s"' % path['filter_v'] if  isinstance(model._meta.get_field(path['filter']),CharField) else path['filter_v']))
+#                 inst1 = model.objects.raw(qry)
+#                  
+# 
+#                 theLogger.info(inst1)
+#                 theLogger.info(inst1[0].id)
+# 
+# 
+#                 from rest_framework import serializers
+# 
+#                 Meta = type('Meta', (object,), dict(model=model, fields='__all__'))
+#                 theSerializer = type('theSerializer', (serializers.ModelSerializer,), dict(Meta=Meta))
+#                 thesz = None
+#                 if len(inst1) == 1 :
+#                     thesz = theSerializer(inst1[0])
+#                 else:
+#                     thesz = theSerializer(inst1,many=True)
+# 
+#                 ret = {'errCode': '0','msg':'success','data':thesz.data}
+# 
+#                 # >>> inst1 = model.objects.raw('SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model']),path['field'],path['value']))
+# 
+#             else:
+#                 raise Exception('key must not null.')   
+#     except Exception as e:
+#         import traceback
+#         import sys
+#         ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
+#         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+#     finally:
+#         return JsonResponse(ret, safe=False)
+# 
+# 
+# @api_view(['GET'])
+# @permission_classes([CICUtill.getPermissionClass()])
+# def updateInfo(request,path=''):
+#     '''
+#     path格式如下：
+#     '{"model":"CustomUser","filter":"email","filter_v":"daniel@bicf.org","field":"username","field_v":"DQ"}'
+#     model是模型的名称
+#     filter是查找条件字段 filter_v 是条件值
+#     field是要更新的字段 field_v 是要更新的值
+#     '''
+#     theLogger.info(path)
+#     ret = {'errCode': '0'}
+#     try:
+#         if request.method == 'GET':
+#             # data = request.data
+#             # key = data.get('key', '')
+#             if path != '':
+#                 # {"model":"CosmterUser","field":'username',"value":"Daniel Q"}
+#                 theLogger.info(path)
+#                 import json
+#                 path = unquote(path)
+#                 theLogger.info(path)
+#                 path = eval(path)
+# 
+#                 path = json.loads(path)
+#                 theLogger.info(path)
+# 
+#                 import ast
+#                 model = eval(path['model'])
+#                 
+#                 qry = 'SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model'].lower()),path['filter'],('"%s"' % path['filter_v'] if  isinstance(model._meta.get_field(path['filter']),CharField) else path['filter_v']))
+#                 inst1 = model.objects.raw(qry)
+#                  
+# 
+#                 theLogger.info(inst1)
+#                 theLogger.info(inst1[0].id)
+# 
+# 
+#                 from rest_framework import serializers
+# 
+#                 Meta = type('Meta', (object,), dict(model=model, fields='__all__'))
+#                 theSerializer = type('theSerializer', (serializers.ModelSerializer,), dict(Meta=Meta))
+#                 thesz = None
+#                 if len(inst1) == 1 :
+#                     # thesz = theSerializer(inst1[0])
+#                     inst1[0].__dict__[path['field']] = path['field_v'] 
+#                     inst1[0].save()
+#                     thesz = theSerializer(inst1[0])
+# 
+#                 else:
+#                     for md in inst1:
+#                         md.__dict__[path['field']] = path['field_v'] 
+#                         md.save()
+#                     thesz = theSerializer(inst1,many=True)
+# 
+#                 ret = {'errCode': '0','msg':'success','data':thesz.data}
+# 
+#                 # >>> inst1 = model.objects.raw('SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model']),path['field'],path['value']))
+# 
+#             else:
+#                 raise Exception('key must not null.')   
+#     except Exception as e:
+#         import traceback
+#         import sys
+#         ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
+#         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+#     finally:
+#         return JsonResponse(ret, safe=False)
 
 
 

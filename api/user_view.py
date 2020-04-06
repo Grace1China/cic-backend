@@ -38,7 +38,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     '''
     queryset=CustomUser.objects.all()
     serializer_class=CustomUser4APISerializer
-    # permission_classes=[CICUtill.getPermissionClass()]
+    permission_classes=[AllowAny]
     @action(detail=True,methods=['POST'], format="json")
     def register(self,request):
         '''
@@ -139,22 +139,22 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return JsonResponse({'errCode': '1001','msg': str(e), 'data': serializer.data}, safe=False)
 
-    @action(detail=True,methods=['GET'], format="json")
-    def getInfo(self,request,email=''):
-        ret = {'errCode': '1001'}
-        try:
-            user1 = CustomUser.objects.all().get(email__exact=email)
-            if user1 is None:
-                raise Exception('User not find')
-            szUser = CustomUser4Info(instance=user1)
-            ret = {'errCode': '0','msg':'success', 'data': szUser.data}
-        except Exception as e:
-            import traceback
-            import sys
-            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            ret = {'errCode': '1001','msg':'there is an exception', 'data': None}
-        finally:
-            return JsonResponse(ret, safe=False)
+    # @action(detail=True,methods=['GET'], format="json")
+    # def getInfo(self,request,email=''):
+    #     ret = {'errCode': '1001'}
+    #     try:
+    #         user1 = CustomUser.objects.all().get(email__exact=email)
+    #         if user1 is None:
+    #             raise Exception('User not find')
+    #         szUser = CustomUser4Info(instance=user1)
+    #         ret = {'errCode': '0','msg':'success', 'data': szUser.data}
+    #     except Exception as e:
+    #         import traceback
+    #         import sys
+    #         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+    #         ret = {'errCode': '1001','msg':'there is an exception', 'data': None}
+    #     finally:
+    #         return JsonResponse(ret, safe=False)
 
 
 class CustomUserInfoViewSet(viewsets.ModelViewSet):

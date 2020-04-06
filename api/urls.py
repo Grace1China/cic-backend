@@ -19,10 +19,6 @@ user_create = CustomUserViewSet.as_view({
 
 user_getInfo = CustomUserViewSet.as_view({'get':'getInfo'})
 
-user_list = CustomUserViewSet.as_view({
-    'get': 'list'
-})
-
 #-------login-------
 user_login = CustomUserViewSet.as_view({'post':'login'})
 
@@ -64,13 +60,13 @@ church_lorddayinfo = SermonViewSet.as_view({'get':'GetCurrentLordsDayInfo'})
 
 urlpatterns = [
     path("user_create",csrf_exempt(user_create),name="user_create"),
-    path("user_getInfo/<str:email>",csrf_exempt(user_getInfo),name="user_getInfo"),
+    # path("user_getInfo/<str:email>",csrf_exempt(user_getInfo),name="user_getInfo"),
 
-    
-    path("user_list",user_list,name="user_list"),
     # path("userProfile/<int:pk>",userProfileDetailView.as_view(),name="userProfile"),
     # path("sermon/0",church_lorddayinfo,name="sermon"),
     
+    # path('info_getinfo/<path:path>', views.getinfo, name='getinfo'),
+    # path('info_update/<path:path>', views.updateInfo, name='updateinfo'),
     path("users/login",user_login,name="users_login"),
     path("users/getuserinfo",user_getUserInfo,name="users_getUserInfo"),
     path("users/updateuserinfo",user_updateUserInfo,name="users_updateUserInfo"),
@@ -96,8 +92,7 @@ urlpatterns = [
     path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished"),
     path('search_course',search_course,name='search_course'),
     path('oss_object_exists/<path:key>',alioss_directup_views.oss_object_exists,name='oss_object_exists'),
-    path('info_getinfo/<path:path>',views.getinfo,name='getinfo'),
-    path('info_update/<path:path>',views.updateInfo,name='updateinfo'),
+ 
 
 
     
