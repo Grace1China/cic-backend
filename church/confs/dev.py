@@ -1,4 +1,3 @@
-
 from .base import *
 
 DEBUG = True
@@ -11,7 +10,7 @@ PAYPAL_IS_SANEBOX = True
 DEFAULT_CHURCH_CODE = 'ims'
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -38,23 +37,21 @@ SIMPLE_JWT = {
 
 DATABASES = {
     'default': {
-
-        'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
-        
-        #本地 
-        'NAME': 'test_cic',  # test_cic数据库名，先前创建的
-       'USER': 'root',     # 用户名，可以自己创建用户
-       'PASSWORD': '',  # 密码
-       'HOST': '127.0.0.1',  # mysql服务所在的主机ip 54.169.143.92
-
-#测试
+        'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
         'NAME': 'cic_20200323',  # test_cic数据库名，先前创建的
-         # 'USER': 'backend_user',     # 用户名，可以自己创建用户
-         # 'PASSWORD': '11/28/2019',  # 密码
-         # 'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
-        
-        'PORT': '3306',         # mysql服务端口
 
+        # 本地 
+        'USER': 'root',  # 用户名，可以自己创建用户
+        'PASSWORD': '',  # 密码
+        'HOST': '127.0.0.1',  # mysql服务所在的主机ip 54.169.143.92
+
+        # 测试
+        # 'NAME': 'cic_20200323',  # test_cic数据库名，先前创建的
+        # 'USER': 'backend_user',     # 用户名，可以自己创建用户
+        # 'PASSWORD': '11/28/2019',  # 密码
+        # 'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
+
+        'PORT': '3306',  # mysql服务端口
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
             # 'charset': 'utf8md4',
@@ -99,10 +96,9 @@ INTERNAL_IPS = ('127.0.0.1',)
 MAINSITE_API_V1 = 'http://127.0.0.1:8200/mainsite_api_v1/mst/MakeSermon'
 APP_SERVER_IP = "13.231.255.163"  # singpore 54.169.143.92
 
-
-
 import os
-save_dir = "data/log/django/l3dev/"
+
+save_dir = "data/log/django/l3dev/" #本地环境 /data/log/django/l3dev/
 if os.path.exists(save_dir) is False:
     os.makedirs(save_dir)
 
@@ -135,7 +131,6 @@ LOGGING = {
             # stack_info										You shouldn’t need to format this yourself.		Stack frame information (where available) from the bottom of the stack in the current thread, up to and including the stack frame of the logging call which resulted in the creation of this record.
             # thread											%(thread)d											Thread ID (if available).
             # threadName										%(threadName)s									Thread name (if available).
-
 
             'style': '{',
         },
