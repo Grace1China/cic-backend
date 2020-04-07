@@ -1,12 +1,12 @@
 from django.contrib import admin
-from .models import WeeklyReport, Sermon, Media,SermonSeries
+from .models import WeeklyReport, Sermon, Media,SermonSeries,Speaker
 from . import models as churchs_models
 from django.db import models as sysmodels
 from ckeditor.widgets import CKEditorWidget
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 from .widget import AliVideoWidgetExt
 from django.forms import ModelForm,Form
-from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt
+from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt
 from .forms import MeidaForm2
 
 
@@ -52,7 +52,11 @@ admin.site.register(WeeklyReport, WeeklyReportAdmin)
 class SpeakerAdmin(admin.ModelAdmin):
     list_display = ('name', 'title') 
     search_fields = ('churchs','name', 'title')
-    fields = ('name', 'churchs','title', 'introduction')
+    fields = ('name', 'churchs','title', 'introduction','profile')
+    formfield_overrides = {
+        Speaker.profile: {'widget': AliMediaWidgetExt()},
+    }
+
 
 from django import forms
 class MeidaForm(forms.Form):

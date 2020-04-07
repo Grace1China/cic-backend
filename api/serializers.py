@@ -62,8 +62,8 @@ class ChurchSerializer4API(serializers.ModelSerializer):
 
     class Meta:
         model = Church
-        fields = ['id','name','code','venue','description','promot_cover','promot_video','giving_qrcode']
-        
+        fields = ['id','name','code','venue','description']
+
 class SpeakerSerializer4API(serializers.ModelSerializer):
 
     class Meta:
