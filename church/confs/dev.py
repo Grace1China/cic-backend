@@ -38,20 +38,23 @@ SIMPLE_JWT = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
+
+        'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
+        
+        #本地 
         'NAME': 'test_cic',  # test_cic数据库名，先前创建的
+       'USER': 'root',     # 用户名，可以自己创建用户
+       'PASSWORD': '',  # 密码
+       'HOST': '127.0.0.1',  # mysql服务所在的主机ip 54.169.143.92
 
-        # 本地 
-        # 'USER': 'root',     # 用户名，可以自己创建用户
-        # 'PASSWORD': '',  # 密码
-        # 'HOST': '127.0.0.1',  # mysql服务所在的主机ip 54.169.143.92
+#测试
+        'NAME': 'cic_20200323',  # test_cic数据库名，先前创建的
+         # 'USER': 'backend_user',     # 用户名，可以自己创建用户
+         # 'PASSWORD': '11/28/2019',  # 密码
+         # 'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
+        
+        'PORT': '3306',         # mysql服务端口
 
-        # 测试
-        'USER': 'backend_user',  # 用户名，可以自己创建用户
-        'PASSWORD': '11/28/2019',  # 密码
-        'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
-
-        'PORT': '3306',  # mysql服务端口
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
             # 'charset': 'utf8md4',
