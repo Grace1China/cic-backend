@@ -73,7 +73,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
 
     #可以无token直接访问。
-    @action(detail=True,methods=['POST'], format="json",permission_classes=[allowAny])#,
+    @action(detail=True,methods=['POST'], format="json",permission_classes=[AllowAny])#,
     def GetL3Eweekly(self,request):
         '''
         查找L3平台最新周报
