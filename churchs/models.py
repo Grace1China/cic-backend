@@ -14,6 +14,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 import oss2
 import urllib
 import re
+from .widget import S3DirectField,AliOssDirectField,AliMediaField
 
 import logging 
 theLogger = logging.getLogger('church.all')
@@ -95,7 +96,7 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
 
 pre_save.connect(create_oss_dir, sender=SermonSeries)
 
-from .widget import S3DirectField,AliOssDirectField
+
 
 class Media(models.Model):
     '''
@@ -493,13 +494,13 @@ class Donation(models.Model):
 
 
 
-
 class Speaker(models.Model):
     # church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
     churchs = models.ManyToManyField(to=Church,default=None,  blank=True,verbose_name='教会')
     name = models.CharField(max_length=32)
     title = models.CharField(max_length=32)
     introduction = models.CharField(max_length=255)
+    profile = AliMediaField(max_length=255,null=True,verbose_name='照片')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
     class Meta:

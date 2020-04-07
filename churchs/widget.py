@@ -179,3 +179,41 @@ class AliVideoWidgetExt(TextInput):
         }
 
         return mark_safe(render_to_string( 'admin/video-wedget.tpl',ctx))
+
+
+
+class AliMediaField(Field):
+    def __init__(self, *args, **kwargs):
+        dest = kwargs.get('dest', None)
+        fn = kwargs.get('fieldname', None)
+        self.widget = AliMediaWidgetExt()
+        super(AliMediaField, self).__init__(*args, **kwargs)
+
+    def get_internal_type(self):
+        return 'TextField'
+
+    def formfield(self, *args, **kwargs):
+        kwargs['widget'] = self.widget
+        return super(AliMediaField, self).formfield(*args, **kwargs)
+
+class AliMediaWidgetExt(TextInput):
+    class Media:
+        # js = ('/static/lib/plupload-2.1.2/js/plupload.full.min.js','/static/upload.js' )
+        # css = {'all': ('/static/ossstyle.css', )}
+        pass
+    def __init__(self, *args, **kwargs):
+        super(AliMediaWidgetExt, self).__init__(*args, **kwargs)
+
+
+    def render(self, name, value, **kwargs):
+        
+        value = value or ''  
+        
+        csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
+
+        ctx = {
+            'value': value,
+            'name':name,
+        }
+
+        return mark_safe(render_to_string( 'admin/AliossMedia-wedget.tpl',ctx))

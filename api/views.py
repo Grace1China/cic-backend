@@ -50,7 +50,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
     permission_classes=[AllowAny]
-    @action(detail=True,methods=['POST'], format="json")
+    @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
     def GetChurchEweekly_v2(self,request):
         '''
         查找用户所属教会的最新周报 or 根据pk查找
@@ -73,7 +73,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
 
     #可以无token直接访问。
-    @action(detail=True,methods=['POST'], format="json")
+    @action(detail=True,methods=['POST'], format="json",permission_classes=[allowAny])#,
     def GetL3Eweekly(self,request):
         '''
         查找L3平台最新周报
@@ -150,7 +150,6 @@ class SermonViewSet(viewsets.ModelViewSet):
         queryset=Media.objects.order_by('kind')))
     serializer_class=SermonSerializer4API
     permission_classes = [AllowAny]
-    
     @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
     def GetCurrentLordsDayInfo(self,request):
         '''
