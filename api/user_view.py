@@ -74,19 +74,19 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['POST'], format="json")
     def login(self,request):
         
-        # data = request.data
-        # email = data.get("email", None)
-        # password = data.get('password', None)
+        data = request.data
+        email = data.get("email", None)
+        password = data.get('password', None)
 
-        # if email is None or email == "" or password is None or password == "":
-        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+        if email is None or email == "" or password is None or password == "":
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
 
-        # existUser = self.get_queryset().filter(email=email).first()
-        # if existUser is None:
-        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "账号未注册", 'sysErrMsg': ''}, safe=False)
+        existUser = self.get_queryset().filter(email=email).first()
+        if existUser is None:
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "账号未注册", 'sysErrMsg': ''}, safe=False)
         
-        # if not existUser.check_password(password):
-        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "密码错误", 'sysErrMsg': ''}, safe=False)
+        if not existUser.check_password(password):
+            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "密码错误", 'sysErrMsg': ''}, safe=False)
         
         # import httplib2
         # import json
@@ -96,7 +96,24 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         #                                 "POST",
         #                                 body=json.dumps({'email': email,'password':password}),
         #                                 headers={"Content-type": "application/json"})
+        # connect.close()
+        # if content is None:
+        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "创建token错误"}, safe=False)
 
+        # 
+        # decodedJson = json.loads(content)
+        # jsonString = json.dumps(decodedJson)
+
+        # 具体错误原因。
+        # detail = decodedJson.get('detail')
+        # if detail is not None:
+        # return JsonResponse({'errCode': '1001', 'data': None, 'msg': detail}, safe=False)
+
+        # refresh = decodedJson.get('refresh')
+        # access = decodedJson.get('access')
+
+        # # refresh = RefreshToken.for_user(user)
+        
         from rest_framework_simplejwt import views
         vCreate =  views.TokenObtainPairView.as_view()
         resp = vCreate(request._request) 
@@ -113,23 +130,6 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                              'data':eval(resp.content), 
                              'msg': "success"}, safe=False)
 
-        # connect.close()
-        # if content is None:
-        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "创建token错误"}, safe=False)
-
-        # decodedJson = json.loads(content)
-        # jsonString = json.dumps(decodedJson)
-
-        # detail = decodedJson.get('detail')
-        # if detail is not None:
-            # return JsonResponse({'errCode': '1001', 'data': None, 'msg': detail}, safe=False)
-        
-        # refresh = decodedJson.get('refresh')
-        # access = decodedJson.get('access')
-        
-        # # refresh = RefreshToken.for_user(user)
-        
-        
     
     @transaction.atomic
     def perform_create(self, serializer):
