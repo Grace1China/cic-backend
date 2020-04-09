@@ -49,8 +49,8 @@ class EweeklyViewSet(viewsets.ModelViewSet):
     from churchs.models import WeeklyReport
     queryset=WeeklyReport.objects.all()
     serializer_class=EweeklySerializer
-    permission_classes=[AllowAny]
-    @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
+    # permission_classes=[IsAuthenticated]
+    @action(detail=True,methods=['POST'], format="json")  #,permission_classes=[IsAuthenticated]这个地方不生效，官方文档有这个用法：）
     def GetChurchEweekly_v2(self,request):
         '''
         查找用户所属教会的最新周报 or 根据pk查找
@@ -73,7 +73,7 @@ class EweeklyViewSet(viewsets.ModelViewSet):
 
 
     #可以无token直接访问。
-    @action(detail=True,methods=['POST'], format="json",permission_classes=[AllowAny])#,
+    @action(detail=True,methods=['POST'], format="json")#,,permission_classes=[AllowAny]
     def GetL3Eweekly(self,request):
         '''
         查找L3平台最新周报
@@ -99,6 +99,19 @@ class EweeklyViewSet(viewsets.ModelViewSet):
         finally:
             # pprint.PrettyPrinter(indent=4).pprint(IndexError)
             return JsonResponse(ret, safe=False)
+
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        theLogger.info(self)
+        theLogger.info(self.action)
+        if self.action == 'GetL3Eweekly':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
             
 
@@ -149,7 +162,7 @@ class SermonViewSet(viewsets.ModelViewSet):
     queryset = Sermon.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=SermonSerializer4API
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
     def GetCurrentLordsDayInfo(self,request):
         '''
@@ -183,7 +196,7 @@ class SermonViewSet(viewsets.ModelViewSet):
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
 
-    @action(detail=True,methods=['POST'], format="json",permission_classes=[AllowAny])
+    @action(detail=True,methods=['POST'], format="json")#,permission_classes=[IsAuthenticated]
     def GetDefaultLordsDayInfo(self,request):
         '''
         查找当前用户所在教会主日信息
@@ -209,7 +222,19 @@ class SermonViewSet(viewsets.ModelViewSet):
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'平台教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
+    
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        theLogger.info(self)
 
+        theLogger.info(self.action)
+        if self.action == 'GetDefaultLordsDayInfo':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 
 from .serializers import CourseSerializer4API, MediaSerializer4API, CourseSerializer4APIPOST

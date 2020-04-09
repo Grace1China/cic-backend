@@ -63,7 +63,7 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
-        'NAME': 'test_cic',  # 数据库名，先前创建的
+        'NAME': 'cic_20200323',  # test_cic 数据库名，先前创建的
         'USER': 'backend_user',     # 用户名，可以自己创建用户
         'PASSWORD': '11/28/2019',  # 密码
         'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
@@ -128,7 +128,7 @@ LOGGING = {
             'style': '{',
         },
         'simple': {
-            'format': '{levelname} {module} {lineno:d} {message}',
+            'format': '{levelname} {process:d} {thread:d}  {module} {lineno:d} {message}',
             'style': '{',
         },
     },
@@ -152,13 +152,13 @@ LOGGING = {
             'level': 'INFO',
             'filters': ['require_debug_true','InfoFilter'],
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'simple',
         },
         'console_err': {
             'level': 'ERROR',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
+            'formatter': 'verbose',
         },
         'file_info': {
             'level': 'INFO',
@@ -166,12 +166,22 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'simple',
             'filename': '/data/log/django/l3sandbox/info.log', #本机data/log/django/error.log
+            'encoding': 'utf8',
+        },
+        'file_DEBUG1': {
+            'level': 'DEBUG',
+            'filters': ['DebugFilter'],
+            'class': 'logging.FileHandler',
+            'formatter': 'simple',
+            'filename': '/data/log/django/l3sandbox/DEBUG0409.log', #本机data/log/django/error.log
+            'encoding': 'utf8',
         },
         'file_all': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'simple',
             'filename': '/data/log/django/l3sandbox/all.log', #本机data/log/django/error.log
+            'encoding': 'utf8',
         },
         'file_debug': {
             'level': 'DEBUG',
@@ -179,17 +189,19 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'simple',
             'filename': '/data/log/django/l3sandbox/debug.log', #本机data/log/django/error.log
+            'encoding': 'utf8',
         },
         'file_err': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '/data/log/django/l3sandbox/error.log',
-            'formatter': 'verbose'
+            'filename': '/data/log/django/l3sandbox/error0409.log',
+            'formatter': 'verbose',
+            'encoding': 'utf8',
         },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['special']
+            'filters': ['special'],
         }
     },
     'loggers': {
@@ -208,7 +220,7 @@ LOGGING = {
             'propagate': False
         },
         'church.all': {
-            'handlers': ['file_err'],#'console', 'console_err','file_info','file_all'
+            'handlers': ['file_err','file_info','file_DEBUG1'],#'console', 'console_err',,'file_all'
             'level': 'INFO',
             'propagate': False,
         }

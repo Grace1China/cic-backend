@@ -57,12 +57,22 @@ class venueSerializer4API(serializers.ModelSerializer):
         model = Venue
         fields = '__all__'
 
+
+
+class ChurchSerializer4Sermon(serializers.ModelSerializer):
+    venue = venueSerializer4API(required=False,many=True)
+
+    class Meta:
+        model = Church
+        fields=['id','name','code','description','address','status','venue']
+
+
 class ChurchSerializer4API(serializers.ModelSerializer):
     venue = venueSerializer4API(required=False,many=True)
 
     class Meta:
         model = Church
-        fields = ['id','name','code','venue','description']
+        fields =  '__all__'
 
 class SpeakerSerializer4API(serializers.ModelSerializer):
 
@@ -99,7 +109,7 @@ class MediaSerializer4API(serializers.ModelSerializer):
 
 class SermonSerializer4API(serializers.ModelSerializer):
     medias = MediaSerializer4API(many=True, read_only=True)
-    church = ChurchSerializer4API(read_only=True)
+    church = ChurchSerializer4Sermon(read_only=True)
     speaker = SpeakerSerializer4API(read_only=True)
     series = SermonSeriesSerializer4API(read_only=True)
 
