@@ -27,6 +27,7 @@ import traceback, sys
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.conf import settings
 import traceback
+from api.serializers import SermonListSerializer4API,SermonSerializer4API
 
 
 theLogger = logging.getLogger('church.all')
@@ -150,93 +151,254 @@ class ChurchViewSet(viewsets.ModelViewSet):
             return JsonResponse({'errCode': '1001', 'msg':'没有找到用户的教会','data': None,'sysErrMsg':traceback.format_exc()}, safe=False)
 
 
-class SermonViewSet(viewsets.ModelViewSet):
+# class SermonViewSet(viewsets.ModelViewSet):
+#     '''
+#     讲道视图，功能：1 按教会取主日讲道; 2 取平台讲道
+#     
+#     '''
+#     from .serializers import SermonSerializer4API, MediaSerializer4API
+#     from churchs.models import Media
+#     from django.db.models import Prefetch
+#     queryset = Sermon.objects.prefetch_related(Prefetch('medias',
+#         queryset=Media.objects.order_by('kind')))
+#     serializer_class=SermonSerializer4API
+#     # permission_classes = [AllowAny]
+#     @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
+#     def GetCurrentLordsDayInfo(self,request):
+#         '''
+#         查找当前用户所在教会主日信息
+#         '''
+#         try:
+#             if not request.user.is_authenticated :
+#                 return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
+#         
+#             if request.user.church == None:
+#                 return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有教会信息','sysErrMsg':''}, safe=False)
+#             now = datetime.datetime.now()
+#             last_sunday = now - timedelta(days=now.weekday()+1)
+#             last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+# 
+#             this_saturday = now + timedelta(days=6-now.weekday())
+#             this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
+# 
+#             theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday,status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').first()
+#             if theSermon is None:
+#                 return JsonResponse({'errCode': '1001', 'data': None, 'msg': "没有主日信息", 'sysErrMsg': ""},safe=False)
+#             slzSermon = self.get_serializer(theSermon)
+#             # from churchs.models import Media
+#             # from .serializers import MediaSerializer4API
+# 
+#             # slzSermon.data['medias'] =  MediaSerializer4API(Media.objects.all().filter(owner=theSermon))
+#             # print(Media.objects.all().filter(owner=theSermon))
+#             # print(slzSermon.medias)
+#             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
+#         except Exception as e:
+#             import traceback
+#             import sys
+#             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+#             return JsonResponse({'errCode': '1001', 'data': None,'msg':e.__str__(),'sysErrMsg':traceback.format_exc()}, safe=False)
+# 
+#     @action(detail=True,methods=['POST'], format="json")#, permission_classes=[AllowAny]
+#     def GetDefaultLordsDayInfo(self,request):
+#         '''
+#         查找默认教会主日信息
+#         '''
+#         try:
+#             from django.conf import settings
+#             theCh = Church.objects.all().get(code=settings.DEFAULT_CHURCH_CODE)
+#             if theCh == None:
+#                 return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有平台教会信息','sysErrMsg':''}, safe=False)
+#             now = datetime.datetime.now()
+#             last_sunday = now - timedelta(days=now.weekday()+1)
+#             last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+# 
+#             this_saturday = now + timedelta(days=6-now.weekday())
+#             this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
+# 
+#             theSermon = self.get_queryset().filter(church=theCh,pub_time__gte=last_sunday,pub_time__lte=this_saturday,status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').first()
+#             if theSermon is None:
+#                 return JsonResponse({'errCode': '1001', 'data': None, 'msg': "没有主日信息", 'sysErrMsg': ""},safe=False)
+#             slzSermon = self.get_serializer(theSermon)
+#             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
+#         except Exception as e:
+# 
+#             import traceback
+#             import sys
+#             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+#             return JsonResponse({'errCode': '1001', 'data': None,'msg':e.__str__(),'sysErrMsg':traceback.format_exc()}, safe=False)
+#     
+#     def get_permissions(self):
+#         """
+#         Instantiates and returns the list of permissions that this view requires.
+#         """
+#         theLogger.info(self)
+# 
+#         theLogger.info(self.action)
+#         if self.action == 'GetDefaultLordsDayInfo':
+#             permission_classes = [AllowAny]
+#         else:
+#             permission_classes = [IsAuthenticated]
+#         return [permission() for permission in permission_classes]
+
+
+class SermonListViewSet(viewsets.ModelViewSet):
     '''
-    讲道视图，功能：1 按教会取主日讲道; 2 取平台讲道
-    
+    主日信息列表。
+    '''
+    queryset=Sermon.objects.all()
+    serializer_class = SermonListSerializer4API
+
+    permission_classes = [AllowAny]
+    @action(detail=True,methods=['get'], format="json")
+    def GetLordsDayInfoList(self,request,page=1,pagesize=30):
+        try:
+            page = getPage(request)
+            pagesize = getPageSize(request)
+            offset = int((page - 1) * pagesize)
+            
+            from django.conf import settings
+            theCh = Church.objects.all().get(code=settings.DEFAULT_CHURCH_CODE)
+            if not request.user.is_authenticated:
+                if theCh == None:
+                    return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有平台教会信息', 'sysErrMsg': ''},
+                                        safe=False)
+            else:
+                theCh = request.user.church
+                if theCh == None:
+                    return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有教会信息', 'sysErrMsg': ''}, safe=False)
+
+            
+            now = datetime.datetime.now()
+            last_sunday = now - timedelta(days=now.weekday() + 1)
+            last_sunday = last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+            this_saturday = now + timedelta(days=6 - now.weekday())
+            this_saturday = this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(
+                microsecond=999)
+
+            count = self.get_queryset().filter(church=theCh,
+                                               status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').count()
+            theSermons = self.get_queryset().filter(church=theCh,
+                                                   status=Sermon.STATUS_PUBLISHED).order_by('-pub_time')[offset:offset + pagesize]
+            
+            totalPage = getTotalPage(pagesize,count)
+            
+            # for sermon in theSermons:
+            #     if sermon.pub_time >= last_sunday and sermon.pub_time <= this_saturday:
+            #         sermon.isLastWeek = True
+                
+            slzSermons = self.get_serializer(theSermons, many=True)
+
+            return JsonResponse({'errCode': '0', 'data': slzSermons.data, 
+                                 'page': page,
+                                 'totalPage': totalPage}, safe=False)
+        except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
+            return JsonResponse(
+                {'errCode': '1001', 'data': None, 'msg': '教会没有最新讲道', 'sysErrMsg': traceback.format_exc()}, safe=False)
+
+
+class SermonViewOneSet(viewsets.ModelViewSet):
+    '''
+    获取一个主日
+
     '''
     from .serializers import SermonSerializer4API, MediaSerializer4API
     from churchs.models import Media
     from django.db.models import Prefetch
-    # queryset=Sermon.objects.all()
     queryset = Sermon.objects.prefetch_related(Prefetch('medias',
-        queryset=Media.objects.order_by('kind')))
-    serializer_class=SermonSerializer4API
-    # permission_classes = [AllowAny]
-    @action(detail=True,methods=['POST'], format="json",permission_classes=[IsAuthenticated])
-    def GetCurrentLordsDayInfo(self,request):
+                                                        queryset=Media.objects.order_by('kind')))
+    serializer_class = SermonSerializer4API
+    permission_classes = [AllowAny]
+    @action(detail=True, methods=['GET'], format="json")
+    def GetLordsDayInfoByID(self, request,pk):
         '''
-        查找当前用户所在教会主日信息
+        根据id获取主日信息
         '''
         try:
-            if not request.user.is_authenticated :
-                return JsonResponse({'errCode': '403', 'data': None,'msg':'您没有执行该操作的权限。','sysErrMsg':''}, safe=False)
-        
-            if (request.user.church == None):
-                return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有教会信息','sysErrMsg':''}, safe=False)
-            now = datetime.datetime.now()
-            last_sunday = now - timedelta(days=now.weekday()+1)
-            last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
-
-            this_saturday = now + timedelta(days=6-now.weekday())
-            this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
-
-            theSermon = self.get_queryset().filter(church=request.user.church,pub_time__gte=last_sunday,pub_time__lte=this_saturday,status=Sermon.STATUS_PUBLISHED).order_by('-pub_time')[0]
+            # if not request.user.is_authenticated:
+            #     return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''},
+            #                         safe=False)
+            
+            # data = request.GET
+            # sermonid = int(data.get('sermonid', -1))
+            # if sermonid == -1:
+            #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ""}, safe=False)
+            theSermon = self.get_queryset().filter(id=pk, 
+                                                   status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').first()
+            if theSermon is None:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "没有主日信息", 'sysErrMsg': ""}, safe=False)
             slzSermon = self.get_serializer(theSermon)
-            # from churchs.models import Media
-            # from .serializers import MediaSerializer4API
-
-            # slzSermon.data['medias'] =  MediaSerializer4API(Media.objects.all().filter(owner=theSermon))
-            # print(Media.objects.all().filter(owner=theSermon))
-            # print(slzSermon.medias)
             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
         except Exception as e:
             import traceback
             import sys
-            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
+            return JsonResponse(
+                {'errCode': '1001', 'data': None, 'msg': e.__str__(), 'sysErrMsg': traceback.format_exc()}, safe=False)
 
-    @action(detail=True,methods=['POST'], format="json")#,permission_classes=[IsAuthenticated]
-    def GetDefaultLordsDayInfo(self,request):
+    @action(detail=True, methods=['POST'], format="json")  # , permission_classes=[AllowAny]
+    def GetDefaultLordsDayInfo(self, request):
         '''
-        查找当前用户所在教会主日信息
+        查找默认教会主日信息
         '''
         try:
             from django.conf import settings
-            theCh = Church.objects.all().get(code = settings.DEFAULT_CHURCH_CODE)
-            if (theCh == None):
-                return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有平台教会信息','sysErrMsg':''}, safe=False)
+            theCh = Church.objects.all().get(code=settings.DEFAULT_CHURCH_CODE)
+            if theCh == None:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有平台教会信息', 'sysErrMsg': ''}, safe=False)
             now = datetime.datetime.now()
-            last_sunday = now - timedelta(days=now.weekday()+1)
-            last_sunday=last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+            last_sunday = now - timedelta(days=now.weekday() + 1)
+            last_sunday = last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
 
-            this_saturday = now + timedelta(days=6-now.weekday())
-            this_saturday=this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(microsecond=999)
+            this_saturday = now + timedelta(days=6 - now.weekday())
+            this_saturday = this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(
+                microsecond=999)
 
-            theSermon = self.get_queryset().filter(church=theCh,pub_time__gte=last_sunday,pub_time__lte=this_saturday,status=Sermon.STATUS_PUBLISHED).order_by('-pub_time')[0]
+            theSermon = self.get_queryset().filter(church=theCh, pub_time__gte=last_sunday, pub_time__lte=this_saturday,
+                                                   status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').first()
+            if theSermon is None:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "没有主日信息", 'sysErrMsg': ""}, safe=False)
             slzSermon = self.get_serializer(theSermon)
             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
         except Exception as e:
 
             import traceback
             import sys
-            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'平台教会没有最新讲道','sysErrMsg':traceback.format_exc()}, safe=False)
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
+            return JsonResponse(
+                {'errCode': '1001', 'data': None, 'msg': e.__str__(), 'sysErrMsg': traceback.format_exc()}, safe=False)
+
     
-    def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
-        theLogger.info(self)
+def getPage(request):
+    data = request.GET
+    page = int(data.get('page', 1))
+    if page < 0:
+        page = 1
+    return page
 
-        theLogger.info(self.action)
-        if self.action == 'GetDefaultLordsDayInfo':
-            permission_classes = [AllowAny]
+def getPageSize(request):
+    data = request.GET
+    pagesize = int(data.get('pagesize', 30))
+    if pagesize < 0:
+        pagesize = 0
+    if pagesize > 100:
+        pagesize = 100
+    return pagesize
+
+def getTotalPage(pagesize,count):
+    if count == 0:
+        return 0
+    elif count <= pagesize:
+        return 1
+    elif count > pagesize:
+        if count % pagesize > 0:
+            return int(count / pagesize) + 1
         else:
-            permission_classes = [IsAuthenticated]
-        return [permission() for permission in permission_classes]
-
-
+            return int(count / pagesize)
+        
+    
 from .serializers import CourseSerializer4API, MediaSerializer4API, CourseSerializer4APIPOST
 class  CourseViewSet(viewsets.ModelViewSet):
     '''
@@ -247,35 +409,29 @@ class  CourseViewSet(viewsets.ModelViewSet):
     from church.models import Course
     from django.db.models import Prefetch
     
-    # from .schema_view import  CustomSchema
     queryset = Course.objects.prefetch_related(Prefetch('medias',
         queryset=Media.objects.order_by('kind')))
     serializer_class=CourseSerializer4APIPOST
     permission_classes=[AllowAny]
 
-    # schema = CustomSchema()
-    # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-
     @action(detail=True,methods=['get','post'], format="json")
-    def GetCourseList(self,request,page=1,pagesize=10,keyword=None,orderby=None,bought=False):
+    def GetCourseList(self,request,page=1,pagesize=30,keyword=None,orderby=None,bought=False):
         '''
         查找课程列表信息
         '''
         try:
             logger = logging.getLogger('dev.error')
-
             logger.error(request.META)
-          
 
             if(request.META['REQUEST_METHOD']  == 'GET'):
                 data = request.GET
                 #pprint.PrettyPrinter(6).pprint(data)
-                page = int(data.get('page', page))
-                pagesize = int(data.get('pagesize', pagesize))
+                page = getPage(request)
+                pagesize = getPageSize(request)
+                offset = int((page - 1) * pagesize)
                 keyword = data.get('keyword', keyword)
                 orderby = data.get('orderby', orderby)
-            else:
-                
+            else:         
                 # data = eval(request.body)
                 # pprint.PrettyPrinter(4).pprint(data)
                 logger.error(request.body)
@@ -284,16 +440,9 @@ class  CourseViewSet(viewsets.ModelViewSet):
                 data = literal_eval(sbody)
                 page = int(data.get('page', page))
                 pagesize = int(data.get('pagesize', pagesize))
+                offset = int((page - 1) * pagesize)
                 keyword = data.get('keyword', keyword)
                 orderby = data.get('orderby', orderby)
-
-            # data = self.request.data
-            # church_code = data.get('church_code', '-1')
-
-            if pagesize <=0 or pagesize >100 :
-                return JsonResponse({'errCode': '1002', 'data': None,'msg':'pagesize要求是[1-100]','sysErrMsg':''}, safe=False)
-            if page < 0 :
-                return JsonResponse({'errCode': '1003', 'data': None,'msg':'page必有大于等于0','sysErrMsg':''}, safe=False)
 
             if orderby is not None:
                 orderpair = orderby.split(' ') 
@@ -302,7 +451,6 @@ class  CourseViewSet(viewsets.ModelViewSet):
                 orderby = '-update_time'
 
             #查询已经购买新逻辑
-            
             if data.get('bought', bought).lower() == 'true':
                 queryBought = True
             else:
@@ -315,35 +463,38 @@ class  CourseViewSet(viewsets.ModelViewSet):
                 if request.user.is_authenticated:
                     queryset = request.user.courses.all().prefetch_related(Prefetch('medias',
                                                              queryset=Media.objects.order_by('kind')))
-                    courseList = queryset.order_by(orderby)
+                    count = queryset.order_by(orderby).count()
+                    courseList = queryset.order_by(orderby)[offset:offset + pagesize]
                     for course in courseList:
                         course.is_buy = True
-                    page = 1
-                    pagesize = 99999
-                    paginator = Paginator(courseList, pagesize)
-                    coursePage = paginator.get_page(page)
     
-                    slzCourseList = CourseSerializer4API(coursePage, many=True)
+                    slzCourseList = CourseSerializer4API(courseList, many=True)
                     # 前端需要用来取页面 
-                    return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 'page': coursePage.number,
-                                         'totalPage': paginator.num_pages}, safe=False)
+                    return JsonResponse({'errCode': '0', 'data': slzCourseList.data,
+                                         'page': page,
+                                         'totalPage': getTotalPage(pagesize,count)}, safe=False)
                 else:
                     return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有课程列表'},
                                         safe=False)
             
             #未购买逻辑
+            count = 0
             if keyword is not None:
-                courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by(orderby)
+                queryset = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword))
+                count = queryset.order_by(orderby).count()
+                courseList = queryset.order_by(orderby)[offset:offset + pagesize]
             else:
-                courseList = self.get_queryset().filter().order_by(orderby)
+                queryset = self.get_queryset()
+                count = queryset.order_by(orderby).count()
+                courseList = queryset.order_by(orderby)[offset:offset + pagesize]
             
             addSalesInfosOnList(courseList, request.user)
-            paginator = Paginator(courseList, pagesize)
-            coursePage = paginator.get_page(page)
 
-            slzCourseList = CourseSerializer4API(coursePage, many=True)
+            slzCourseList = CourseSerializer4API(courseList, many=True)
             # 前端需要用来取页面 
-            return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 'page':coursePage.number, 'totalPage':paginator.num_pages}, safe=False)
+            return JsonResponse({'errCode': '0', 'data': slzCourseList.data, 
+                                 'page':page, 
+                                 'totalPage':getTotalPage(pagesize,count)}, safe=False)
         except Exception as e:
             # pprint.PrettyPrinter(4).pprint(e.__traceback__)
             import traceback
@@ -369,38 +520,6 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
-
-    
-    @action(detail=True,methods=['post'], format="json")
-    def SearchCourse(self,request):
-        '''
-        查找课程
-        '''
-        try:
-            data = request.data
-            keyword = data.get('keyword', '')
-            if keyword == '':
-                import traceback
-                import sys
-                traceback.print_exc(file=sys.stdout)
-                return JsonResponse({'errCode': '1001', 'data': None,'msg':'搜索关键词不能为空','sysErrMsg':traceback.format_exc()}, safe=False)
-
-
-            courseList = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword)).order_by('-update_time')
-            # paginator = Paginator(courseList, pagesize)
-            # coursePage = paginator.get_page(page)
-            
-            addSalesInfosOnList(courseList,request.user)
-            slzCourseList = CourseSerializer4API(courseList, many=True)
-            # 前端需要用来取页面 
-            return JsonResponse({'errCode': '0', 'data': slzCourseList.data}, safe=False)
-        except Exception as e:
-            import traceback
-            import sys
-            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
-
-
 
 def addSalesInfosOnList(courseList,user):
     try:

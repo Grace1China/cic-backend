@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
-from .views import ChurchViewSet,EweeklyViewSet,SermonViewSet
+from .views import ChurchViewSet,EweeklyViewSet,SermonViewOneSet,SermonListViewSet
 from .user_view import CustomUserViewSet,CustomUserInfoViewSet
 from . import views
 from .alioss_directup_views import AliOssSignature, AliOssCallBack
@@ -54,9 +54,10 @@ v2_church_eweekly = EweeklyViewSet.as_view({
     'get':'GetChurchEweekly_v2'
 })
 
-l3_lorddayinfo = SermonViewSet.as_view({'get':'GetDefaultLordsDayInfo'})
-church_lorddayinfo = SermonViewSet.as_view({'get':'GetCurrentLordsDayInfo'})
-
+# l3_lorddayinfo = SermonViewSet.as_view({'get':'GetDefaultLordsDayInfo'})
+# church_lorddayinfo = SermonViewSet.as_view({'get':'GetCurrentLordsDayInfo'})
+lorddayinfolist = SermonListViewSet.as_view({'get':'GetLordsDayInfoList'})
+lorddayinfoByID = SermonViewOneSet.as_view({'get':'GetLordsDayInfoByID'})
 
 urlpatterns = [
     path("user_create",csrf_exempt(user_create),name="user_create"),
@@ -72,14 +73,18 @@ urlpatterns = [
     path("users/updateuserinfo",user_updateUserInfo,name="users_updateUserInfo"),
     path("users/updateuserpwd",user_updateUserPWD,name="users_updateUserPWD"),
     
-    path("lorddayinfo/l3",l3_lorddayinfo,name="l3_lorddayinfo"),
-    path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
+    
     # path("eweekly/<int:pk>",church_eweekly,name="church_eweekly"),
     path("eweekly",v2_church_eweekly,name="church_eweekly"),
-
     path("eweekly/l3",l3_eweekly,name="l3_eweekly"),
+    
     path("getmychurch",user_church,name="mychurch"),
 
+    # path("lorddayinfo/l3",l3_lorddayinfo,name="l3_lorddayinfo"),
+    # path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
+    path("lorddayinfos/list", lorddayinfolist, name="lorddayinfolist"),
+    path("lorddayinfos/<int:pk>", lorddayinfoByID, name="lorddayinfobyid"),
+    
     path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>/orderby/<str:orderby>",course_list,name="courses_search_order"),
     path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>",course_list,name="courses_search"),
     path("courses/pagesize/<int:pagesize>/page/<int:page>",course_list,name="courses_list_page"),

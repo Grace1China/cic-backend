@@ -118,6 +118,12 @@ class SermonSerializer4API(serializers.ModelSerializer):
         model = Sermon
         fields = ['id','church','user','title','pub_time','status','speaker','scripture','series','medias','create_time','update_time']
 
+class SermonListSerializer4API(serializers.ModelSerializer):
+    speaker = SpeakerSerializer4API(read_only=True)
+
+    class Meta:
+        model = Sermon
+        fields = ['id','user','title','pub_time','status','speaker','scripture','create_time','update_time']
 
 
 class CourseSerializer4APIPOST(serializers.ModelSerializer):
