@@ -19,6 +19,9 @@ import httplib2
 import uuid
 from django.conf import settings
 from django.db import transaction
+import logging
+
+theLogger = logging.getLogger('church.all')
 
 class IAPChargeViewSet(mixins.ListModelMixin,
                        viewsets.GenericViewSet):
@@ -35,17 +38,12 @@ class IAPChargeViewSet(mixins.ListModelMixin,
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        # if not request.user.is_authenticated:
-        #     return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
         try:
             charges = IAPCharge.objects.all().order_by('price_code__price')
             slzCharges = self.get_serializer(charges, many=True)
             return JsonResponse({'errCode': '0', 'data': slzCharges.data}, safe=False)
         except Exception as e:
-            # pprint.PrettyPrinter(4).pprint(e.__traceback__)
-            import traceback
-            import sys
-            traceback.print_exc(file=sys.stdout)
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有充值产品', 'sysErrMsg': e.__str__()},
                                 safe=False)
         pass
@@ -58,9 +56,6 @@ class OrderCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        # if not request.user.is_authenticated:
-        #     return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
-
         try:
             # serializer = self.get_serializer(data=data)
             # if serializer.is_valid():
@@ -81,6 +76,7 @@ class OrderCreateAPIView(APIView):
             return JsonResponse({'errCode': '0', 'data': {'order_no': order.order_no}}, safe=False)
 
         except Exception as e:
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             return JsonResponse({'errCode': '1001', 'msg': str(e), 'data': None}, safe=False)
         pass
 
@@ -122,9 +118,6 @@ class IapVerifyReceipt(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        # if not request.user.is_authenticated:
-        #     return JsonResponse({'errCode': '403', 'data': None, 'msg': '您没有执行该操作的权限。', 'sysErrMsg': ''}, safe=False)
-
         try:
             receipt = request.data.get('receipt', '')
             order_no = request.data.get('order_no', '')
@@ -177,7 +170,7 @@ class IapVerifyReceipt(APIView):
             return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "验证成功"}, safe=False)
 
         except Exception as e:
-            print("e:" + e.__str__())
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             SaveWithFailed(order)
             return JsonResponse({'errCode': '1001', 'data': None, 'msg': "访问apple验证服务器错误：" + e.__str__()}, safe=False)
 
@@ -236,7 +229,7 @@ class ClientToken(APIView):
                 {'errCode': '0', 'data': {"client_token": clientToken, "order_no": order.order_no}, 'msg': "成功"},
                 safe=False)
         except Exception as e:
-            print("e:" + e.__str__())
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             return JsonResponse({'errCode': '1001', 'data': None, 'msg': "请求client token失败：" + e.__str__()}, safe=False)
 
 
@@ -269,9 +262,9 @@ class PaymentMethodNonce(APIView):
             })
             order.pp_transcation_id = result.transaction.id
 
-            print(result.transaction.status)
+            theLogger.info(result.transaction.status)
             if result.is_success:
-                print("success!: " + result.transaction.id)
+                theLogger.info("success!: " + result.transaction.id)
                 course = Course.objects.get(pk=order.course.id)
                 usercourse = Users_Courses(user=request.user, course=course)
                 
@@ -283,9 +276,9 @@ class PaymentMethodNonce(APIView):
                 return JsonResponse({'errCode': '0', 'data': {"order_no":order.order_no,"course_id":order.course.id}, 'msg': "支付成功"}, safe=False)
 
             elif result.transaction:
-                print("Error processing transaction:")
-                print("  code: " + result.transaction.processor_response_code)
-                print("  text: " + result.transaction.processor_response_text)
+                theLogger.info("Error processing transaction:")
+                theLogger.info("  code: " + result.transaction.processor_response_code)
+                theLogger.info("  text: " + result.transaction.processor_response_text)
 
                 SaveWithFailed(order)
                 return JsonResponse({'errCode': '1001', 'data': None,
@@ -294,14 +287,14 @@ class PaymentMethodNonce(APIView):
             else:
                 msg = ""
                 for error in result.errors.deep_errors:
-                    print("attribute: " + error.attribute)
-                    print("  code: " + error.code)
-                    print("  message: " + error.message)
+                    theLogger.info("attribute: " + error.attribute)
+                    theLogger.info("  code: " + error.code)
+                    theLogger.info("  message: " + error.message)
                     msg += "," + error.code + ":" + error.message
                 SaveWithFailed(order)
                 return JsonResponse({'errCode': '1001', 'data': None, 'msg': "支付失败" + msg}, safe=False)
         except Exception as e:
-            print("e:" + e.__str__())
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             SaveWithFailed(order)
             return JsonResponse({'errCode': '1001', 'data': None, 'msg': "支付失败：" + e.__str__()}, safe=False)
 
