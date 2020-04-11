@@ -88,47 +88,70 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         if not existUser.check_password(password):
             return JsonResponse({'errCode': '1001', 'data': None, 'msg': "密码错误", 'sysErrMsg': ''}, safe=False)
         
+        #jwt method方案
+        token = RefreshToken.for_user(existUser)
+        
+        return JsonResponse({'errCode': '0',
+                             'data': {"refresh": str(token), "access": str(token.access_token)},
+                             'msg': "success"}, safe=False)
+        
+        #httplib2 方案
         # import httplib2
         # import json
-        
+        # 
         # connect = httplib2.Http()
-        # resp, content = connect.request("http://t:8000/rapi/auth/jwt/create",
+        # resp, content = connect.request("http://localhost:8000/rapi/auth/jwt/create",
         #                                 "POST",
         #                                 body=json.dumps({'email': email,'password':password}),
         #                                 headers={"Content-type": "application/json"})
         # connect.close()
         # if content is None:
         #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "创建token错误"}, safe=False)
-
+        # 
         # 
         # decodedJson = json.loads(content)
         # jsonString = json.dumps(decodedJson)
-
-        # 具体错误原因。
+        # 
+        # #具体错误原因。
         # detail = decodedJson.get('detail')
         # if detail is not None:
-        # return JsonResponse({'errCode': '1001', 'data': None, 'msg': detail}, safe=False)
-
+        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': detail}, safe=False)
+        # 
         # refresh = decodedJson.get('refresh')
         # access = decodedJson.get('access')
-
-        # # refresh = RefreshToken.for_user(user)
+        # 
+        # return JsonResponse({'errCode': '0', 
+        #                      'data': {"refresh": refresh,"access": access}, 
+        #                      'msg': "success"}, safe=False)
         
-        from rest_framework_simplejwt import views
-        vCreate =  views.TokenObtainPairView.as_view()
-        resp = vCreate(request._request) 
-        resp.render()
-        theLogger.info('-----login---------')
-        theLogger.info(resp)
-        theLogger.info(resp.content)
-
-
-        if resp.status_code != 200:
-            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "创建token错误"}, safe=False)
-        
-        return JsonResponse({'errCode': '0', 
-                             'data':eval(resp.content), 
-                             'msg': "success"}, safe=False)
+        #TokenObtainPairView.as_view() 方案
+        # from rest_framework_simplejwt import views
+        # vCreate = views.TokenObtainPairView.as_view()
+        # resp = vCreate(request._request) 
+        # resp.render()
+        # theLogger.info('-----login---------')
+        # theLogger.info(resp)
+        # theLogger.info(resp.content)
+        # 
+        # 
+        # if resp.status_code != 200:
+        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "创建token错误"}, safe=False)
+        # 
+        # import json
+        # decodedJson = json.loads(resp.content)
+        # jsonString = json.dumps(decodedJson)
+        # 
+        # detail = decodedJson.get('detail')
+        # if detail is not None:
+        #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': detail}, safe=False)
+        # 
+        # refresh = decodedJson.get('refresh')
+        # access = decodedJson.get('access')
+        # 
+        # 
+        # return JsonResponse({'errCode': '0', 
+        #                      'data': {"refresh": refresh,"access": access}, 
+        #                      'msg': "success"}, safe=False)
 
     
     @transaction.atomic
@@ -140,7 +163,6 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         try:
             data = self.request.data
             church_code = data.get('church_code', '-1')
-            pp.pprint(church_code)
 
             theChurch = Church.objects.get(Q(code=church_code))
             
