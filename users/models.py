@@ -42,4 +42,7 @@ class CustomUser(AbstractUser):
         verbose_name = "用户信息"
         verbose_name_plural = "用户信息"
 
-    
+
+class VerifyCode(models.Model):
+    email = models.EmailField(unique=True,db_index=True,verbose_name='电子邮件')
+    verify_code = models.CharField(max_length=6,verbose_name='验证码')
