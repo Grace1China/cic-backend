@@ -111,7 +111,6 @@ venv.bak/
 .mypy_cache/
 todo
 /static
-/church/static
 **/daniel_*
 church/gunicorn.conf.py
 stop_site
