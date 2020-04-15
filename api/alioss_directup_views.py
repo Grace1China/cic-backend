@@ -182,6 +182,19 @@ class AliOssCallBack(APIView):
 
         return JsonResponse(ret_dict, safe=False)
 
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        theLogger.info(self)
+        theLogger.info(self.action)
+        if self.action == 'post':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
 class AliMtsCallBack(APIView):
     def post(self,request,*args,**kwargs):
         '''
