@@ -229,7 +229,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES' : (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
 
     ),
     'DEFAULT_METADATA_CLASS': 'api.metadata.MinimalMetadata',
@@ -444,7 +444,8 @@ ALIOSS_DESTINATIONS = {
 
 AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
 # DEFAULT_FILE_STORAGE = 'church.storage_backends.PublicMediaStorage'
-DEFAULT_FILE_STORAGE = 'church.alioss_storage_backends.AliyunMediaStorage'
+DEFAULT_FILE_STORAGE = 'church.alioss_storage_backends_v3.AliyunMediaStorage'
+MEDIA_BROWSE_SHOW_DIRS = True
 
 # FILER_STORAGES = {
 #     'public': {
@@ -522,7 +523,7 @@ CKEDITOR_CONFIGS = {
                        'Language', 'CodeSnippet', 'CodeSnippetGeshi']},
             {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
             {'name': 'insert',
-             'items': ['Image','Html5video', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
+             'items': ['Abbr','Image','Html5video', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
             '/',
             {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
             {'name': 'colors', 'items': ['TextColor', 'BGColor']},
@@ -533,10 +534,11 @@ CKEDITOR_CONFIGS = {
                 # put the name of your editor.ui.addButton here
                 'Preview',
                 'Maximize',
+                
 
             ],
             },
-            ['FilerImage']
+            # ['FilerImage']
 
         ],
         
@@ -571,7 +573,8 @@ CKEDITOR_CONFIGS = {
             'div',
             'clipboard',
             'widgetselection', 
-            'filerimage',
+            'abbr',
+            # 'filerimage',
 
 #             'a11yhelp',
 # 'about',
@@ -633,7 +636,7 @@ CKEDITOR_CONFIGS = {
 # 'xml'
             
         ]),
-        'extraAllowedContent': 'video [*]{*}(*);p [*]{*}(*); script [*]{*}(*);',
+        'extraAllowedContent': 'video [*]{*}(*);p [*]{*}(*); script [*]{*}(*); img [*]{*}(*)',
     }
 }
 

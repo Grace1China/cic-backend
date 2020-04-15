@@ -1,0 +1,247 @@
+{% load static i18n %}
+{% load cust_filters %}
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>CKEditor | {% trans "Select an image to embed" %}</title>
+     
+        <link rel="stylesheet" href="{% static "church/css/dialog.css" %}" type="text/css" />
+
+        <link rel="stylesheet" href="{% static "church/css/ele_index.css" %}" type="text/css" />
+        <link rel="stylesheet" href="{% static "ossstyle.css" %}" type="text/css" />
+
+
+      
+        
+        
+      
+
+        <!-- We only want the thunbnails to display when javascript is disabled -->
+        <script type="text/javascript">
+            document.write('<style>.noscript { display: none; }</style>');
+        </script>
+        <style type="text/css">
+            a.thumb { text-align: center; display: block; float: left; width: 75px; height: 75px; word-wrap: break-word; line-height: 1.2em; overflow: hidden; }
+            a.thumb img { display: inline-block; }
+            span.filename { color: #666; font-size: 0.95em; }
+            #container { min-width: 880px; }
+            #search {
+                display:flex;
+                
+            }
+            .image_check{
+                width: 145px;
+                height: 170px !important;
+            }
+            .image {
+                width: 125px;
+                height: 125px;
+                display: block;
+            }
+            .el-checkbox__inner{
+                position:absolute;
+                left: -5px;
+                bottom: 0px;
+            }
+            .el-checkbox__label{
+                padding:0;
+            }
+            .imagetitle{
+                width:135px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            .toolbar{
+                display:inline-flex;
+            }
+                
+        </style>
+    </head>
+    <body>
+        <div id="page">
+            <div id="container" style="width: 880px">
+                <div class="toolbar">
+                    <div id="search">
+                        {% if show_dirs %}
+                            <el-select 
+                                v-model="curdir" 
+                                filterable placeholder="请选择"
+                                @change="showImages"
+                            >
+                                {% for dir in dirs %}
+                                    <el-option
+                                        key="{{ dir }}"
+                                        label="{{ dir }}"
+                                        value="{{ dir }}">
+                                    </el-option>
+                                {% endfor %}
+                            </el-select>
+                        {% endif %}
+                        {% comment %} <form action="" method="post">
+                            {% csrf_token %}
+                            {{ form }}
+                        </form> {% endcomment %}
+                    </div>
+                    <el-button-group>
+                        <el-button type="primary" icon="el-icon-arrow-left" @click=prev(curdir)>第一页</el-button>
+                        <el-button type="primary" @click=next(curdir)>下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+                    </el-button-group>
+                </div>
+                
+
+                <el-tabs v-model="activeName" :tab-position="'right'" @tab-click="handleClick">
+                    <el-tab-pane label="图片" name="image">
+                        <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
+                            <el-col :span="4" v-for="jj in 6" >
+                                <el-checkbox 
+                                    v-if=" (theImage(ii,jj).src||'') != '' "
+                                    label="备选项1" 
+                                    border class="image_check"
+                                >
+                                    <img 
+                                        :src=`${theImage(ii,jj).thumb}/wh100_auto` 
+                                        :data-src=`${theImage(ii,jj).src}` class="image">
+                                        <div class="imagetitle">
+                                            [[ theImage(ii,jj).visible_filename ]]
+                                        </div>
+                                </el-checkbox>
+                            </el-col>
+                        </el-row>
+                    </el-tab-pane>
+                    <el-tab-pane label="影片" name="video">视频</el-tab-pane>
+                    <el-tab-pane label="音乐" name="audio">音频</el-tab-pane>
+                    <el-tab-pane label="上传" name="uplaod">
+                        {% comment %} <el-upload
+                            class="upload-demo"
+                            drag
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            multiple>
+                            <i class="el-icon-upload"></i>
+                            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                            <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+                        </el-upload> {% endcomment %}
+
+                        <div id="uploadcontrol">
+                            <div class="ossfile"></div>
+                            <div class='preview'></div>
+                            <input type="hidden" value="public" name="nouse"/>
+
+                            <div class="container" style="text-align: center;">
+                                <el-button type="default"  class="selectfiles"  plain>上传(Upload)<i class="el-icon-upload el-icon--right"></i></el-button>
+                                                                
+                                <input class="file-url fileurl" name="name" type="hidden" value="file_url" />
+                                <input class='x-oss-object-acl' type='hidden' value = 'public-read'/>
+                            </div>
+                            <pre class="console"></pre>
+                        </div>
+                    </el-tab-pane>
+                </el-tabs>
+               
+                
+                
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        <script type="text/javascript" src="{% static "church/vue.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/ele_index.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/es6-promise.auto.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/vuex.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/store.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/axios.min.js" %}"></script>
+
+        <script type="text/javascript" src="{% static 'lib/plupload-2.1.2/js/plupload.full.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'ossupload.js' %}?v={{ now |timeticks }}"></script>
+        <script type="text/javascript" src="{% static "ossupload.js" %}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded',function(){
+                console.log('-----------formset:added--------------')
+                upit = document.getElementById('uploadcontrol')
+                preview = upit.getElementsByClassName('preview')[0] 
+
+                selectfiles = upit.getElementsByClassName('selectfiles')[0] 
+                container = upit.getElementsByClassName('container')[0]
+                ossfile = upit.getElementsByClassName('ossfile')[0] 
+                postfiles = upit.getElementsByClassName('postfiles')[0] 
+
+                pconsole = upit.getElementsByClassName('console')[0] 
+                myradio = upit.getElementsByClassName('myradio')[0] 
+                fileurl = upit.getElementsByClassName('fileurl')[0] 
+                selectfiles = upit.getElementsByClassName('selectfiles')[0] 
+                acl = upit.getElementsByClassName('x-oss-object-acl')[0]
+                var upfact = UploaderFactory(selectfiles,container,ossfile,postfiles,pconsole,myradio,fileurl,acl);
+                upfact().init()
+            })
+            
+        </script>
+
+
+        <script>
+            Vue.config.delimiters = ["[[", "]]"];
+            var app = new Vue({
+                el: '#page',
+                data () {
+                    return {
+                        curdir: '{{ dirs.0 }}',
+                        activeName: 'image',
+                    }
+                },
+                computed: {
+                    count() {
+                        return store.state.count
+                    },
+                    images(){
+                        return store.state.images||[]
+                    },
+                   
+                },
+                store,
+                mounted: function (){
+                    this.showImages(this.curdir)
+                },
+                methods:{
+                    showImages:function(path){
+                        //我现在要，做的是，通过目录查找oss相关目录的图片
+                        //存放在一个store里面
+                        //自动绑定到相关的页面里面
+                        console.log('-------showImages----------')
+                        store.dispatch('getImages',{'path':path,'marker':''} )
+                    },
+                    theImage(i,j){
+                        //console.log(store.state.images)
+                        //console.log(`-------------${i}-${j}-----------------`)
+                        return (store.state.images||[])[(i-1)*6 + j-1]||{}
+                    },
+                    next:function(path){
+                        //当没有18个图片的时候，说明就结束了
+                        console.log('------next------')
+                        console.log(path)
+                        //dl = document.getElementsByClassName('image')
+                        if (this.images.length == 18){
+                            key = decodeURI(this.images[this.images.length-1].src).match('//.*?/(.*)')[1]
+                            //取域名后面的 纯key https://bicf-media-destination.oss-cn-beijing.aliyuncs.com/L3/DISC_1_Title8.jpg"
+                            console.log(key)
+                            if( key ){
+                                 store.dispatch('getImages', {'path':path,'marker':key} )
+                            }
+                        }
+                    },
+                    prev:function(path){
+                        //dl = document.getElementsByClassName('image')
+                        //if (this.images.length > 0){
+                        //    key = decodeURI(this.images[0].src).match('//.*?/(.*)')[1]
+                        //    if( key ){
+                                 store.dispatch('getImages', {'path':path,'marker':''} )
+                        //    }
+                        //}
+                    },
+                    handleClick(tab, event) {
+                        console.log(tab, event);
+                    },
+                },
+                delimiters: ["[[","]]"]
+            });
+        </script>
+ 
+    </body>
+</html>

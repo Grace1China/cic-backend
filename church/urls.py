@@ -18,8 +18,12 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.conf.urls import url, include
 from . import view
+from . import media_browse_view
 from api import urls as apiusrls
 from  rest_framework import routers
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.cache import never_cache
 
 # from api
 import logging
@@ -66,6 +70,12 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     # url(r'^filer/', include('filer.urls')),
     # url(r'^filebrowser_filer/', include('ckeditor_filebrowser_filer.urls')),
+
+    url(r'^media_browse/', never_cache(staff_member_required(media_browse_view.browse)),name="media_browse"),
+    path(r'alioss_list/<path:path>', never_cache(staff_member_required(media_browse_view.list_img)), name='media_list_dir'),
+    path(r'alioss_list/', never_cache(staff_member_required(media_browse_view.list_img)), name='media_list_dir'),#this is for /根目录没有匹配的情况
+
+
 
 ]
 

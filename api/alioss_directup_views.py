@@ -38,6 +38,9 @@ class AliOssSignature(APIView):
     # upload_dir = '%s' %
     expire_time = 30
 
+    def get_datetime_prefix(self):
+        return dt.strftime('%Y%m%d%H%M%S%f')
+         
 
     def get_iso_8601(self,expire):
         gmt = datetime.datetime.utcfromtimestamp(expire).isoformat()
@@ -48,7 +51,7 @@ class AliOssSignature(APIView):
     def get_token(self,request):
         try:
             import logging
-            logger = logging.getLogger('dev.error')
+            logger = logging.getLogger('church.all')
             
             now = int(time.time())
             expire_syncpoint = now + self.expire_time
@@ -59,13 +62,13 @@ class AliOssSignature(APIView):
             policy_dict['expiration'] = expire
             condition_array = []
             array_item = []
-            array_item.append('starts-with');
-            array_item.append('$key');
+            array_item.append('starts-with')
+            array_item.append('$key')
             if (request.user.church == None):
-                import pprint
-                pprint.PrettyPrinter(6).pprint(request.user)
+                # import pprint
+                # pprint.PrettyPrinter(6).pprint(request.user)
                 raise Exception('user or church of user is null')
-            array_item.append(request.user.church.code);
+            array_item.append(request.user.church.code)
             condition_array.append(array_item)
             policy_dict['conditions'] = condition_array
             policy = json.dumps(policy_dict).strip()
@@ -74,15 +77,15 @@ class AliOssSignature(APIView):
             sign_result = base64.encodestring(h.digest()).strip()
 
             callback_dict = {}
-            callback_dict['callbackUrl'] = self.callback_url;
+            callback_dict['callbackUrl'] = self.callback_url
             callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
-                                            '&height=${imageInfo.height}&width=${imageInfo.width}';
-            callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded';
+                                            '&height=${imageInfo.height}&width=${imageInfo.width}'
+            callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded'
 
             import logging
             logging.debug(callback_dict)
             callback_param = json.dumps(callback_dict).strip()
-            base64_callback_body = base64.b64encode(callback_param.encode());
+            base64_callback_body = base64.b64encode(callback_param.encode())
 
             token_dict = {}
             token_dict['accessid'] = self.access_key_id
@@ -91,6 +94,7 @@ class AliOssSignature(APIView):
             token_dict['policy'] = policy_encode.decode()
             token_dict['signature'] = sign_result.decode()
             token_dict['expire'] = expire_syncpoint
+            # token_dict['datetime_prefix'] = self.get_datetime_prefix()
             # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
 
             if request.user.church == None:
@@ -99,14 +103,13 @@ class AliOssSignature(APIView):
                 token_dict['dir'] = '%s/' % request.user.church.code
 
 
-
             token_dict['callback'] = base64_callback_body.decode()
             result = json.dumps(token_dict)
             return result
         except Exception as e:
             import logging
-            logger = logging.getLogger('dev.error')
-            logger.exception("there is an exception")
+            logger = logging.getLogger('church.all')
+            logger.exception("there is an exception",exc_info=True,stack_info=True)
         finally:
             pass
 
@@ -127,27 +130,29 @@ class AliOssSignature(APIView):
         return JsonResponse({'errCode': '0', 'token': token}, safe=False)
 
 import pprint
+from churchs.models import MediaFile
 class AliOssCallBack(APIView):
     '''
     阿里上传完成视频后进行回写
     '''
-    def get(self,request,*args,**kwargs):
-        '''
-        用post方法
-        '''
-        import logging
-        logging.debug('-------------------in get ----------------------')
-        auth = request.META.get('Authorization')
-        logging.debug(auth)
-        # if not request:
-        #     return None
-        logging.debug(request)
-        logging.debug(args)
-        logging.debug(kwargs)
-        pprint.PrettyPrinter(4).pprint(request)
-        pprint.PrettyPrinter(4).pprint(args)
-        pprint.PrettyPrinter(4).pprint(kwargs)
-        return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
+    permission_classes = [AllowAny]
+    # def get(self,request,*args,**kwargs):
+    #     '''
+    #     用post方法
+    #     '''
+    #     import logging
+    #     logging.debug('-------------------in get ----------------------')
+    #     auth = request.META.get('Authorization')
+    #     logging.debug(auth)
+    #     # if not request:
+    #     #     return None
+    #     logging.debug(request)
+    #     logging.debug(args)
+    #     logging.debug(kwargs)
+    #     pprint.PrettyPrinter(4).pprint(request)
+    #     pprint.PrettyPrinter(4).pprint(args)
+    #     pprint.PrettyPrinter(4).pprint(kwargs)
+    #     return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
 
     def post(self,request,*args,**kwargs):
         '''
@@ -155,14 +160,14 @@ class AliOssCallBack(APIView):
         '''
         import logging
         from .utill import CICUtill
-        logger = logging.getLogger('dev.error')
-        logger.error('-------------------in post ----------------------')
+        logger = logging.getLogger('church.all')
+        logger.debug('--------------AliOssCallBack-----in post ----------------------')
 
         auth = request.META.get('Authorization')
-        logger.error(auth)
-        logger.error(request)
-        logger.error(request.headers)
-        logger.error(request.POST)
+        logger.debug(auth)
+        logger.debug(request)
+        logger.debug(request.headers)
+        logger.debug(request.POST)
         data = request.data
         ret_dict = {}
         ret_dict['filename'] = data.get('filename', '')
@@ -170,8 +175,10 @@ class AliOssCallBack(APIView):
         ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
         ret_dict['String value'] = 'OK'
         ret_dict['Key'] = 'Status'
+        logger.info(data)
+        MediaFiles.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
 
-        logger.error(ret_dict)
+        logger.debug(ret_dict)
 
         return JsonResponse(ret_dict, safe=False)
 
@@ -181,6 +188,7 @@ class AliMtsCallBack(APIView):
         用post方法
         用原文件来定位media,
         用计算的方法，来求得目标文件，存储在相应的记录里面
+        4、15 这个方法 目前不用了。直接用文件查找，看目标盘是否有文件了。
         '''
         import logging    
         import churchs.models as md

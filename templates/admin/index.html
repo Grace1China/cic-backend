@@ -28,15 +28,15 @@
             <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/5.8.1/css/all.min.css">
         {% endif %}
 
-        <link rel="stylesheet" href="{% static 'admin/simpleui-x/css/index.css' %}?_=2.7">
-        <link rel="stylesheet" href="{% static 'admin/simpleui-x/waves/waves.min.css' %}?_=2.1">
+        <link rel="stylesheet" href="{% static 'admin/simpleui-x/css/index.css' %}">
+        {% comment %} ?_=2.7 {% endcomment %}
+        <link rel="stylesheet" href="{% static 'admin/simpleui-x/waves/waves.min.css' %}">
+        {% comment %} ?_=2.1 {% endcomment %}
     {% endblock %}
     {% block head %}
 
     {% endblock %}
-</head>
-<body>
-<style type="text/css">
+    <style type="text/css">
     .el-tabs__nav .el-tabs__item:nth-child(1) .el-icon-close {
         display: none;
     }
@@ -91,8 +91,6 @@
         background: #7d7d7d;
     }
 </style>
-
-
 {% verbatim dynamicCss %}
     <style type="text/css" id="dynamicCss" v-if="fontSize!=0">
         * {
@@ -101,19 +99,23 @@
     </style>
 {% endverbatim dynamicCss %}
 
+{% block theme_css %}
+    <link v-if="theme && theme!=''" rel="stylesheet" :href="theme">
+
+    {% if "SIMPLEUI_DEFAULT_THEME"|get_config %}
+    <link v-else rel="stylesheet" href="{% static 'admin/simpleui-x/theme/' %}{{ "SIMPLEUI_DEFAULT_THEME"|get_config }}">
+    {% endif %}
+{% endblock %}
+</head>
+<body>
+
 {% block menus %}
     {% autoescape off %}
         {% menus %}
     {% endautoescape %}
 {% endblock %}
 <div id="main" @click="mainClick($event)" v-block>
-    {% block theme_css %}
-        <link v-if="theme && theme!=''" rel="stylesheet" :href="theme">
 
-        {% if "SIMPLEUI_DEFAULT_THEME"|get_config %}
-        <link v-else rel="stylesheet" href="{% static 'admin/simpleui-x/theme/' %}{{ "SIMPLEUI_DEFAULT_THEME"|get_config }}">
-        {% endif %}
-    {% endblock %}
 
     <el-container :style="{height: height+'px'}">
         
@@ -385,11 +387,12 @@
     <script type="text/javascript" src="{% static 'admin/simpleui-x/theme/theme.js' %}"></script>
     <script type="text/javascript" src="{% static 'admin/simpleui-x/waves/waves.min.js' %}?_=2.0.5"></script>
     {% block index_js %}
-        <script type="text/javascript" src="{% static 'admin/simpleui-x/js/index.js' %}?_=3.1"></script>
+        <script type="text/javascript" src="{% static 'church/js/myindex.js' %}"></script>
+        {% comment %} ?_=3.1 {% endcomment %}
     {% endblock %}
     {% block autoupdate %}
     <script type="text/javascript" async
-            src="https://api.github.com/repos/newpanjing/simpleui/releases/latest?callback=simple_call"></script>
+            {% comment %} src="https://api.github.com/repos/newpanjing/simpleui/releases/latest?callback=simple_call"></script> {% endcomment %}
     {% endblock %}
 {% endblock %}
 {% load_analysis %}

@@ -122,3 +122,4 @@ redeploy
 restart
 ./church/settings.py
 ./church/confs/dev.py
+sh_*

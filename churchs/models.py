@@ -53,8 +53,8 @@ class SermonSeries(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_CLOSE,verbose_name='状态')
 
     class Meta:
-        verbose_name = "讲道系列"
-        verbose_name_plural = "讲道系列"
+        verbose_name = "专栏系列"
+        verbose_name_plural = "专栏系列"
 
     def __str__(self):
         return '%s' % (self.title)
@@ -66,7 +66,10 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
     try:
         if instance.res_path  == '' or instance.res_path is None:
             ct = SermonSeries.objects.filter(church__exact = instance.church).count()
-            instance.res_path = 'series_%d' % ct
+            if ct <= 0:
+                instance.res_path = '/'
+            else:
+                instance.res_path = 'series_%d' % ct
 
             path = '%s/%s' % (instance.church.code,instance.res_path)
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
@@ -96,6 +99,19 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
 
 pre_save.connect(create_oss_dir, sender=SermonSeries)
 
+class MediaFile(models.Model):
+    '''
+    用来存储oss的单个媒体文件
+    '''  
+    id = models.AutoField(primary_key=True)
+    # church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
+    # user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
+    name = models.CharField(max_length=200, default='',verbose_name='标题')
+    mime_type = models.CharField(max_length=50, default='',verbose_name='媒体类型')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    # pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
+    # status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
 
 
 class Media(models.Model):
@@ -438,7 +454,9 @@ class WeeklyReport(models.Model):
     title = models.CharField(max_length=32,default='',verbose_name='标题')
     image = models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='封面')
     #todo 
-    content = RichTextUploadingField(null=True, blank=True,verbose_name='内容')
+    content = RichTextUploadingField(null=True, blank=True,verbose_name='内容',external_plugin_resources=[('html5video','/static/ckeditor/ckeditor/plugins/html5video/','plugin.js'),('abbr','/static/ckeditor/ckeditor/plugins/abbr/','plugin.js')
+    
+    ]) 
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pub_time = models.DateTimeField(auto_now_add=True,null=True, blank=True,editable=True,verbose_name='发布时间')
