@@ -4,6 +4,8 @@
 
 
 {% block afterEndBody %}
+    {{ block.super }}
+
     <script type="text/javascript" src="{% static 'lib/plupload-2.1.2/js/plupload.full.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'ossupload.js' %}?v={{ now |timeticks }}"></script>
 {% endblock afterEndBody %}
