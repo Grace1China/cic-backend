@@ -172,7 +172,7 @@ class SermonAdmin(admin.ModelAdmin):
     model = Sermon
     list_display = ('title','user','pub_time','status')
     search_fields = ('pub_time', 'title','status','user')
-    fields = ('title','speaker','scripture','series','church','pub_time','status','user')
+    fields = ('title','cover','speaker','scripture','series','church','pub_time','status','user')
 
     def get_formsets_with_inlines(self, request, obj=None):
         for inline in self.get_inline_instances(request, obj):
