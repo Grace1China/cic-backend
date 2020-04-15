@@ -123,7 +123,7 @@ class SermonListSerializer4API(serializers.ModelSerializer):
     medias = MediaSerializer4API(many=True, read_only=True)
     class Meta:
         model = Sermon
-        fields = ['id','user','title','pub_time','status','speaker','scripture','medias','create_time','update_time']
+        fields = ['id','user','title','cover','pub_time','status','speaker','scripture','medias','create_time','update_time']
 
 
 class CourseSerializer4APIPOST(serializers.ModelSerializer):

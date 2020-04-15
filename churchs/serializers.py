@@ -3,7 +3,7 @@ from . import models
 class SermonSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Sermon
-        fields = ['id', 'church', 'user', 'title', 'date', 'description','pdf','speaker','scripture','series','cover','worshipvideo','mcvideo','sermonvideo','givingvideo','status']
+        fields = ['id', 'church', 'user','cover', 'title', 'date', 'description','pdf','speaker','scripture','series','cover','worshipvideo','mcvideo','sermonvideo','givingvideo','status']
 
 class EweeklySerializer(serializers.ModelSerializer):
     class Meta:

@@ -404,6 +404,7 @@ class Media(models.Model):
         return '%s' % (self.title)
 
 
+from church.alioss_storage_backends_v2 import AliyunMediaStorage,AliyunStaticStorage
 
 class Sermon(models.Model):
     STATUS_DRAFT = 1
@@ -418,6 +419,7 @@ class Sermon(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
     title = models.CharField(max_length=200, default='',verbose_name='标题')
     speaker = models.ForeignKey("Speaker",on_delete=models.CASCADE,default=None,verbose_name='讲员')
+    cover = models.ImageField(storage=AliyunMediaStorage(), null=True, blank=True,verbose_name='海报封面')
     scripture = models.CharField(max_length=100, default='',blank=True,verbose_name='经文')
     series = models.ForeignKey(SermonSeries, on_delete=models.CASCADE,null=True,blank=True,default=None,verbose_name='讲道系列')
 

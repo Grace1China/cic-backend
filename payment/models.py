@@ -67,7 +67,7 @@ class Order(models.Model):
         return {'foo': 'bar'}
     
     id = models.AutoField(primary_key=True)
-    order_no = models.UUIDField(default=uuid.uuid4(), verbose_name='订单号', editable=False,db_index=True,unique=True,null=False,blank=False)
+    order_no = models.UUIDField(default=uuid.uuid4, verbose_name='订单号', editable=False,db_index=True,unique=True,null=False,blank=False)
     user = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, blank=False, null=False)
 
