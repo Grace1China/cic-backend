@@ -126,14 +126,13 @@
                             <div class="ossfile"></div>
                             <div class='preview'></div>
                             <input type="hidden" value="public" name="nouse"/>
-
+                            <pre class="console"></pre>
                             <div class="container" style="text-align: center;">
-                                <el-button type="default"  class="selectfiles"  plain>上传(Upload)<i class="el-icon-upload el-icon--right"></i></el-button>
-                                                                
+                                <el-button type="default"  class="selectfiles"  plain>本地上传(Upload from my files)<i class="el-icon-upload el-icon--right"></i></el-button>
                                 <input class="file-url fileurl" name="name" type="hidden" value="file_url" />
                                 <input class='x-oss-object-acl' type='hidden' value = 'public-read'/>
                             </div>
-                            <pre class="console"></pre>
+                            
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -205,7 +204,7 @@
                         //存放在一个store里面
                         //自动绑定到相关的页面里面
                         console.log('-------showImages----------')
-                        store.dispatch('getImages',{'path':path,'marker':''} )
+                        store.dispatch('getImages',{'host':'{{ host }}','path':path,'marker':''} )
                     },
                     theImage(i,j){
                         //console.log(store.state.images)

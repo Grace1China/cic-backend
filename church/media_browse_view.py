@@ -153,12 +153,13 @@ def browse(request):
     #     files = [f for f in files if os.path.basename(f['src']) != 'Thumbs.db']
 
     # dirs.add(storage._get_user_path(request.user)) # dirs 是所有遍历中找到的dir, 而user_path是指定的，所以这里加上
-
+    from django.conf import setting
     context = {
         'show_dirs': True,
         'dirs': dirs,
         'files': files,
         'form': None ,#form
+        'host':setting.APP_SERVER_IP
     }
     lg.info(context)
     return render(request, 'church/media_browse.html', context)
