@@ -31,7 +31,7 @@ class AliOssSignature(APIView):
     access_key_secret = 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I'
     # host的格式为 bucketname.endpoint ，请替换为您的真实信息。
     host = 'https://bicf-media-source.oss-accelerate.aliyuncs.com'#'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
-    desthost = 'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
+    desthost = 'bicf-media-destination.oss-accelerate.aliyuncs.com'#'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
     # callback_url为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
     callback_url = "http://%s/rapi/alioss_directup_callback" %  settings.APP_SERVER_IP
     # 用户上传文件时指定的前缀。
