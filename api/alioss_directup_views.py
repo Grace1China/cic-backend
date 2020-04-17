@@ -175,7 +175,7 @@ class AliOssCallBack(APIView):
             ret_dict['String value'] = 'OK'
             ret_dict['Key'] = 'Status'
             theLogger.info(ret_dict)
-            fruit = MediaFiles.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
+            fruit = MediaFile.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
             theLogger.info(fruit)
             return JsonResponse(ret_dict, safe=False)
 
