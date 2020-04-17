@@ -178,7 +178,9 @@ class AliOssCallBack(APIView):
             theLogger.info(json.dumps(ret_dict))
             mfile = MediaFile.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
             theLogger.info(mfile)
-            return JsonResponse(ret_dict, safe=True)
+            retV = JsonResponse(ret_dict, safe=True)
+            theLogger.info(retV)
+            return retV
 
         except Exception as e:
             #import logging
