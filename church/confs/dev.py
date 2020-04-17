@@ -40,16 +40,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
         'NAME': 'cic_20200323',  # test_cic数据库名，先前创建的
 
-        # 本地 
-        'USER': 'root',  # 用户名，可以自己创建用户
-        'PASSWORD': '',  # 密码
-        'HOST': '127.0.0.1',  # mysql服务所在的主机ip 54.169.143.92
-
         # 测试
         # 'NAME': 'cic_20200323',  # test_cic数据库名，先前创建的
-        # 'USER': 'backend_user',     # 用户名，可以自己创建用户
-        # 'PASSWORD': '11/28/2019',  # 密码
-        # 'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
+        'USER': 'backend_user',     # 用户名，可以自己创建用户
+        'PASSWORD': '11/28/2019',  # 密码
+        'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
 
         'PORT': '3306',  # mysql服务端口
         'OPTIONS': {
@@ -94,7 +89,10 @@ MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 INTERNAL_IPS = ('127.0.0.1',)
 
 MAINSITE_API_V1 = 'http://127.0.0.1:8200/mainsite_api_v1/mst/MakeSermon'
-APP_SERVER_IP = "13.231.255.163"  # singpore 54.169.143.92
+APP_SERVER_IP = "localhost:8000"  # singpore 54.169.143.92  
+
+ALIOSS_MEDIA_CALLBACK_SERVER = 'test.l3.bicf.org'
+ALIOSS_MEDIA_BROWSE_SERVER = 'localhost:8000'  #测试的时候调用本地，回调是用test.l3,本地数据库要与test.l3保持一致
 
 import os
 
@@ -169,13 +167,13 @@ LOGGING = {
             'filters': ['InfoFilter'],
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename': 'data/log/django/l3dev/info.log',  # 本机data/log/django/error.log
+            'filename': 'data/log/django/l3dev/info416.log',  # 本机data/log/django/error.log
             'encoding': 'utf8',
         },
         'file_err': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': 'data/log/django/l3dev/error.log',
+            'filename': 'data/log/django/l3dev/error416.log',
             'formatter': 'verbose',
             'encoding': 'utf8',
         },

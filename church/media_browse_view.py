@@ -158,7 +158,8 @@ def browse(request):
         'dirs': dirs,
         'files': files,
         'form': None ,#form
-        'host':settings.APP_SERVER_IP
+        'host':settings.ALIOSS_MEDIA_BROWSE_SERVER,
+        'rediret_url_prefix':settings.ALIOSS_DESTINATIONS[typ]['redirecturl']
     }
     lg.info(context)
     return render(request, 'church/media_browse.html', context)

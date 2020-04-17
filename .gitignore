@@ -122,3 +122,8 @@ restart
 ./church/settings.py
 ./church/confs/dev.py
 sh_*
+church/confs/dev.py
+church/confs/dev_*
+church/confs/bak_*
+
+

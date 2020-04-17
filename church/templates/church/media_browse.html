@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="{% static "church/css/dialog.css" %}" type="text/css" />
 
         <link rel="stylesheet" href="{% static "church/css/ele_index.css" %}" type="text/css" />
-        <link rel="stylesheet" href="{% static "ossstyle.css" %}" type="text/css" />
+        <link rel="stylesheet" href="{% static "church/css/ossstyle.css" %}" type="text/css" />
 
 
       
@@ -142,16 +142,16 @@
                 <div style="clear: both;"></div>
             </div>
         </div>
-        <script type="text/javascript" src="{% static "church/vue.js" %}"></script>
-        <script type="text/javascript" src="{% static "church/ele_index.js" %}"></script>
-        <script type="text/javascript" src="{% static "church/es6-promise.auto.js" %}"></script>
-        <script type="text/javascript" src="{% static "church/vuex.js" %}"></script>
-        <script type="text/javascript" src="{% static "church/store.js" %}"></script>
-        <script type="text/javascript" src="{% static "church/axios.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/js/ele_index.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/js/es6-promise.auto.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/js/store.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/js/axios.min.js" %}"></script>
 
-        <script type="text/javascript" src="{% static 'lib/plupload-2.1.2/js/plupload.full.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'ossupload.js' %}?v={{ now |timeticks }}"></script>
-        <script type="text/javascript" src="{% static "ossupload.js" %}"></script>
+        <script type="text/javascript" src="{% static 'church/js/lib/plupload-2.1.2/js/plupload.full.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'church/js/ossupload.js' %}?v={{ now |timeticks }}"></script>
+     
         <script>
             document.addEventListener('DOMContentLoaded',function(){
                 console.log('-----------formset:added--------------')
@@ -217,11 +217,11 @@
                         console.log(path)
                         //dl = document.getElementsByClassName('image')
                         if (this.images.length == 18){
-                            key = decodeURI(this.images[this.images.length-1].src).match('//.*?/(.*)')[1]
+                            key = decodeURI(this.images[this.images.length-1].src).match('{{ rediret_url_prefix }}/(.*)')[1]
                             //取域名后面的 纯key https://bicf-media-destination.oss-cn-beijing.aliyuncs.com/L3/DISC_1_Title8.jpg"
                             console.log(key)
                             if( key ){
-                                 store.dispatch('getImages', {'path':path,'marker':key} )
+                                 store.dispatch('getImages', {'host':'{{ host }}','path':path,'marker':key} )
                             }
                         }
                     },
@@ -230,7 +230,7 @@
                         //if (this.images.length > 0){
                         //    key = decodeURI(this.images[0].src).match('//.*?/(.*)')[1]
                         //    if( key ){
-                                 store.dispatch('getImages', {'path':path,'marker':''} )
+                                 store.dispatch('getImages', {'host':'{{ host }}','path':path,'marker':''} )
                         //    }
                         //}
                     },

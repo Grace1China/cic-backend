@@ -31,9 +31,9 @@ class AliOssSignature(APIView):
     access_key_secret = 'pXfMGYs2xAjjWHSKVoIaDuAC5ze49I'
     # host的格式为 bucketname.endpoint ，请替换为您的真实信息。
     host = 'https://bicf-media-source.oss-accelerate.aliyuncs.com'#'http://bicf-media-source.oss-cn-beijing.aliyuncs.com' 
-    desthost = 'bicf-media-destination.oss-accelerate.aliyuncs.com'#'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
+    desthost = 'https://bicf-media-destination.oss-accelerate.aliyuncs.com'#'http://bicf-media-destination.oss-cn-beijing.aliyuncs.com'
     # callback_url为 上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
-    callback_url = "http://%s/rapi/alioss_directup_callback" %  settings.APP_SERVER_IP
+    callback_url = "http://%s/rapi/alioss_directup_callback" %  settings.ALIOSS_MEDIA_CALLBACK_SERVER
     # 用户上传文件时指定的前缀。
     # upload_dir = '%s' %
     expire_time = 30
@@ -158,16 +158,14 @@ class AliOssCallBack(APIView):
         '''
         用post方法
         '''
-        import logging
         from .utill import CICUtill
-        logger = logging.getLogger('church.all')
-        logger.debug('--------------AliOssCallBack-----in post ----------------------')
+        theLogger.info('--------------AliOssCallBack-----in post ----------------------')
 
         auth = request.META.get('Authorization')
-        logger.debug(auth)
-        logger.debug(request)
-        logger.debug(request.headers)
-        logger.debug(request.POST)
+        theLogger.info(auth)
+        theLogger.info(request)
+        theLogger.info(request.headers)
+        theLogger.info(request.POST)
         data = request.data
         ret_dict = {}
         ret_dict['filename'] = data.get('filename', '')
@@ -175,10 +173,10 @@ class AliOssCallBack(APIView):
         ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
         ret_dict['String value'] = 'OK'
         ret_dict['Key'] = 'Status'
-        logger.info(data)
+        theLogger.info(data)
         MediaFiles.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
 
-        logger.debug(ret_dict)
+        theLogger.info(ret_dict)
 
         return JsonResponse(ret_dict, safe=False)
 

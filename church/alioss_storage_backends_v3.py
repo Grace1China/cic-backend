@@ -82,6 +82,8 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         except AccessDenied:
             # 当启用了RAM访问策略，是不允许list和create bucket的
             self.bucket = self._get_bucket(self.auth)
+    
+    
 
     def _get_config(self, name):
         """
@@ -230,41 +232,43 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         finally:
             return list(dirs), files
 
-    def __url(self, bucket_name, key, safe='/'):
-        # self.type = _determine_endpoint_type(self.netloc, self.is_cname, bucket_name)
+    # def __url(self, bucket_name, key, safe='/'):
+    #     # self.type = _determine_endpoint_type(self.netloc, self.is_cname, bucket_name)
 
-        # safe = '/' if slash_safe is True else ''
-        from oss2.compat import urlquote,urlparse
-        key = urlquote(key, safe=safe)
+    #     # safe = '/' if slash_safe is True else ''
+    #     from oss2.compat import urlquote,urlparse
+    #     key = urlquote(key, safe=safe)
 
-        p = urlparse(self.end_point)
+    #     p = urlparse(self.end_point)
 
 
-        return '{0}://{1}.{2}/{3}'.format(p.scheme, bucket_name, p.netloc, key)
+    #     return '{0}://{1}.{2}/{3}'.format(p.scheme, bucket_name, p.netloc, key)
 
-    def url(self, name):
-        try:
-            # theLogger.info(name)
-            name = self._normalize_name(self._clean_name(name))
-            name = '%s/%s' % (self._get_user_path(None),name)
-            name = name.encode('utf8')
-            theLogger.info(name)
-            # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
-            retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
-        except:
-            import traceback
-            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-        finally:
-            return retUrl
+    # def url(self, name):
+    #     try:
+    #         # theLogger.info(name)
+    #         name = self._normalize_name(self._clean_name(name))
+    #         name = '%s/%s' % (self._get_user_path(None),name)
+    #         name = name.encode('utf8')
+    #         theLogger.info(name)
+    #         # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+    #         retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
+    #     except:
+    #         import traceback
+    #         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+    #     finally:
+    #         return retUrl
     def url(self, name, addUpath = True):
         try:
-            # theLogger.info(name)
             name = self._normalize_name(self._clean_name(name))
-            name = '%s/%s' % (self._get_user_path(None),name) if addUpath else name
-            name = name.encode('utf8')
-            theLogger.info(name)
+            key = '%s/%s' % (self._get_user_path(None),name) if addUpath else name #加入用户的教会目录
+            key = key.encode('utf8')
             # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
-            retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
+            # retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
+            from oss2.compat import urlquote,urlparse
+            key = urlquote(key, safe='/?=')
+            p = urlparse(self.end_point)
+            return '{0}://{1}.{2}/{3}'.format(p.scheme, bucket_name, p.netloc, key)
         except:
             import traceback
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
@@ -394,10 +398,10 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
                 continue
             
             filename = el['name']
-            src = self.url(filename,addUpath=False)
+            src = self.media_url(filename,addUpath=False)
             if getattr(settings, 'CKEDITOR_IMAGE_BACKEND', None):
                 if is_valid_image_extension(src):
-                    thumb = self.url(self.get_thumb_filename(filename),addUpath=False)
+                    thumb = self.media_url(self.get_thumb_filename(filename),addUpath=False)
                 else:
                     thumb = utils.get_icon_filename(filename)
                 visible_filename = os.path.split(filename)[1]
@@ -427,22 +431,42 @@ from django.utils.deconstruct import deconstructible
 class AliyunMediaStorage(AliyunBaseStorage):
     
     location = '/'#settings.MEDIA_ROOT
+    destination = "destination" #在父类url中使用取得redirect url getattr(self, 'out')# 获取子类的out()方法
     def get_files_browse_urls(self,user=None,typ=None,path='',marker = ''):
+        self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url
         return super().get_files_browse_urls(user=user,typ=typ,path=path,marker = marker)
+        
+        # for f in files:
+            
     def get_image_files(self,user=None, path='',marker = ''):
         return super().get_image_files(user=user,path=path,marker = marker)
-    # def _get_user_path(self,user):
-    #     return super()._get_user_path(user)
-    
-    
-    # def getLocation():
-    #     current_request = CrequestMiddleware.get_request()
-    #     if current_request is None:
-    #         raise Exception('There is now requests user found')
-    #     return current_request.user.church.code
+
+
+    def _set_bucket(self,dest="destination"):
+        self.destination = dest
+        self.bucket_name = settings.ALIOSS_DESTINATIONS[dest]['bucket']
         
+        try:
+            if self.bucket_name not in super()._list_bucket(self.service):
+                # create bucket if not exists
+                self.bucket = super()._create_bucket(self.auth)
+            else:
+                # change bucket acl if not consists
+                self.bucket = super()._check_bucket_acl(self._get_bucket(self.auth))
+        except AccessDenied:
+            # 当启用了RAM访问策略，是不允许list和create bucket的
+            self.bucket = super()._get_bucket(self.auth)
 
-
+    def media_url(self, fn, addUpath=False):
+        fn = self._normalize_name(self._clean_name(fn))
+        key = '%s/%s' % (self._get_user_path(None),fn) if addUpath else fn #加入用户的教会目录
+        key = key.encode('utf8')
+        # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+        # retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
+        from oss2.compat import urlquote,urlparse
+        key = urlquote(key, safe='/?=')
+        p = urlparse(self.end_point)
+        return '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
 
 @deconstructible
 class AliyunStaticStorage(AliyunBaseStorage):
