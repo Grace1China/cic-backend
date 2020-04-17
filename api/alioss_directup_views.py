@@ -161,6 +161,7 @@ class AliOssCallBack(APIView):
         try:
             from .utill import CICUtill
             theLogger.info('--------------AliOssCallBack-----in post ----------------------')
+            theLogger.info(request.META)
 
             auth = request.META.get('Authorization')
             theLogger.info(auth)
