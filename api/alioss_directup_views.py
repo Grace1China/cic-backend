@@ -186,11 +186,13 @@ class AliOssCallBack(APIView):
         Instantiates and returns the list of permissions that this view requires.
         """
         theLogger.info(self)
-        theLogger.info(self.action)
-        if self.action == 'post':
-            permission_classes = [AllowAny]
-        else:
-            permission_classes = [IsAuthenticated]
+        theLogger.info(self.__dict__)
+
+        # theLogger.info(self.action)
+        # if self.action == 'post':
+        permission_classes = [AllowAny]
+        # else:
+        # permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
 class AliMtsCallBack(APIView):
