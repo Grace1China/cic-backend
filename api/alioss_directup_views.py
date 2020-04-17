@@ -158,27 +158,34 @@ class AliOssCallBack(APIView):
         '''
         用post方法
         '''
-        from .utill import CICUtill
-        theLogger.info('--------------AliOssCallBack-----in post ----------------------')
+        try:
+            from .utill import CICUtill
+            theLogger.info('--------------AliOssCallBack-----in post ----------------------')
 
-        auth = request.META.get('Authorization')
-        theLogger.info(auth)
-        theLogger.info(request)
-        theLogger.info(request.headers)
-        theLogger.info(request.POST)
-        data = request.data
-        ret_dict = {}
-        ret_dict['filename'] = data.get('filename', '')
-        ret_dict['mimeType'] = data.get('mimeType','')
-        ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
-        ret_dict['String value'] = 'OK'
-        ret_dict['Key'] = 'Status'
-        theLogger.info(data)
-        MediaFiles.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
+            auth = request.META.get('Authorization')
+            theLogger.info(auth)
+            theLogger.info(request)
+            theLogger.info(request.headers)
+            theLogger.info(request.POST)
+            data = request.data
+            ret_dict = {}
+            ret_dict['filename'] = data.get('filename', '')
+            ret_dict['mimeType'] = data.get('mimeType','')
+            ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
+            ret_dict['String value'] = 'OK'
+            ret_dict['Key'] = 'Status'
+            theLogger.info(ret_dict)
+            fruit = MediaFiles.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
+            theLogger.info(fruit)
+            return JsonResponse(ret_dict, safe=False)
 
-        theLogger.info(ret_dict)
+        except Exception as e:
+            #import logging
+            #logger = logging.getLogger('church.all')
+            theLogger.exception("there is an exception",exc_info=True,stack_info=True)
+        finally:
+            return JsonResponse(None, safe=False) 
 
-        return JsonResponse(ret_dict, safe=False)
 
 
     def get_permissions(self):
