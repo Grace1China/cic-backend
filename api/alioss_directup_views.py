@@ -179,7 +179,7 @@ class AliOssCallBack(APIView):
             mfile = MediaFile.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
             theLogger.info(mfile)
             retV = JsonResponse(ret_dict, safe=True)
-            theLogger.info(retV)
+            theLogger.info(retV.__dict__)
             return retV
 
         except Exception as e:
