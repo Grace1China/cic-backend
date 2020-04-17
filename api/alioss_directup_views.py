@@ -50,8 +50,8 @@ class AliOssSignature(APIView):
 
     def get_token(self,request):
         try:
-            import logging
-            logger = logging.getLogger('church.all')
+            #import logging
+            #logger = logging.getLogger('church.all')
             
             now = int(time.time())
             expire_syncpoint = now + self.expire_time
@@ -82,8 +82,8 @@ class AliOssSignature(APIView):
                                             '&height=${imageInfo.height}&width=${imageInfo.width}'
             callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded'
 
-            import logging
-            logging.debug(callback_dict)
+            #import logging
+            theLogger.info(callback_dict)
             callback_param = json.dumps(callback_dict).strip()
             base64_callback_body = base64.b64encode(callback_param.encode())
 
@@ -107,9 +107,9 @@ class AliOssSignature(APIView):
             result = json.dumps(token_dict)
             return result
         except Exception as e:
-            import logging
-            logger = logging.getLogger('church.all')
-            logger.exception("there is an exception",exc_info=True,stack_info=True)
+            #import logging
+            #logger = logging.getLogger('church.all')
+            theLogger.exception("there is an exception",exc_info=True,stack_info=True)
         finally:
             pass
 

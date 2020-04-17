@@ -158,7 +158,7 @@ def browse(request):
         'dirs': dirs,
         'files': files,
         'form': None ,#form
-        'host':settings.ALIOSS_MEDIA_BROWSE_SERVER,
+        'MEDIA_BROWSE_API_SERVER':settings.MEDIA_BROWSE_API_SERVER,
         'rediret_url_prefix':settings.ALIOSS_DESTINATIONS[typ]['redirecturl']
     }
     lg.info(context)

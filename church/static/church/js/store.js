@@ -1,6 +1,6 @@
 async function getImages (context,par) {
     console.log(`getImages==============path==${par.path}=`)
-    await axios.get(`http://${par.host}/alioss_list${par.path=='/'?'/':'/'+par.path}`,{params: { 'type': 'images','marker':par.marker }})
+    await axios.get(`http://${par.MEDIA_BROWSE_API_SERVER}/alioss_list${par.path=='/'?'/':'/'+par.path}`,{params: { 'type': 'images','marker':par.marker }})
     .then(function (res) {
         console.log(res)
         if (res.data.errCode == '0'){

@@ -24,6 +24,9 @@ DEFAULT_CHURCH = 'L3'
 MAINSITE_API_V1 = 'http://47.95.199.234:8200/mainsite_api_v1/mst/MakeSermon'
 APP_SERVER_IP = "test.l3.bicf.org"  #singpore 54.169.143.92
 
+ALIOSS_MEDIA_CALLBACK_SERVER = 'test.l3.bicf.org' # 用来指定alioss媒体上传和转码后的回调地址
+MEDIA_BROWSE_API_SERVER = 'test.l3.bicf.org'  #await axios.get(`http://${par.MEDIA_BROWSE_API_SERVER}/alioss_list${par.path=='/'?'/':'/'+par.path}` 在媒体库的store.js中要看使用那个地址来取内容，测试当然是本地;
+# test.l3环境就是test.l3， product 的luxmundi.bicf.org就是 luxmundi.bicf.org
 
 IAP_IS_SANDBOX = True
 PAYPAL_IS_SANEBOX = True
