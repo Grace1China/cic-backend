@@ -184,7 +184,7 @@ class AliOssCallBack(APIView):
 
             # retV =  HttpResponse(json.dumps(ret_dict,ensure_ascii=False),content_type="application/json,charset=utf-8")
             retV = JsonResponse({'Status':'OK'}, safe=True)
-            theLogger.info(retV.__dict__)
+            theLogger.info(retV.__dict__) #print it
             return   retV
 
         except Exception as e:
