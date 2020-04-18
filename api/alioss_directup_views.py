@@ -169,20 +169,17 @@ class AliOssCallBack(APIView):
             theLogger.info(request.headers)
             theLogger.info(request.POST)
             data = request.data
-            # ret_dict = {}
-            # ret_dict['filename'] = data.get('filename', '')
-            # ret_dict['mimeType'] = data.get('mimeType','')
-            # ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
-            # ret_dict['String value'] = 'OK'
-            # ret_dict['Key'] = 'Status'
-            # theLogger.info(ret_dict)
-            # # theLogger.info(json.dumps(ret_dict))
-            # mfile = MediaFile.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
-            # theLogger.info(mfile)
-            # return Response(data=json.dumps(ret_dict,ensure_ascii=False),status=status.HTTP_200_OK)
+            ret_dict = {}
+            ret_dict['filename'] = data.get('filename', '')
+            ret_dict['mimeType'] = data.get('mimeType','')
+            ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
+            ret_dict['Status'] = 'OK'
+            theLogger.info(ret_dict)
 
-            # retV =  HttpResponse(json.dumps(ret_dict,ensure_ascii=False),content_type="application/json,charset=utf-8")
-            retV = JsonResponse({'Status':'OK'}, safe=True)
+            mfile = MediaFile.objects.create(name=ret_dict['filename'], mime_type=ret_dict['mimeType'])
+            theLogger.info(mfile)
+
+            retV = JsonResponse(ret_dict, safe=True)
             theLogger.info(retV.__dict__) #print it
             return   retV
 
