@@ -170,9 +170,9 @@ class AliOssCallBack(APIView):
             theLogger.info(request.POST)
             data = request.data
             ret_dict = {}
-            ret_dict['filename'] = data.get('filename', '')
-            ret_dict['mimeType'] = data.get('mimeType','')
-            ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
+            ret_dict['x:filename'] = data.get('filename', '')
+            ret_dict['x:mimeType'] = data.get('mimeType','')
+            ret_dict['x:signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
             ret_dict['Status'] = 'OK'
             theLogger.info(ret_dict)
 
