@@ -165,7 +165,7 @@ class AliOssCallBack(APIView):
 
             auth = request.META.get('Authorization')
             theLogger.info(auth)
-            theLogger.info(request)
+            theLogger.info(request.__dict__)
             theLogger.info(request.headers)
             theLogger.info(request.POST)
             data = request.data
