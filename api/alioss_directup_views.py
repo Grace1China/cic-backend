@@ -172,7 +172,11 @@ class AliOssCallBack(APIView):
             ret_dict = {}
             ret_dict['x:filename'] = data.get('filename', '')
             ret_dict['x:mimeType'] = data.get('mimeType','')
-            ret_dict['x:signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
+            if data.get('mimeType','').lower().find('mp4') >= 0 : #如果是mp4文件，要年原文件有没有， 其它类型都是在目标存储桶中
+                ret_dict['x:signedurl'] = CICUtill.signurl(key=data.get('filename', ''),whichbucket='source')
+            else:
+                ret_dict['x:signedurl'] = CICUtill.signurl(key=data.get('filename', ''),whichbucket='destination')
+
             ret_dict['Status'] = 'OK'
             theLogger.info(ret_dict)
 

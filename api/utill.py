@@ -29,6 +29,9 @@ class CICUtill():
         # obj = str.replace(obj, '%s/' % settings.ALIOSS_DESTINATION_ENDPOINT,'')
         return obj
     def signurl(key='', whichbucket='source'):
+        '''
+        如果不在指定的bucket 报异常， 如果key没有，也会返回一个签名的url.但无法访问。
+        '''
         key = CICUtill. getObjectKey(key)
         if whichbucket == 'destination':
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
