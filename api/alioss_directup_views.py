@@ -192,7 +192,7 @@ class AliOssCallBack(APIView):
             #logger = logging.getLogger('church.all')
             theLogger.exception("there is an exception",exc_info=True,stack_info=True)
         finally:
-            return JsonResponse({'Status':'OK'}, safe=False) 
+            return JsonResponse({'Status':'Cancel'}, safe=False) 
 
 
 
