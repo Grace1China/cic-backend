@@ -231,6 +231,8 @@ function UploaderFactory(
         
                 FilesAdded: function(up, files) {
                     plupload.each(files, function(file) {
+                        console.log('----------FilesAdded-----------')
+                        console.log(file)
                         loc_ossfile.innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ')<b></b>'
                         +'<div class="progress"><div class="progress-bar" style="width: 0%"></div></div>'
                         +'</div>';
@@ -239,12 +241,16 @@ function UploaderFactory(
                 },
         
                 BeforeUpload: function(up, file) {
+                    console.log('----------BeforeUpload-----------')
+                    console.log(file)
                     
                     check_object_radio();
                     set_upload_param(up, file.name, true);
                 },
         
                 UploadProgress: function(up, file) {
+                    console.log('----------BeforeUpload-----------')
+                    console.log(file)
                     var d = document.getElementById(file.id);
                     d.getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
                     var prog = d.getElementsByTagName('div')[0];
@@ -255,6 +261,7 @@ function UploaderFactory(
         
                 FileUploaded: function(up, file, info) {
                     // filename = file.name.replace(' ','')
+                    console.log('---FileUploaded-file---------')
                     console.log(file)
                     console.log(info)
                     console.log(up)
@@ -264,16 +271,16 @@ function UploaderFactory(
 
                     if (info.status == 200)
                     {
-                        document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${(res.signedurl)}">${(res.filename)}</a>`     
-                        loc_fileurl.value =`${(res.filename)}`//key
-                        loc_ossfile.href =`${(res.signedurl)}`//签名url
-                        loc_ossfile.innerText  =`${(res.filename)}`
+                        // document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = `<a href="${(res.signedurl)}">${(res.filename)}</a>`     
+                        // loc_fileurl.value =`${(res.filename)}`//key
+                        // loc_ossfile.href =`${(res.signedurl)}`//签名url
+                        // loc_ossfile.innerText  =`${(res.filename)}`
 
-                        if ((document.getElementsByName('title')[0].value||'')==''){
-                            var thefn = res.filename.replace(/^.*\//g,'').replace(/\..*$/,'')//这里是为了去掉目录和文件扩展名
-                            document.getElementsByName('title')[0].value = (thefn)
-                        }
-                        // document.getElementsByName('_continue')[0].click()
+                        // if ((document.getElementsByName('title')[0].value||'')==''){
+                        //     var thefn = res.filename.replace(/^.*\//g,'').replace(/\..*$/,'')//这里是为了去掉目录和文件扩展名
+                        //     document.getElementsByName('title')[0].value = (thefn)
+                        // } 这个title 不知道做什么用的，所以先注释掉
+                        // // document.getElementsByName('_continue')[0].click()
                     }
                     else if (info.status == 203)
                     {

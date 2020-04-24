@@ -23,104 +23,6 @@ lg = logging.getLogger('church.all')
 
 
 
-
-
-# def get_upload_filename(upload_name, request):
-#     user_path = storage._get_user_path(request.user)
-
-#     # Generate date based path to put uploaded file.
-#     # If CKEDITOR_RESTRICT_BY_DATE is True upload file to date specific path.
-#     if getattr(settings, 'CKEDITOR_RESTRICT_BY_DATE', True):
-#         date_path = datetime.now().strftime('%Y/%m/%d')
-#     else:
-#         date_path = ''
-
-#     # Complete upload path (upload_path + date_path).
-#     upload_path = os.path.join(
-#         settings.CKEDITOR_UPLOAD_PATH, user_path, date_path
-#     )
-
-#     lg.info('(%s,%s,%s)' % (settings.CKEDITOR_UPLOAD_PATH, user_path, date_path))
-
-#     if (getattr(settings, 'CKEDITOR_UPLOAD_SLUGIFY_FILENAME', True) and
-#             not hasattr(settings, 'CKEDITOR_FILENAME_GENERATOR')):
-#         upload_name = utils.slugify_filename(upload_name)
-
-#     if hasattr(settings, 'CKEDITOR_FILENAME_GENERATOR'):
-#         generator = import_string(settings.CKEDITOR_FILENAME_GENERATOR)
-#         # Does the generator accept a request argument?
-#         try:
-#             inspect.getcallargs(generator, upload_name, request)
-#         except TypeError:
-#             # Does the generator accept only an upload_name argument?
-#             try:
-#                 inspect.getcallargs(generator, upload_name)
-#             except TypeError:
-#                 warnings.warn(
-#                     "Update %s() to accept the arguments `filename, request`."
-#                     % settings.CKEDITOR_FILENAME_GENERATOR
-#                 )
-#             else:
-#                 warnings.warn(
-#                     "Update %s() to accept a second `request` argument."
-#                     % settings.CKEDITOR_FILENAME_GENERATOR,
-#                     PendingDeprecationWarning
-#                 )
-#                 upload_name = generator(upload_name)
-#         else:
-#             upload_name = generator(upload_name, request)
-
-#     return storage.get_available_name(
-#         os.path.join(upload_path, upload_name)
-#     )
-
-
-# class ImageUploadView(generic.View):
-#     http_method_names = ['post']
-
-#     def post(self, request, **kwargs):
-#         """
-#         Uploads a file and send back its URL to CKEditor.
-#         """
-#         uploaded_file = request.FILES['upload']
-
-#         backend = registry.get_backend()
-
-#         ck_func_num = request.GET.get('CKEditorFuncNum')
-#         if ck_func_num:
-#             ck_func_num = escape(ck_func_num)
-
-#         filewrapper = backend(storage, uploaded_file)
-#         allow_nonimages = getattr(settings, 'CKEDITOR_ALLOW_NONIMAGE_FILES', True)
-#         # Throws an error when an non-image file are uploaded.
-#         if not filewrapper.is_image and not allow_nonimages:
-#             return HttpResponse("""
-#                 <script type='text/javascript'>
-#                 window.parent.CKEDITOR.tools.callFunction({0}, '', 'Invalid file type.');
-#                 </script>""".format(ck_func_num))
-
-#         filepath = get_upload_filename(uploaded_file.name, request)
-#         lg.info('save filepath:%s' % filepath)
-#         saved_path = filewrapper.save_as(filepath)
-
-#         url = utils.get_media_url(saved_path)
-
-#         if ck_func_num:
-#             # Respond with Javascript sending ckeditor upload url.
-#             return HttpResponse("""
-#             <script type='text/javascript'>
-#                 window.parent.CKEDITOR.tools.callFunction({0}, '{1}'); 
-#             </script>""".format(ck_func_num, url))
-#         else:
-#             _, filename = os.path.split(saved_path)
-#             retdata = {'url': url, 'uploaded': '1',
-#                        'fileName': filename}
-#             return JsonResponse(retdata)
-
-
-# upload = csrf_exempt(ImageUploadView.as_view())
-
-
 from churchs.models import SermonSeries
 
 def browse(request):
@@ -133,33 +35,25 @@ def browse(request):
     dirs = list()
     for i in ls_res_path:
         dirs.append(i['res_path'])
-    # if request.method == 'POST':
-    #     form = SearchForm(request.POST)
-    #     if form.is_valid():
-    #         query = form.cleaned_data.get('q', '').lower()
-    #         files = list(filter(lambda d: query in d[
-    #             'visible_filename'].lower(), files))
-    # else:
-    #     form = SearchForm()
-    
+  
+    from api.alioss_directup_views import AliOssSignature
+    token = AliOssSignature.cls_get_token('L3')
+    lg.info(token)
 
-    # show_dirs = getattr(settings, 'MEDIA_BROWSE_SHOW_DIRS', False)
-    # dir_list = sorted(set(os.path.dirname(f['src'])
-    #                       for f in files), reverse=True)
+    # {"accessid": "LTAI4Fd1JMHM3WSUN4vrHcj8", "host": "https://bicf-media-source.oss-accelerate.aliyuncs.com", "desthost": "https://bicf-media-destination.oss-accelerate.aliyuncs.com", "policy": "eyJleHBpcmF0aW9uIjogIjIwMjAtMDQtMThUMDc6NDc6NDlaIiwgImNvbmRpdGlvbnMiOiBbWyJzdGFydHMtd2l0aCIsICIka2V5IiwgIkwzIl1dfQ==", "signature": "cnmgjhxg5wo65PuGU58/UlT/7No=", "expire": 1587196069, "dir": "L3/", "callback": "eyJjYWxsYmFja1VybCI6ICJodHRwOi8vdGVzdC5sMy5iaWNmLm9yZy9yYXBpL2FsaW9zc19kaXJlY3R1cF9jYWxsYmFjayIsICJjYWxsYmFja0JvZHkiOiAiZmlsZW5hbWU9JHtvYmplY3R9JnNpemU9JHtzaXplfSZtaW1lVHlwZT0ke21pbWVUeXBlfSZoZWlnaHQ9JHtpbWFnZUluZm8uaGVpZ2h0fSZ3aWR0aD0ke2ltYWdlSW5mby53aWR0aH0iLCAiY2FsbGJhY2tCb2R5VHlwZSI6ICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQifQ=="}
 
-    # Ensures there are no objects created from Thumbs.db files - ran across
-    # this problem while developing on Windows
-    # if os.name == 'nt':
-    #     files = [f for f in files if os.path.basename(f['src']) != 'Thumbs.db']
-
-    # dirs.add(storage._get_user_path(request.user)) # dirs 是所有遍历中找到的dir, 而user_path是指定的，所以这里加上
     context = {
         'show_dirs': True,
         'dirs': dirs,
         'files': files,
         'form': None ,#form
         'MEDIA_BROWSE_API_SERVER':settings.MEDIA_BROWSE_API_SERVER,
-        'rediret_url_prefix':settings.ALIOSS_DESTINATIONS[typ]['redirecturl']
+        'rediret_url_prefix':settings.ALIOSS_DESTINATIONS[typ]['redirecturl'],
+        'OSSAccessKeyId': token['accessid'],
+        'policy': token['policy'],
+        'Signature': token['signature'],
+        'callback': token['callback'],
+
     }
     lg.info(context)
     return render(request, 'church/media_browse.html', context)

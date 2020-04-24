@@ -6,8 +6,12 @@
         <title>CKEditor | {% trans "Select an image to embed" %}</title>
      
         <link rel="stylesheet" href="{% static "church/css/dialog.css" %}" type="text/css" />
+        {% comment %} <link rel="stylesheet" href="//unpkg.com/element-ui@2.0.11/lib/theme-chalk/index.css" type="text/css" /> {% endcomment %}
+        
+        
 
-        <link rel="stylesheet" href="{% static "church/css/ele_index.css" %}" type="text/css" />
+        <link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
+
         <link rel="stylesheet" href="{% static "church/css/ossstyle.css" %}" type="text/css" />
 
 
@@ -30,12 +34,12 @@
                 
             }
             .image_check{
-                width: 145px;
-                height: 170px !important;
+                width: 134px;
+                height: 145px !important;
             }
             .image {
                 width: 125px;
-                height: 125px;
+                height: 100px;
                 display: block;
             }
             .el-checkbox__inner{
@@ -47,20 +51,36 @@
                 padding:0;
             }
             .imagetitle{
-                width:135px;
+                width:128px;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
+                margin-top:10px;
             }
-            .toolbar{
-                display:inline-flex;
+            .toolbar {
+                display: inline-flex;
+                width: 100%;
+                justify-content: space-between;
+                margin: 15 0 0;
             }
+            .el-icon-upload{
+                line-height:unset;
+            }
+            .el-upload--picture-card{
+                position: fixed;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+                width: fit-content;
+            }
+            
                 
         </style>
     </head>
     <body>
-        <div id="page">
-            <div id="container" style="width: 880px">
+        <el-container id="page">
+            <el-header>
                 <div class="toolbar">
                     <div id="search">
                         {% if show_dirs %}
@@ -87,93 +107,85 @@
                         <el-button type="primary" icon="el-icon-arrow-left" @click=prev(curdir)>第一页</el-button>
                         <el-button type="primary" @click=next(curdir)>下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
                     </el-button-group>
+                    <el-button type="primary" @click="goTab('upload')">上传upload<i class="el-icon-upload"></i></el-button>
                 </div>
-                
-
-                <el-tabs v-model="activeName" :tab-position="'right'" @tab-click="handleClick">
-                    <el-tab-pane label="图片" name="image">
-                        <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
-                            <el-col :span="4" v-for="jj in 6" >
-                                <el-checkbox 
-                                    v-if=" (theImage(ii,jj).src||'') != '' "
-                                    label="备选项1" 
-                                    border class="image_check"
+            </el-header>
+            <el-container id="container">
+                <el-main>
+                    <el-tabs v-model="activeName" :tab-position="'left'" @tab-click="handleClick">
+                        <el-tab-pane label="图片" name="image">
+                            <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
+                                <el-col :span="4" v-for="jj in 6" :key="jj">
+                                    <el-checkbox 
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        label="备选项1" 
+                                        border class="image_check"
+                                    >
+                                        <img 
+                                            :src=`${theImage(ii,jj).thumb}/wh100_auto` 
+                                            :data-src=`${theImage(ii,jj).src}` class="image">
+                                            <div class="imagetitle">
+                                                [[ theImage(ii,jj).visible_filename ]]
+                                            </div>
+                                    </el-checkbox>
+                                </el-col>
+                            </el-row>
+                        </el-tab-pane>
+                        <el-tab-pane label="影片" name="video">视频</el-tab-pane>
+                        <el-tab-pane label="音乐" name="audio">音频</el-tab-pane>
+                        <el-tab-pane label="上传" name="upload">
+                            <el-upload
+                                class="upload"
+                                ref="upload"
+                                :with-credentials="true"
+                                action=""
+                                list-type="picture-card"
+                                :auto-upload='false'
+                                :before-upload="onbeforeUpload"
+                                :on-progress="onprogress"
+                                :on-change="onchange"
+                                :on-error="onerror"
+                                :on-success="onsuccess"
+                                :on-remove="onremove"
+                                :on-preview="handlePictureCardPreview"
+                                :on-exceed="onexceed"
+                                :show-file-list="true"
+                                :http-request="diyUpload"
+                                :limit="10"
+                                multiple
+                                drag
                                 >
-                                    <img 
-                                        :src=`${theImage(ii,jj).thumb}/wh100_auto` 
-                                        :data-src=`${theImage(ii,jj).src}` class="image">
-                                        <div class="imagetitle">
-                                            [[ theImage(ii,jj).visible_filename ]]
-                                        </div>
-                                </el-checkbox>
-                            </el-col>
-                        </el-row>
-                    </el-tab-pane>
-                    <el-tab-pane label="影片" name="video">视频</el-tab-pane>
-                    <el-tab-pane label="音乐" name="audio">音频</el-tab-pane>
-                    <el-tab-pane label="上传" name="uplaod">
-                        {% comment %} <el-upload
-                            class="upload-demo"
-                            drag
-                            action="https://jsonplaceholder.typicode.com/posts/"
-                            multiple>
-                            <i class="el-icon-upload"></i>
-                            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                            <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-                        </el-upload> {% endcomment %}
+                                <i class="el-icon-upload"></i>
+                            </el-upload> 
+                            <el-button style="margin-left: 10px;float:right;" size="small" type="success" @click="submitUpload"
+                                :disabled="!filePrepared"
+                            >
+                                把这些文件上传到服务器
+                            </el-button>
 
-                        <div id="uploadcontrol">
-                            <div class="ossfile"></div>
-                            <div class='preview'></div>
-                            <input type="hidden" value="public" name="nouse"/>
-                            <pre class="console"></pre>
-                            <div class="container" style="text-align: center;">
-                                <el-button type="default"  class="selectfiles"  plain>本地上传(Upload from my files)<i class="el-icon-upload el-icon--right"></i></el-button>
-                                <input class="file-url fileurl" name="name" type="hidden" value="file_url" />
-                                <input class='x-oss-object-acl' type='hidden' value = 'public-read'/>
-                            </div>
+                            <el-dialog :visible.sync="dialogVisible" size="tiny">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
                             
-                        </div>
-                    </el-tab-pane>
-                </el-tabs>
-               
-                
-                
-                <div style="clear: both;"></div>
-            </div>
-        </div>
+                            <el-alert 
+                                :title="errorMsg"
+                                type="error"
+                                :closable="false"
+                                :style="{ display: errorDisplay }"
+                            >
+                            </el-alert>
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-main>
+            </el-container>
+        </el-container>
+
         <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
-        <script type="text/javascript" src="{% static "church/js/ele_index.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/simpleui-x/elementui/index.js" %}"></script>
         <script type="text/javascript" src="{% static "church/js/es6-promise.auto.js" %}"></script>
         <script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
         <script type="text/javascript" src="{% static "church/js/store.js" %}"></script>
         <script type="text/javascript" src="{% static "church/js/axios.min.js" %}"></script>
-
-        <script type="text/javascript" src="{% static 'church/js/lib/plupload-2.1.2/js/plupload.full.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'church/js/ossupload.js' %}?v={{ now |timeticks }}"></script>
-     
-        <script>
-            document.addEventListener('DOMContentLoaded',function(){
-                console.log('-----------formset:added--------------')
-                upit = document.getElementById('uploadcontrol')
-                preview = upit.getElementsByClassName('preview')[0] 
-
-                selectfiles = upit.getElementsByClassName('selectfiles')[0] 
-                container = upit.getElementsByClassName('container')[0]
-                ossfile = upit.getElementsByClassName('ossfile')[0] 
-                postfiles = upit.getElementsByClassName('postfiles')[0] 
-
-                pconsole = upit.getElementsByClassName('console')[0] 
-                myradio = upit.getElementsByClassName('myradio')[0] 
-                fileurl = upit.getElementsByClassName('fileurl')[0] 
-                selectfiles = upit.getElementsByClassName('selectfiles')[0] 
-                acl = upit.getElementsByClassName('x-oss-object-acl')[0]
-                var upfact = UploaderFactory(selectfiles,container,ossfile,postfiles,pconsole,myradio,fileurl,acl);
-                upfact().init()
-            })
-            
-        </script>
-
 
         <script>
             Vue.config.delimiters = ["[[", "]]"];
@@ -183,6 +195,13 @@
                     return {
                         curdir: '{{ dirs.0 }}',
                         activeName: 'image',
+                        dialogImageUrl: '',
+                        dialogVisible: false,
+                        errorDisplay:'none',
+                        errorMsg:'',
+                        filePrepared:false,
+                        progressPercent:0,
+                        fileArr:[],
                     }
                 },
                 computed: {
@@ -192,7 +211,6 @@
                     images(){
                         return store.state.images||[]
                     },
-                   
                 },
                 store,
                 mounted: function (){
@@ -234,9 +252,163 @@
                         //    }
                         //}
                     },
+                    goTab(page){
+                        this.activeName = page
+                    },
                     handleClick(tab, event) {
                         console.log(tab, event);
                     },
+                    onbeforeUpload(file){
+                        console.log('--------onbeforeUpload----------')
+                        console.log(file)
+                    },
+                    onprogress(e, rawFile,fileList){
+                        console.log('-------onprogress---------')
+                        console.log(e)
+                        console.log(rawFile)
+
+                        this.fileArr = fileList
+                        this.fileArr.forEach(item=>{
+                            if (item.percentage == 100) {
+
+                            } else {
+                                item.progressFlag = true
+                                item.progressPercent = Math.abs(item.percentage.toFixed(0));
+                            }
+                        })
+                        
+                        /*file = this.$refs.upload.getFile(rawFile)
+
+                        file.status = 'uploading';
+                        file.percentage = this.progressPercent = parseInt(((e.percent || 0) *100).toFixed(2));
+                        console.log(file)
+                        console.log(file.percentage)
+                        console.log(app.$refs.upload.uploadFiles)
+                        app.$set(files,rawFile,files[files.indexOf(rawFile)])*/
+                    },
+                    onchange(e,fileList){
+                        console.log('-------onchange---------')
+                        console.log(e)
+                        console.log(fileList)
+
+                        this.errorDisplay = 'none'
+                        this.errorMsg=''
+
+                        if(!e.raw.type.match('image/')){
+                            if(e.raw.type.match('video/')){
+                                e.url="/static/church/img/vidoe.jpg"
+                            } else if(e.raw.type.match('audio/')){
+                                e.url="/static/church/img/audio.jpg"
+                            } else{
+                                e.url="/static/church/img/document.jpg"   
+                            }
+                        }
+                        this.filePrepared = false
+                        
+                        fileList.forEach((item,index)=>{
+                            if(item.status == 'ready'){
+                                this.filePrepared = true
+                            }
+                        })
+                        if (fileList.length <= 0){
+                            this.filePrepared = false
+                        }
+                        //"success" "ready" "uploading" "fail"
+                    },
+                    onerror(e,f){
+                        console.log('-------onerror---------')
+                        console.log(e)
+                        console.log(f)
+                    },
+                    onsuccess(e,f,fileList){
+                        console.log('-------onsuccess---------')
+                        console.log(e)
+                        console.log(f)
+                        this.fileArr = fileList
+                        this.fileArr.forEach((item,index)=>{
+                            item.progressFlag = false
+                            if(item.status == 'success'){
+                                item.successFlag = true
+                            }else{
+                                item.successFlag = false
+                            }
+                        })
+                    },
+                    onremove(e,f){
+                        console.log('-------onremove---------')
+                        console.log(e)
+                        console.log(f)
+                        
+                        if (f.length <= 0){
+                            this.filePrepared = false
+                        }
+                        //this.fileArr.splice(f,1)
+                    },
+                    removeFile(item,index){
+                        this.fileArr.splice(f,index)
+                    },
+                    onpreview(e,f){
+                        console.log('-------onpreview---------')
+                        console.log(e)
+                        console.log(f)
+                    },
+                    onexceed(e,f){
+                        console.log('-------onexceed---------')
+                        console.log(e)
+                        console.log(f)
+                        if((e||[]).length >10){
+                            this.errorDisplay = 'block'
+                            this.errorMsg = `最多只能一次加入10个文件，现在有${e.length}请重新选择。`
+                        }else{
+                            this.errorDisplay = 'none'
+                            this.errorMsg=''
+                        }
+                    },
+                    submitUpload() {
+                        //console.log(file)
+                        
+                        //return true
+                        console.log('--------submitUpload---------------')
+                        this.$refs.upload.submit();
+                    },
+                    //handleRemove(file, fileList) {
+                    //    console.log(file, fileList);
+                    //},
+                    handlePictureCardPreview(file) {
+                        this.dialogImageUrl = file.url;
+                        this.dialogVisible = true;
+                    },
+                    parsePercentage(val) {
+                        return parseInt(val, 10);
+                    },
+                    S4() {
+                        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+                    },
+                    guid() {
+                        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+                    },
+                    diyUpload(params) {
+                        const file = params.file,
+                            fileType = file.type,
+                            isImage = fileType.indexOf("image") != -1,
+                            isLt2M = file.size / 1024 / 1024 < 2;
+                        console.log('-----------diyUpload------------')
+                        console.log(params)
+                        let fd = new FormData()
+                        fd.append('OSSAccessKeyId', '{{ OSSAccessKeyId }}')
+                        fd.append('policy', '{{ policy }}')
+                        fd.append('Signature', '{{ Signature }}')
+                        fd.append('callback', '{{ callback }}')
+                        fd.append('key', `L3/${guid()}`)
+                        fd.append('x:originname', file.name)
+                        fd.append('file', file)
+
+                        option = {
+                            'f':fd,
+                            'uploader':params
+                        }
+                        return store.dispatch('upload2oss',option)
+                    } 
                 },
                 delimiters: ["[[","]]"]
             });

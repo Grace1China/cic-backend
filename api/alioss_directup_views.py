@@ -41,11 +41,80 @@ class AliOssSignature(APIView):
     def get_datetime_prefix(self):
         return dt.strftime('%Y%m%d%H%M%S%f')
          
-
+    @classmethod
     def get_iso_8601(self,expire):
         gmt = datetime.datetime.utcfromtimestamp(expire).isoformat()
         gmt += 'Z'
         return gmt
+
+
+    
+    @classmethod
+    def cls_get_token(cls,user_path):
+        '''
+        因为一个教会所有用户共享目录，所以user_path就是church的根目录。也就是church code
+        '''
+        try:
+            theLogger.info('---------cls_get_token-----')
+            now = int(time.time())
+            expire_syncpoint = now + 30000
+            # expire_syncpoint = 1612345678
+            expire = AliOssSignature.get_iso_8601(expire_syncpoint)
+
+            policy_dict = {}
+            policy_dict['expiration'] = expire
+            condition_array = []
+            # array_item = []
+            
+            # array_item.append('starts-with')
+            # array_item.append('$key')
+            # # if (request.user.church == None):
+            #     # import pprint
+            #     # pprint.PrettyPrinter(6).pprint(request.user)
+            #     # raise Exception('user or church of user is null')
+            # array_item.append(user_path)
+            condition_array.append({"bucket":"bicf-media-destination"})
+            policy_dict['conditions'] = condition_array
+            policy = json.dumps(policy_dict).strip()
+            theLogger.info(policy)
+            policy_encode = base64.b64encode(policy.encode())
+            h = hmac.new(AliOssSignature.access_key_secret.encode(), policy_encode, sha)
+            sign_result = base64.encodestring(h.digest()).strip()
+
+            callback_dict = {}
+            callback_dict['callbackUrl'] = AliOssSignature.callback_url
+            callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
+                                            '&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}'
+            callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded'
+
+            #import logging
+            # theLogger.info(callback_dict)
+            callback_param = json.dumps(callback_dict).strip()
+            base64_callback_body = base64.b64encode(callback_param.encode())
+
+            token_dict = {}
+            token_dict['accessid'] = AliOssSignature.access_key_id
+            token_dict['host'] = AliOssSignature.host
+            token_dict['desthost'] = AliOssSignature.desthost
+            token_dict['policy'] = policy_encode.decode()
+            token_dict['signature'] = sign_result.decode()
+            token_dict['expire'] = expire_syncpoint
+            # token_dict['datetime_prefix'] = self.get_datetime_prefix()
+            # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
+
+            # if request.user.church == None:
+            #     token_dict['dir'] = 'l3/'
+            # else:
+            token_dict['dir'] = '%s/' % user_path
+
+
+            token_dict['callback'] = base64_callback_body.decode()
+            return token_dict
+
+        except Exception as e:
+            theLogger.exception("there is an exception",exc_info=True,stack_info=True)
+            raise e
+      
 
 
     def get_token(self,request):
@@ -56,7 +125,7 @@ class AliOssSignature(APIView):
             now = int(time.time())
             expire_syncpoint = now + self.expire_time
             # expire_syncpoint = 1612345678
-            expire = self.get_iso_8601(expire_syncpoint)
+            expire = AliOssSignature.get_iso_8601(expire_syncpoint)
 
             policy_dict = {}
             policy_dict['expiration'] = expire
@@ -176,11 +245,18 @@ class AliOssCallBack(APIView):
                 ret_dict['signedurl'] = CICUtill.signurl(key=data.get('filename', ''),whichbucket='source')
             else:
                 ret_dict['signedurl'] = CICUtill.signurl(key=data.get('filename', ''),whichbucket='destination')
+            
+            ret_dict['originname'] = data.get('x:originname','')
+
 
             ret_dict['Status'] = 'OK'
             theLogger.info(ret_dict)
-
-            mfile = MediaFile.objects.create(name=data.get('filename', ''), mime_type=data.get('mimeType',''))
+            # aMediaFile = MediaFile.objects.filter(name=data.get('filename', ''))
+            key = data.get('filename', '')
+            if key:
+                arrkey = key.split('/',1)
+            
+            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=arrkey[1],originname=data.get('x:originname',''), mime_type=data.get('mimeType',''))
             theLogger.info(mfile)
 
             retV = JsonResponse(ret_dict, safe=True)
