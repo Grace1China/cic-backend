@@ -13,14 +13,11 @@ from django.contrib.auth.decorators import login_required,permission_required,us
 from django.contrib.auth.models import Group
 #----------------------------v1---------------------------------------------------------
 
-user_create = CustomUserViewSet.as_view({
-    'post': 'register'
-})
-
-user_getInfo = CustomUserViewSet.as_view({'get':'getInfo'})
-
-#-------login-------
+#-------register----login-------
+user_register = CustomUserViewSet.as_view({'post': 'register'})
+# user_getInfo = CustomUserViewSet.as_view({'get':'getInfo'})
 user_login = CustomUserViewSet.as_view({'post':'login'})
+generate_verify_code = CustomUserViewSet.as_view({'post':'generateVerifyCode'})
 
 #----userInfo----new---zk-----
 user_getUserInfo = CustomUserInfoViewSet.as_view({'get':'getUserInfo'})
@@ -60,7 +57,6 @@ lorddayinfolist = SermonListViewSet.as_view({'get':'GetLordsDayInfoList'})
 lorddayinfoByID = SermonViewOneSet.as_view({'get':'GetLordsDayInfoByID'})
 
 urlpatterns = [
-    path("user_create",csrf_exempt(user_create),name="user_create"),
     # path("user_getInfo/<str:email>",csrf_exempt(user_getInfo),name="user_getInfo"),
 
     # path("userProfile/<int:pk>",userProfileDetailView.as_view(),name="userProfile"),
@@ -68,6 +64,8 @@ urlpatterns = [
     
     # path('info_getinfo/<path:path>', views.getinfo, name='getinfo'),
     # path('info_update/<path:path>', views.updateInfo, name='updateinfo'),
+    path("users/generateverifycode",generate_verify_code,name="users_generateVerifyCode"),
+    path("users/register",csrf_exempt(user_register),name="user_register"),
     path("users/login",user_login,name="users_login"),
     path("users/getuserinfo",user_getUserInfo,name="users_getUserInfo"),
     path("users/updateuserinfo",user_updateUserInfo,name="users_updateUserInfo"),

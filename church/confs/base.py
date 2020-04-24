@@ -36,6 +36,15 @@ AUTH_USER_MODEL = 'users.CustomUser'
 SIMPLEUI_HOME_INFO = False
 # Application definition
 
+#Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.office365.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'churchplatform@bicf.org'
+EMAIL_HOST_PASSWORD = '2wsx@WSX'
+DEFAULT_FROM_EMAIL = 'churchplatform@bicf.org'
+
 X_FRAME_OPTIONS = 'SAMEORIGIN' 
 
 
