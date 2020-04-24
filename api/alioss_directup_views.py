@@ -14,6 +14,7 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 import oss2
+from oss2.models import Tagging, TaggingRule
 from rest_framework.decorators import api_view, authentication_classes,permission_classes
 from rest_framework.permissions import IsAuthenticated,AllowAny
 import logging
@@ -84,7 +85,7 @@ class AliOssSignature(APIView):
             callback_dict = {}
             callback_dict['callbackUrl'] = AliOssSignature.callback_url
             callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
-                                            '&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}'
+                                            '&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}&dest=${x:dest}'
             callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded'
 
             #import logging
@@ -256,8 +257,22 @@ class AliOssCallBack(APIView):
             if key:
                 arrkey = key.split('/',1)
             
-            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=arrkey[1],originname=data.get('x:originname',''), mime_type=data.get('mimeType',''))
+            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=arrkey[1],origin_name=data.get('x:originname',''), mime_type=data.get('mimeType',''),endpoint=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'],bucket=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
             theLogger.info(mfile)
+
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'], settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
+
+            rule = TaggingRule()
+            rule.add('originname', data.get('x:originname',''))
+
+            # 创建标签。
+            tagging = Tagging(rule)
+
+            # 设置标签。
+            result = bucket.put_object_tagging(data.get('filename', ''), tagging)
+            # 查看HTTP返回码。
+            theLogger('http response status:', result.status)
 
             retV = JsonResponse(ret_dict, safe=True)
             theLogger.info(retV.__dict__) #print it

@@ -106,7 +106,12 @@ class MediaFile(models.Model):
     id = models.AutoField(primary_key=True)
     # church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     # user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
-    name = models.CharField(max_length=200, default='',unique=True,verbose_name='oss存储key')
+    name = models.CharField(max_length=200, default='',unique=True,verbose_name='oss存储key GUID')
+    origin_name = models.CharField(max_length=200, default='',verbose_name='媒体原有文件名')
+    endpoint = models.CharField(max_length=200, default='',verbose_name='桶地址')
+    bucket = models.CharField(max_length=200, default='',verbose_name='桶名称')
+
+
     church_prefix = models.CharField(max_length=200, default='L3',verbose_name='教会存储目录')
     mime_type = models.CharField(max_length=50, default='',verbose_name='媒体类型')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)

@@ -385,7 +385,7 @@
                         return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
                     },
                     guid() {
-                        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+                        return (this.S4()+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+this.S4()+this.S4());
                     },
                     diyUpload(params) {
                         const file = params.file,
@@ -399,8 +399,9 @@
                         fd.append('policy', '{{ policy }}')
                         fd.append('Signature', '{{ Signature }}')
                         fd.append('callback', '{{ callback }}')
-                        fd.append('key', `L3/${guid()}`)
-                        fd.append('x:originname', file.name)
+                        fd.append('key', `L3/${this.guid()}`)//这个是oss中的key,随机
+                        fd.append('x:originname', file.name)//文件原有名称 x是自定义oss回调变量
+                        fd.append('x:dest', {{ type }})//所属的文件目标桶类型
                         fd.append('file', file)
 
                         option = {
