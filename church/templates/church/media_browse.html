@@ -4,22 +4,9 @@
     <head>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
         <title>CKEditor | {% trans "Select an image to embed" %}</title>
-     
         <link rel="stylesheet" href="{% static "church/css/dialog.css" %}" type="text/css" />
-        {% comment %} <link rel="stylesheet" href="//unpkg.com/element-ui@2.0.11/lib/theme-chalk/index.css" type="text/css" /> {% endcomment %}
-        
-        
-
         <link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
-
         <link rel="stylesheet" href="{% static "church/css/ossstyle.css" %}" type="text/css" />
-
-
-      
-        
-        
-      
-
         <!-- We only want the thunbnails to display when javascript is disabled -->
         <script type="text/javascript">
             document.write('<style>.noscript { display: none; }</style>');
@@ -74,8 +61,6 @@
                 text-align: center;
                 width: fit-content;
             }
-            
-                
         </style>
     </head>
     <body>
@@ -86,14 +71,14 @@
                         {% if show_dirs %}
                             <el-select 
                                 v-model="curdir" 
-                                filterable placeholder="请选择"
+                                filterable placeholder="请选择专栏系列"
                                 @change="showImages"
                             >
-                                {% for dir in dirs %}
+                                {% for key,value in series.items %}
                                     <el-option
-                                        key="{{ dir }}"
-                                        label="{{ dir }}"
-                                        value="{{ dir }}">
+                                        key="{{ key }}"
+                                        label="{{ value }}-{{key}}"
+                                        value="{{ key }}">
                                     </el-option>
                                 {% endfor %}
                             </el-select>
@@ -248,7 +233,7 @@
                         //if (this.images.length > 0){
                         //    key = decodeURI(this.images[0].src).match('//.*?/(.*)')[1]
                         //    if( key ){
-                                 store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':''} )
+                        store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':''} )
                         //    }
                         //}
                     },
@@ -276,15 +261,6 @@
                                 item.progressPercent = Math.abs(item.percentage.toFixed(0));
                             }
                         })
-                        
-                        /*file = this.$refs.upload.getFile(rawFile)
-
-                        file.status = 'uploading';
-                        file.percentage = this.progressPercent = parseInt(((e.percent || 0) *100).toFixed(2));
-                        console.log(file)
-                        console.log(file.percentage)
-                        console.log(app.$refs.upload.uploadFiles)
-                        app.$set(files,rawFile,files[files.indexOf(rawFile)])*/
                     },
                     onchange(e,fileList){
                         console.log('-------onchange---------')
@@ -399,11 +375,11 @@
                         fd.append('policy', '{{ policy }}')
                         fd.append('Signature', '{{ Signature }}')
                         fd.append('callback', '{{ callback }}')
-                        fd.append('key', `L3/${this.guid()}`)//这个是oss中的key,随机
+                        fd.append('key', `L3${(this.curdir||'').length>1?'/'+this.curdir:''}/${this.guid()}`)//这个是oss中的key,随机
                         fd.append('x:originname', file.name)//文件原有名称 x是自定义oss回调变量
                         fd.append('x:dest', '{{ type }}')//所属的文件目标桶类型
+                        fd.append('x:seriesrespath', `${ this.curdir }`)
                         fd.append('file', file)
-
                         option = {
                             'f':fd,
                             'uploader':params

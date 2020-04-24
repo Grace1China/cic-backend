@@ -111,7 +111,7 @@ class MediaFile(models.Model):
     endpoint = models.CharField(max_length=200, default='',verbose_name='桶地址')
     bucket = models.CharField(max_length=200, default='',verbose_name='桶名称')
 
-
+    series_prefix = models.CharField(max_length=200, default='/',verbose_name='教会存储目录')
     church_prefix = models.CharField(max_length=200, default='L3',verbose_name='教会存储目录')
     mime_type = models.CharField(max_length=50, default='',verbose_name='媒体类型')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
