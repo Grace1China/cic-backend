@@ -140,20 +140,29 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
     #生成验证码
     @action(detail=True, methods=['POST'], format="json")
-    def generateVerifyCode(self, request):
+    def generateVerifyCode(self, request,modifypwd=False):
         '''
         生成验证码。
         '''
         try:
             data = self.request.data
-
+            
+            if data.get('modifypwd', modifypwd).lower() == 'true':
+                ismodifypwd = True
+            else:
+                ismodifypwd = False
+            
             email = data.get("email", None)
             if email is None or email == "":
                 return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
 
             existUser = self.get_queryset().filter(email=email).first()
-            if existUser is not None:
-                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "该账号已注册", 'sysErrMsg': ''}, safe=False)
+            if ismodifypwd:
+                if existUser is None:
+                    return JsonResponse({'errCode': '1001', 'data': None, 'msg': "该账号未注册", 'sysErrMsg': ''}, safe=False)
+            else:
+                if existUser is not None:
+                    return JsonResponse({'errCode': '1001', 'data': None, 'msg': "该账号已注册", 'sysErrMsg': ''}, safe=False)
             
             code = getVerifyCode()
             existVerifyCode = VerifyCode.objects.all().filter(email=email).first()
@@ -164,10 +173,17 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 existVerifyCode.verify_code = code
                 existVerifyCode.save()
             
+            if ismodifypwd:
+                title = "修改密码提示"
+                content = '请您在APP修改密码界面，输入以下验证码：' + code + ' 完成账户密码修改。\n若您没有注册教会平台，或没有申请修改密码，请忽略此信息。'
+            else:
+                title = '感谢您注册教会平台'
+                content = '请您在APP注册界面，输入以下验证码：' + code + ' 完成账户注册。\n若您没有注册教会平台，请忽略此信息。'
+                
             from django.core.mail import send_mail
             send_mail(
-                '感谢您注册教会平台',
-                '请您在APP注册界面，输入以下验证码：' + code + ' 完成账户注册。\n若您没有注册教会平台，请忽略此信息。',
+                title,
+                content,
                 'churchplatform@bicf.org',
                 [email],
                 fail_silently=False,
@@ -281,16 +297,26 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
             if user is None or user is AnonymousUser:
                 return JsonResponse({'errCode': '1001', 'msg': 'User not find', 'data': None}, safe=False)
     
-            oldpwd = request.data.get('oldpwd', None)
+            email = request.data.get("email", None)
+            verify_code = request.data.get('verify_code', None)
+
             newpwd = request.data.get('newpwd', None)
             confirmpwd = request.data.get('confirmpwd', None)
-            if oldpwd is None or oldpwd == "" or newpwd is None or newpwd == "" or confirmpwd is None or confirmpwd == "":
+            
+            if email is None or email == "" \
+                or verify_code is None or verify_code == "" \
+                or newpwd is None or newpwd == "" \
+                or confirmpwd is None or confirmpwd == "":
                 return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
     
-            if not user.check_password(oldpwd):
-                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "老密码输入错误", 'sysErrMsg': ''}, safe=False)
+            existVerifyCode = VerifyCode.objects.all().filter(email=email).first()
+            if existVerifyCode is None or existVerifyCode.verify_code != verify_code:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "验证码错误", 'sysErrMsg': ''}, safe=False)
+            
+            # if not user.check_password(oldpwd):
+            #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "老密码输入错误", 'sysErrMsg': ''}, safe=False)
             if newpwd != confirmpwd:
-                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "两次输入新密码不同", 'sysErrMsg': ''}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "两次输入的密码不同", 'sysErrMsg': ''}, safe=False)
             
             user.set_password(newpwd)
             user.save()
