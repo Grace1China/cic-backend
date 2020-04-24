@@ -401,7 +401,7 @@
                         fd.append('callback', '{{ callback }}')
                         fd.append('key', `L3/${this.guid()}`)//这个是oss中的key,随机
                         fd.append('x:originname', file.name)//文件原有名称 x是自定义oss回调变量
-                        fd.append('x:dest', {{ type }})//所属的文件目标桶类型
+                        fd.append('x:dest', '{{ type }}')//所属的文件目标桶类型
                         fd.append('file', file)
 
                         option = {

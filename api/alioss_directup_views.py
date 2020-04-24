@@ -247,7 +247,7 @@ class AliOssCallBack(APIView):
             else:
                 ret_dict['signedurl'] = CICUtill.signurl(key=data.get('filename', ''),whichbucket='destination')
             
-            ret_dict['originname'] = data.get('x:originname','')
+            ret_dict['originname'] = data.get('originname','')
 
 
             ret_dict['Status'] = 'OK'
@@ -257,14 +257,14 @@ class AliOssCallBack(APIView):
             if key:
                 arrkey = key.split('/',1)
             
-            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=arrkey[1],origin_name=data.get('x:originname',''), mime_type=data.get('mimeType',''),endpoint=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'],bucket=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
+            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=arrkey[0],origin_name=data.get('originname',''), mime_type=data.get('mimeType',''),endpoint=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'],bucket=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
             theLogger.info(mfile)
 
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'], settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
 
             rule = TaggingRule()
-            rule.add('originname', data.get('x:originname',''))
+            rule.add('originname', data.get('originname',''))
 
             # 创建标签。
             tagging = Tagging(rule)
