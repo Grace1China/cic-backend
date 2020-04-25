@@ -104,7 +104,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         
         #jwt method方案
         token = RefreshToken.for_user(existUser)
-        
+        theLogger.info("登陆：" + existUser + ",token:" + token)
         return JsonResponse({'errCode': '0',
                              'data': {"refresh": str(token), "access": str(token.access_token)},
                              'msg': "success"}, safe=False)
@@ -255,6 +255,7 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
             # if user is CustomUser: #判断不出来。
             szUser = CustomUser4Info(instance=user)
             ret = {'errCode': '0', 'msg': 'success', 'data': szUser.data}
+            theLogger.info(ret)
         except Exception as e:
             import traceback
             import sys
@@ -282,7 +283,7 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
             user.save()
 
             szUser = CustomUser4Info(instance=user)
-            
+            theLogger.info(szUser)
             return JsonResponse({'errCode': '0', 'data': szUser.data, 'msg': "success", 'sysErrMsg': ''}, safe=False)
         except Exception as e:
             return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
@@ -320,7 +321,7 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
             
             user.set_password(newpwd)
             user.save()
-    
+            theLogger.info(user)
             return JsonResponse({'errCode': '0', 'data': None, 'msg': "success", 'sysErrMsg': ''}, safe=False)
         except Exception as e:
             return JsonResponse({'errCode': '1001', 'msg': str(e), 'data': None}, safe=False)

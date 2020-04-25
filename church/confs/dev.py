@@ -47,6 +47,10 @@ DATABASES = {
         'PASSWORD': '11/28/2019',  # 密码
         'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
 
+        # 'USER': 'root',  # 用户名，可以自己创建用户
+        # 'PASSWORD': '',  # 密码
+        # 'HOST': '127.0.0.1',  # mysql服务所在的主机ip
+        
         'PORT': '3306',  # mysql服务端口
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",
