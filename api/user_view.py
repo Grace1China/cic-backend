@@ -80,34 +80,48 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(data=data)
             if serializer.is_valid():
                 serializer.save(church=theChurch,is_active=True)
+
+            logFormat(request, serializer.data)
             return JsonResponse({'errCode': '0', 'data': serializer.data}, safe=False)
 
         except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
 
     @action(detail=True, methods=['POST'], format="json")
     def login(self,request):
         
-        data = request.data
-        email = data.get("email", None)
-        password = data.get('password', None)
-
-        if email is None or email == "" or password is None or password == "":
-            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
-
-        existUser = self.get_queryset().filter(email=email).first()
-        if existUser is None:
-            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "账号未注册", 'sysErrMsg': ''}, safe=False)
-        
-        if not existUser.check_password(password):
-            return JsonResponse({'errCode': '1001', 'data': None, 'msg': "密码错误", 'sysErrMsg': ''}, safe=False)
-        
-        #jwt method方案
-        token = RefreshToken.for_user(existUser)
-        theLogger.info("登陆：" + existUser + ",token:" + token)
-        return JsonResponse({'errCode': '0',
-                             'data': {"refresh": str(token), "access": str(token.access_token)},
-                             'msg': "success"}, safe=False)
+        try:
+            
+            data = request.data
+            email = data.get("email", None)
+            password = data.get('password', None)
+    
+            if email is None or email == "" or password is None or password == "":
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ''}, safe=False)
+    
+            existUser = self.get_queryset().filter(email=email).first()
+            if existUser is None:
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "账号未注册", 'sysErrMsg': ''}, safe=False)
+            
+            if not existUser.check_password(password):
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "密码错误", 'sysErrMsg': ''}, safe=False)
+            
+            #jwt method方案
+            token = RefreshToken.for_user(existUser)
+            
+            logFormat(request,str(existUser) + ",token:" + str(token))
+    
+            return JsonResponse({'errCode': '0',
+                                 'data': {"refresh": str(token), "access": str(token.access_token)},
+                                 'msg': "success"}, safe=False)
+        except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
+            return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
         
         #httplib2 方案
         # import httplib2
@@ -189,10 +203,14 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 fail_silently=False,
             )
 
+            logFormat(request, "验证码已发送到邮箱")
             return JsonResponse({'errCode': '0', 'data': {"msg": "验证码已发送到邮箱"}, 'msg': "", 'sysErrMsg': ''},
                                 safe=False)
 
         except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             return JsonResponse({'errCode': '1001', 'msg': str(e), 'data': None}, safe=False)
         
     
@@ -255,7 +273,8 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
             # if user is CustomUser: #判断不出来。
             szUser = CustomUser4Info(instance=user)
             ret = {'errCode': '0', 'msg': 'success', 'data': szUser.data}
-            theLogger.info(ret)
+            
+            logFormat(request, str(ret))
         except Exception as e:
             import traceback
             import sys
@@ -283,9 +302,12 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
             user.save()
 
             szUser = CustomUser4Info(instance=user)
-            theLogger.info(szUser)
+            logFormat(request,szUser)
             return JsonResponse({'errCode': '0', 'data': szUser.data, 'msg': "success", 'sysErrMsg': ''}, safe=False)
         except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
 
     '''
@@ -321,9 +343,13 @@ class CustomUserInfoViewSet(viewsets.ModelViewSet):
             
             user.set_password(newpwd)
             user.save()
-            theLogger.info(user)
+            
+            logFormat(request,user)
             return JsonResponse({'errCode': '0', 'data': None, 'msg': "success", 'sysErrMsg': ''}, safe=False)
         except Exception as e:
+            import traceback
+            import sys
+            theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
             return JsonResponse({'errCode': '1001', 'msg': str(e), 'data': None}, safe=False)
 
 
@@ -339,7 +365,24 @@ def getVerifyCode():
 
     return capta
 
-
+def logFormat(request,msg):
+    result = "---> 请求：" + "路径：" + request.get_full_path() + "，From IP: " + request.META.get("HTTP_HOST")
+    if request.META.get("HTTP_AUTHORIZATION") is not None:
+        result = result + "，Header头 AUTHORIZATION:" + request.META.get("HTTP_AUTHORIZATION")
+    else:
+        result = result + "，Header头 AUTHORIZATION:"
+        
+    if request.method == "GET":
+        result = result + ",参数：" + str(request.GET) + ",响应:" + str(msg)
+        theLogger.info(result)
+        
+    elif request.method == "POST":
+        result = result + ",参数：" + str(request.data) + ",响应:" + str(msg)
+        theLogger.info(result)
+    else:
+        result = result + ",响应:" + str(msg)
+        theLogger.info(result)
+    
 
 
 
