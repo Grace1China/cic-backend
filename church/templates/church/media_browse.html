@@ -88,6 +88,7 @@
                             {{ form }}
                         </form> {% endcomment %}
                     </div>
+                   
                     <el-button-group>
                         <el-button type="primary" icon="el-icon-arrow-left" @click=prev(curdir)>第一页</el-button>
                         <el-button type="primary" @click=next(curdir)>下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
@@ -97,8 +98,8 @@
             </el-header>
             <el-container id="container">
                 <el-main>
-                    <el-tabs v-model="activeName" :tab-position="'left'" @tab-click="handleClick">
-                        <el-tab-pane label="图片" name="image">
+                    <el-tabs v-model="activeName" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
+                        <el-tab-pane label="图片" name="images">
                             <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
                                 <el-col :span="4" v-for="jj in 6" :key="jj">
                                     <el-checkbox 
@@ -107,8 +108,8 @@
                                         border class="image_check"
                                     >
                                         <img 
-                                            :src=`${theImage(ii,jj).thumb}/wh100_auto` 
-                                            :data-src=`${theImage(ii,jj).src}` class="image">
+                                            :src=`${theImage(ii,jj).thumb}` 
+                                            :data-src=`${theImage(ii,jj).src}` class="image"/>
                                             <div class="imagetitle">
                                                 [[ theImage(ii,jj).visible_filename ]]
                                             </div>
@@ -116,8 +117,42 @@
                                 </el-col>
                             </el-row>
                         </el-tab-pane>
-                        <el-tab-pane label="影片" name="video">视频</el-tab-pane>
-                        <el-tab-pane label="音乐" name="audio">音频</el-tab-pane>
+                        <el-tab-pane label="影片" name="videos">
+                            <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
+                                <el-col :span="4" v-for="jj in 6" :key="jj">
+                                    <el-checkbox 
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        label="备选项1" 
+                                        border class="image_check"
+                                    >
+                                        <img 
+                                            :src=`${theImage(ii,jj).thumb}` 
+                                            :data-src=`${theImage(ii,jj).src}` class="videos"/>
+                                            <div class="imagetitle">
+                                                [[ theImage(ii,jj).visible_filename ]]
+                                            </div>
+                                    </el-checkbox>
+                                </el-col>
+                            </el-row>
+                        </el-tab-pane>
+                        <el-tab-pane label="音乐" name="audios">
+                            <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
+                                <el-col :span="4" v-for="jj in 6" :key="jj">
+                                    <el-checkbox 
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        label="备选项1" 
+                                        border class="image_check"
+                                    >
+                                        <img 
+                                            :src=`${theImage(ii,jj).thumb}` 
+                                            :data-src=`${theImage(ii,jj).src}` class="videos"/>
+                                            <div class="imagetitle">
+                                                [[ theImage(ii,jj).visible_filename ]]
+                                            </div>
+                                    </el-checkbox>
+                                </el-col>
+                            </el-row>
+                        </el-tab-pane>
                         <el-tab-pane label="上传" name="upload">
                             <el-upload
                                 class="upload"
@@ -179,7 +214,7 @@
                 data () {
                     return {
                         curdir: '{{ dirs.0 }}',
-                        activeName: 'image',
+                        activeName: 'images',
                         dialogImageUrl: '',
                         dialogVisible: false,
                         errorDisplay:'none',
@@ -187,6 +222,12 @@
                         filePrepared:false,
                         progressPercent:0,
                         fileArr:[],
+                        page:{
+                            'images':1,
+                            'videos':1,
+                            'audios':1
+                        },
+                        loading:false
                     }
                 },
                 computed: {
@@ -207,17 +248,18 @@
                         //存放在一个store里面
                         //自动绑定到相关的页面里面
                         console.log('-------showImages----------')
-                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':''} )
+                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','type':this.activeName,'series':path,'page':1})
                     },
+                    
                     theImage(i,j){
                         //console.log(store.state.images)
                         //console.log(`-------------${i}-${j}-----------------`)
                         return (store.state.images||[])[(i-1)*6 + j-1]||{}
                     },
-                    next:function(path){
+                    next:function(){
                         //当没有18个图片的时候，说明就结束了
                         console.log('------next------')
-                        console.log(path)
+                        /*console.log(path)
                         //dl = document.getElementsByClassName('image')
                         if (this.images.length == 18){
                             key = decodeURI(this.images[this.images.length-1].src).match('{{ rediret_url_prefix }}/(.*)')[1]
@@ -226,22 +268,50 @@
                             if( key ){
                                  store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
                             }
-                        }
+                        }*/
+                        this.page[this.activeName] = (++this.page[this.activeName] >=1 ? this.page[this.activeName] : 1)
+                        this.showFiles(tab.name,this.curdir,this.page[this.activeName])
                     },
-                    prev:function(path){
+                    prev:function(){
                         //dl = document.getElementsByClassName('image')
                         //if (this.images.length > 0){
                         //    key = decodeURI(this.images[0].src).match('//.*?/(.*)')[1]
                         //    if( key ){
-                        store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':''} )
+                        //store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':''} )
                         //    }
                         //}
+                        this.page[this.activeName] = (--this.page[this.activeName] >=1 ? this.page[this.activeName] : 1)
+                        this.showFiles(tab.name,this.curdir,this.page[this.activeName])
+
                     },
                     goTab(page){
                         this.activeName = page
                     },
+                    
+                    showFiles:function(type,series,page){
+                        vm = this
+                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','type':type,'series':series,'page':page}).then(function(){
+                            console.log('then(function(){})')
+                            vm.$forceUpdate()
+                            vm.loading = false
+                        })
+                    },
                     handleClick(tab, event) {
-                        console.log(tab, event);
+                        console.log(tab, event)
+                        console.log(`-----------this.activeName -------${this.activeName}----`)
+                        /*if (tab.name == "videos"){
+                            store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
+                        }
+                        if (tab.name == "audios"){
+                            store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
+                        }
+                        if (tab.name == "images"){
+                            store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
+                        }*/
+                        this.loading = true
+                        this.activeName = tab.name
+                        this.showFiles(tab.name,this.curdir,this.page.image)
+                        
                     },
                     onbeforeUpload(file){
                         console.log('--------onbeforeUpload----------')

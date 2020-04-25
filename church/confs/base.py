@@ -418,35 +418,56 @@ ALIOSS_DESTINATIONS = {
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
-        'x-oss-object-acl':'public-read'   #public-read、private、public-read-write
+        'x-oss-object-acl':'public-read',   #public-read、private、public-read-write
+        'mimetype_prefix':'image/'
     },
     'pdfs':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
-        'x-oss-object-acl':'public-read'   #public-read、private、public-read-write
+        'x-oss-object-acl':'public-read',   #public-read、private、public-read-write
+        'mimetype_prefix':'pdf/'
     },
     'source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
         'location':ALIOSS_SOURCE_LOCATION,
         'bucket':ALIOSS_SOURCE_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediasource',
-        'x-oss-object-acl':'private'   #public-read、private、public-read-write
+        'x-oss-object-acl':'private',   #public-read、private、public-read-write
+        'mimetype_prefix':'video/' #传到源桶里的视频是为了转码，所以源桶是视频格式
+    },
+    'videos.source':{
+        'endpoint':ALIOSS_SOURCE_ENDPOINT,
+        'location':ALIOSS_SOURCE_LOCATION,
+        'bucket':ALIOSS_SOURCE_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediasource',
+        'x-oss-object-acl':'private',   #public-read、private、public-read-write
+        'mimetype_prefix':'video/' #传到源桶里的视频是为了转码，所以源桶是视频格式
     },
     'destination':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
-        'x-oss-object-acl':'private'   #public-read、private、public-read-write
+        'x-oss-object-acl':'private',   #public-read、private、public-read-write
+        'mimetype_prefix':'unkown/'
+    },
+    'videos.destination':{
+        'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'location':ALIOSS_DESTINATION_LOCATION,
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediabase',
+        'x-oss-object-acl':'private',   #public-read、private、public-read-write
+        'mimetype_prefix':'unkown/'
     },
     'audios':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
-        'x-oss-object-acl':'public-read'   #public-read、private、public-read-write
+        'x-oss-object-acl':'public-read',   #public-read、private、public-read-write
+        'mimetype_prefix':'audio/'
     }
 }
 

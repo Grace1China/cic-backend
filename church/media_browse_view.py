@@ -81,18 +81,19 @@ def list_img(request,path=''):
         if request.method == 'GET':
             data = request.GET
             typ = data.get('type','images')
-            marker = data.get('marker','')
-            path = '%s%s' % (storage._get_user_path(request.user), '' if path=='' else '/'+path) #教会的目录是本函数负责加上
+            page = data.get('page',1)
+            
+            # path = '%s%s' % (storage._get_user_path(request.user), '' if path=='' else '/'+path) #教会的目录是本函数负责加上
             if path != '':
-                files = _list_img(request.user,typ=typ,path=path,marker=marker)
-                # files,dirs = storage.get_files_browse_urls(request.user,typ,path,marker)
+                # files = _list_img(request.user,typ=typ,path=path,marker=marker)
+                files,dirs = storage.get_files_from_db(user=request.user,typ=typ,series=path,page=page)
                 ret = {'errCode': '0','msg':'success','data':files}
             else:
                 raise Exception('key must not null.')   
     except Exception as e:
         import traceback
         import sys
-        ret = {'errCode': '1001', 'msg': 'there is an exception check err logs'}
+        ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
         lg.exception('There is and exceptin',exc_info=True,stack_info=True)
     finally:
         return JsonResponse(ret, safe=False)

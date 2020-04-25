@@ -21,6 +21,8 @@ from django.core.files.storage import Storage
 from oss2.api import _normalize_endpoint
 import traceback, sys 
 from crequest.middleware import CrequestMiddleware
+from churchs.models import MediaFile
+from django.core.paginator import Paginator
 
 import logging
 theLogger = logging.getLogger('church.all')
@@ -201,6 +203,7 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
                     files.append(obj.key.replace(name,'',1))
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
         finally:
             return list(dirs), files
 
@@ -229,6 +232,7 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
             theLogger.info(files)
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
         finally:
             return list(dirs), files
 
@@ -269,9 +273,10 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
             key = urlquote(key, safe='/?=')
             p = urlparse(self.end_point)
             return '{0}://{1}.{2}/{3}'.format(p.scheme, bucket_name, p.netloc, key)
-        except:
+        except Exception as e:
             import traceback
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
         finally:
             return retUrl
 
@@ -435,16 +440,75 @@ class AliyunMediaStorage(AliyunBaseStorage):
     def get_files_browse_urls(self,user=None,typ=None,path='',marker = ''):
         self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url
         return super().get_files_browse_urls(user=user,typ=typ,path=path,marker = marker)
-        
-        # for f in files:
+
+    def get_files_from_db(self,user=None,typ=None,series='',page=1):
+        '''
+        从数据库中，查找媒体记录
+        '''
+        try:
+            self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url  同时会对self.destination进行赋值
+            lg.info('mime_type:%s church_prefix%s series_prefix%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series))
+            qrset = MediaFile.objects.filter(mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],church_prefix=user.church.code,series_prefix=series).order_by('-update_time')
+            lg.info(qrset)
+            pg = Paginator(qrset, 18)
+            results = pg.page(page)
+
+            from  ckeditor_uploader import utils 
+            from .utils import is_valid_image_extension
+            lg.info(typ)
+            files = []
+            dirs = set()
+            for rc in results :
+                
+                filename = rc.name  #bucket key
+            
+                key = self._normalize_name(self._clean_name(filename))
+                key = key.encode('utf8')
+                # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+                from oss2.compat import urlquote,urlparse
+                key = urlquote(key, safe='/?=')
+                p = urlparse(rc.endpoint)
+
+                media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
+
+                visible_filename = rc.origin_name
+                # lg.info('key : %s' % key)
+                if is_valid_image_extension(visible_filename):
+                    thumb = self.get_thumb_filename(media_url)
+                else:
+                    thumb = utils.get_icon_filename(visible_filename)
+
+                files.append({
+                    'thumb': thumb,
+                    'src': media_url,
+                    'is_image': is_valid_image_extension(filename),
+                    'visible_filename': visible_filename,
+                })
+                
+            lg.info('last (files dirs):')
+            lg.info((files,dirs))
+            return (files,dirs)
+        except Exception as e:
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
             
     def get_image_files(self,user=None, path='',marker = ''):
         return super().get_image_files(user=user,path=path,marker = marker)
 
 
     def _set_bucket(self,dest="destination"):
-        self.destination = dest
-        self.bucket_name = settings.ALIOSS_DESTINATIONS[dest]['bucket']
+        '''
+        这个里面包含了，源桶和目标桶的逻辑。比如。当videos取不到时，取videos的源桶。videos.source
+        '''
+        if dest not in settings.ALIOSS_DESTINATIONS:
+            if '%s.source' % dest not in settings.ALIOSS_DESTINATIONS:
+                raise Exception('not find the destination bucket')
+            else:
+                self.destination = '%s.source' % dest
+                self.bucket_name = settings.ALIOSS_DESTINATIONS['%s.source' % dest]['bucket']
+        else:
+            self.destination = dest
+            self.bucket_name = settings.ALIOSS_DESTINATIONS[dest]['bucket']
         
         try:
             if self.bucket_name not in super()._list_bucket(self.service):

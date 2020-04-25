@@ -312,44 +312,50 @@ class AliMtsCallBack(APIView):
         import logging    
         import churchs.models as md
         import urllib
+        try:
 
-        logger = logging.getLogger('dev.error')
-        logger.error('-------------------in post ----------------------')
+            theLogger.error('-------------------in post ----------------------')
 
-        topic = json.loads(request.body)
-        msg = json.loads(topic['Message'])
-        logger.error(msg)
+            topic = json.loads(request.body)
+            msg = json.loads(topic['Message'])
+            theLogger.error(msg)
 
-        if msg['MediaWorkflowExecution']['State'] != 'Completed':
+            if msg['MediaWorkflowExecution']['State'] != 'Completed':
+                return Response(data='',status=status.HTTP_204_NO_CONTENT)
+
+            Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
+            Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
+            Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
+
+            key_arr = Object.split('/')
+            filename_arr = key_arr[1].rsplit('.',1)
+
+            quotedfn = urllib.parse.quote(filename_arr[0])
+
+            alioss_video = '%s/%s.%s' % (key_arr[0],quotedfn,filename_arr[1])
+            alioss_SHD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4')
+            alioss_HD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4')
+            alioss_SD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4')
+            alioss_image = '%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg')
+
+            theLogger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
+            qrset = md.Media.objects.filter(alioss_video__iexact=alioss_video)
+
+            
+            theLogger.error(qrset)
+
+            qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
+            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+            bucket.put_object_acl(alioss_image, oss2.OBJECT_ACL_PUBLIC_READ)
+            bucket.put_object_acl(alioss_HD_URL, oss2.OBJECT_ACL_PUBLIC_READ)
+        except Exception as e:
+            import traceback
+            ret = {'errCode': '1001', 'msg': 'there is an exception check logs','sysErrMsg':traceback.format_exc()}
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+        finally:
             return Response(data='',status=status.HTTP_204_NO_CONTENT)
-
-        Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
-        Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
-        Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
-
-        key_arr = Object.split('/')
-        filename_arr = key_arr[1].rsplit('.',1)
-
-        quotedfn = urllib.parse.quote(filename_arr[0])
-
-        alioss_video = '%s/%s.%s' % (key_arr[0],quotedfn,filename_arr[1])
-        alioss_SHD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4')
-        alioss_HD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4')
-        alioss_SD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4')
-        alioss_image = '%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg')
-
-        logger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
-        qrset = md.Media.objects.filter(alioss_video__iexact=alioss_video)
-        
-        logger.error(qrset)
-
-        qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
-        auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-        bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-        bucket.put_object_acl(alioss_image, oss2.OBJECT_ACL_PUBLIC_READ)
-        bucket.put_object_acl(alioss_HD_URL, oss2.OBJECT_ACL_PUBLIC_READ)
-
-        return Response(data='',status=status.HTTP_204_NO_CONTENT)
 
 # from .utill import CICUtill
 
@@ -378,8 +384,9 @@ def oss_object_exists(request,key=''):
                 raise Exception('key must not null.')   
     except Exception as e:
         import traceback
-        import sys
+        ret = {'errCode': '1001', 'msg': 'there is an exception check logs','sysErrMsg':traceback.format_exc()}
         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+        raise e
     finally:
         return JsonResponse(ret, safe=False)
          
