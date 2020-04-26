@@ -436,7 +436,10 @@
                             isImage = fileType.indexOf("image") != -1,
                             isLt2M = file.size / 1024 / 1024 < 2;
                         console.log('-----------diyUpload------------')
-                        console.log(params)
+                        console.log(fileType)
+                        if(fileType == 'image'){
+                            dest = 'images'
+                        }
                         let fd = new FormData()
                         fd.append('OSSAccessKeyId', '{{ OSSAccessKeyId }}')
                         fd.append('policy', '{{ policy }}')
@@ -444,9 +447,9 @@
                         fd.append('callback', '{{ callback }}')
                         fd.append('key', `${this.guid()}`)//这个是oss中的key,随机 不用这个前缀方式了L3${(this.curdir||'').length>1?'/'+this.curdir:''}/
                         fd.append('x:originname', file.name)//文件原有名称 x是自定义oss回调变量
-                        fd.append('x:dest', '{{ type }}')//所属的文件目标桶类型
+                        fd.append('x:dest', `${dest}`)//所属的文件目标桶类型
                         fd.append('x:seriesrespath', `${ this.curdir }`)
-                        fd.append('x:church', `${ this.curdir }`)
+                        fd.append('x:church', `${ this.church }`)
                         fd.append('file', file)
                         option = {
                             'f':fd,
