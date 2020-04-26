@@ -275,7 +275,7 @@ class AliOssCallBack(APIView):
             # 设置标签。
             result = bucket.put_object_tagging(data.get('filename', ''), tagging)
             # 查看HTTP返回码。
-            theLogger('http response status:', result.status)
+            theLogger.info(' add tagging http response status:', result.status)
 
             retV = JsonResponse(ret_dict, safe=True)
             theLogger.info(retV.__dict__) #print it
