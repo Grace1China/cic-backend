@@ -74,9 +74,9 @@ class AliOssSignature(APIView):
             #     # pprint.PrettyPrinter(6).pprint(request.user)
             #     # raise Exception('user or church of user is null')
             # array_item.append(user_path)
-            settings.get_ALIOSS_DESTINATIONS(typ)
+            
 
-            condition_array.append({"bucket":"bicf-media-destination"})
+            condition_array.append({"bucket":settings.get_ALIOSS_DESTINATIONS(typ)})
             policy_dict['conditions'] = condition_array
             policy = json.dumps(policy_dict).strip()
             theLogger.info(policy)
