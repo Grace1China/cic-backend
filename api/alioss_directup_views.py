@@ -85,7 +85,7 @@ class AliOssSignature(APIView):
             callback_dict = {}
             callback_dict['callbackUrl'] = AliOssSignature.callback_url
             callback_dict['callbackBody'] = 'filename=${object}&size=${size}&mimeType=${mimeType}' \
-                                            '&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}&dest=${x:dest}&seriesrespath=${x:seriesrespath}'
+                                            '&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}&dest=${x:dest}&seriesrespath=${x:seriesrespath}&church=${x:church}'
             callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded'
 
             #import logging
@@ -253,11 +253,11 @@ class AliOssCallBack(APIView):
             ret_dict['Status'] = 'OK'
             theLogger.info(ret_dict)
             # aMediaFile = MediaFile.objects.filter(name=data.get('filename', ''))
-            key = data.get('filename', '')
-            if key:
-                arrkey = key.split('/',1)
+            # key = data.get('filename', '')
+            # if key:
+            #     arrkey = key.split('/',1)
             
-            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=arrkey[0],series_prefix=data.get('seriesrespath', ''),origin_name=data.get('originname',''), mime_type=data.get('mimeType',''),endpoint=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'],bucket=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
+            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=data.get('church',''),series_prefix=data.get('seriesrespath', ''),origin_name=data.get('originname',''), mime_type=data.get('mimeType',''),endpoint=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'],bucket=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
             theLogger.info(mfile)
 
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
@@ -265,6 +265,9 @@ class AliOssCallBack(APIView):
 
             rule = TaggingRule()
             rule.add('originname', data.get('originname',''))
+            rule.add('church', data.get('church',''))
+            rule.add('series', data.get('seriesrespath',''))
+
 
             # 创建标签。
             tagging = Tagging(rule)

@@ -56,6 +56,7 @@ def browse(request):
         'Signature': token['signature'],
         'callback': token['callback'],
         'type':typ,
+        'churchcode':request.user.church.code,
 
     }
     lg.info(context)
@@ -82,7 +83,7 @@ def list_img(request,path=''):
             data = request.GET
             typ = data.get('type','images')
             page = data.get('page',1)
-            series = data.get('series','')
+            series = data.get('series','/') #默认的专栏，这样在专栏生成前应该有一个预置的默认专栏。就是用这个根目录。
             
             # path = '%s%s' % (storage._get_user_path(request.user), '' if path=='' else '/'+path) #教会的目录是本函数负责加上
             if series != '':
