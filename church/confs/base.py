@@ -471,6 +471,24 @@ ALIOSS_DESTINATIONS = {
     }
 }
 
+MAINSITE_API_V1 = 'http://47.95.199.234/mainsite_api_v1/mst/MakeSermon'
+APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
+
+ALIOSS_MEDIA_CALLBACK_SERVER = 'luxmundi.bicf.org' # 用来指定alioss媒体上传和转码后的回调地址
+MEDIA_BROWSE_API_SERVER = 'luxmundi.bicf.org'  #测试的时候调用本地，回调是用test.l3,本地数据库要与test.l3保持一致 
+#await axios.get(`http://${par.host}/alioss_list${par.path=='/'?'/':'/'+par.path}` 在媒体库的store.js中要看使用那个地址来取内容，测试当然是本地;
+# test.l3环境就是test.l3， product 的luxmundi.bicf.org就是 luxmundi.bicf.org
+
+ALIOSS_MEDIA_CALLBACK_SERVER_ENV = {#因为alioss只能有一个回调地址，为了sandbox能够有回调测试，在此指定sandbox环境的回调地址. 这个也是在国外执行
+    'sandbox':'test.l3.bicf.org',
+    'prod':ALIOSS_MEDIA_CALLBACK_SERVER
+}
+MEDIA_BROWSE_API_SERVER_ENV = {
+    'sandbox':'test.l3.bicf.org',
+    'prod':MEDIA_BROWSE_API_SERVER
+}
+
+
 
 AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
 # DEFAULT_FILE_STORAGE = 'church.storage_backends.PublicMediaStorage'
@@ -515,6 +533,8 @@ MEDIA_BROWSE_SHOW_DIRS = True
 #     #     },
 #     # },
 # }
+
+
 
 
 AWS_PRIVATE_MEDIA_LOCATION = 'media/private'

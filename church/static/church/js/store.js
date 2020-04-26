@@ -1,6 +1,6 @@
 async function getImages (context,par) {
     console.log(`getImages==============path==${par.series}=`)
-    await axios.get(`http://${par.MEDIA_BROWSE_API_SERVER}/alioss_list${par.series=='/'?'/':'/'+par.series}`,{params: { 'type': par.type,'page':par.page }})
+    await axios.get(`http://${par.MEDIA_BROWSE_API_SERVER}/alioss_list${par.series=='/'?'/':'/'+par.series}`,{params: { 'type': par.type,'page':par.page ,'series':par.series}})
     .then(function (res) {
         console.log(res)
         if (res.data.errCode == '0'){

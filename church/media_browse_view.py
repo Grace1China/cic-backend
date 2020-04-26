@@ -82,14 +82,15 @@ def list_img(request,path=''):
             data = request.GET
             typ = data.get('type','images')
             page = data.get('page',1)
+            series = data.get('series','')
             
             # path = '%s%s' % (storage._get_user_path(request.user), '' if path=='' else '/'+path) #教会的目录是本函数负责加上
-            if path != '':
+            if series != '':
                 # files = _list_img(request.user,typ=typ,path=path,marker=marker)
-                files,dirs = storage.get_files_from_db(user=request.user,typ=typ,series=path,page=page)
+                files,dirs = storage.get_files_from_db(user=request.user,typ=typ,series=series,page=page)
                 ret = {'errCode': '0','msg':'success','data':files}
             else:
-                raise Exception('key must not null.')   
+                raise Exception('series key must not null.')   
     except Exception as e:
         import traceback
         import sys
