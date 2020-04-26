@@ -502,7 +502,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
         '''
         if dest not in settings.ALIOSS_DESTINATIONS:
             if '%s.source' % dest not in settings.ALIOSS_DESTINATIONS:
-                raise Exception('not find the destination bucket')
+                raise Exception('%s or %s not find the destination bucket' % (dest,'%s.source' % dest))
             else:
                 self.destination = '%s.source' % dest
                 self.bucket_name = settings.ALIOSS_DESTINATIONS['%s.source' % dest]['bucket']
