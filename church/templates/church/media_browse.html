@@ -72,7 +72,7 @@
                             <el-select 
                                 v-model="curdir" 
                                 filterable placeholder="请选择专栏系列"
-                                @change="showImages"
+                                @change="showFiles"
                             >
                                 {% for key,value in series.items %}
                                     <el-option
@@ -237,10 +237,10 @@
                 },
                 store,
                 mounted: function (){
-                    this.showImages(this.curdir)
+                    //this.showImages(this.curdir)
                 },
                 methods:{
-                    showImages:function(path){
+                    showImages_del:function(path){
                         //我现在要，做的是，通过目录查找oss相关目录的图片
                         //存放在一个store里面
                         //自动绑定到相关的页面里面

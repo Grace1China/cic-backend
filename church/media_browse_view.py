@@ -32,10 +32,7 @@ def browse(request):
         res_path = SermonSeries.objects.filter(church=request.user.church).values('res_path','title')
         ls_res_path = list(res_path)
         path = ls_res_path[0]['res_path'] if len(ls_res_path)>0 else '/'  #默认显示根目录的文件 同专栏系列的默认设置保持一致
-        #files,dirs = storage.get_files_browse_urls(request.user,typ=typ,marker='')#not use dirs use res_path
         files = _list_img(request.user,typ='images',path=path,marker='')
-        # dirs = list()
-        # titles = list()
         sereis_dict = dict()
         for i in ls_res_path:
             sereis_dict[i['res_path']] = i['title']
