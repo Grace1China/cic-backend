@@ -11,7 +11,7 @@ def main():
 
     # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'church.confs.bak_sandbox_dev')
 
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'church.confs.dev')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'church.confs.bak_sandbox_dev')
 
     try:
         from django.core.management import execute_from_command_line

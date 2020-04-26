@@ -304,10 +304,38 @@ class AliOssCallBack(APIView):
 class AliMtsCallBack(APIView):
     def post(self,request,*args,**kwargs):
         '''
-        用post方法
         用原文件来定位media,
         用计算的方法，来求得目标文件，存储在相应的记录里面
         4、15 这个方法 目前不用了。直接用文件查找，看目标盘是否有文件了。
+        --------------------------------------------------------------------
+        04/25/2020 现在用这个prod环境 接收alioss的转码回调。但这个方法里不处理逻辑，而是往不同环境里发送执行逻辑请求。
+        '''
+        try:
+            topic = json.loads(request.body)
+            import urllib.request
+            import urllib.parse
+            data = urllib.parse.urlencode(topic)
+            data = data.encode('ascii')
+            ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
+            ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
+
+            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox'], data) as f:
+                theLogger.info(f.read().decode('utf-8'))
+            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod'], data) as f:
+                theLogger.info(f.read().decode('utf-8'))
+
+        except Exception as e:
+            import traceback
+            ret = {'errCode': '1001', 'msg': 'there is an exception check logs','sysErrMsg':traceback.format_exc()}
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+        finally:
+            return Response(data='',status=status.HTTP_204_NO_CONTENT)
+
+class AliMtsCallBack_process(APIView):
+    def post(self,request,*args,**kwargs):
+        '''
+        逻辑处理
         '''
         import logging    
         import churchs.models as md
@@ -315,8 +343,9 @@ class AliMtsCallBack(APIView):
         try:
 
             theLogger.error('-------------------in post ----------------------')
-
+            # {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'MediaWorkflowExecution': {'MediaWorkflowId': 'cf66e7b257ef47d089c03b323a30840c', 'Name': 'base', 'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'MediaId': '2300c53ed1ab411fbca2f66519f153a2', 'Input': {'InputFile': {'Bucket': 'bicf-media-source', 'Location': 'oss-cn-beijing', 'Object': 'zgc/20200426ZGCENGM.mp4'}}, 'State': 'Completed', 'ActivityList': [{'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'StartTime': '2020-04-26T03:08:10Z', 'EndTime': '2020-04-26T03:08:10Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': 'eb27a74949eb43b9b5a472c10294eec6', 'State': 'Success', 'StartTime': '2020-04-26T02:56:21Z', 'EndTime': '2020-04-26T02:56:22Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'base', 'Type': 'Snapshot', 'JobId': 'e2a2574e9db04ff7afab0a2c780f847c', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T02:56:24Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'HD', 'Type': 'Transcode', 'JobId': 'ba9cd39ad7ad47869044e47361ce6b45', 'TemplateId': 'S00000001-200030', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T03:08:10Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'LD', 'Type': 'Transcode', 'JobId': 'acf40e2037a642c78032b7f138366c3b', 'TemplateId': 'S00000001-200010', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T03:01:44Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'SD', 'Type': 'Transcode', 'JobId': '55ee0050ecfd4e09a840e7de09cdc760', 'TemplateId': 'S00000001-200020', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T03:03:34Z'}], 'CreationTime': '2020-04-26T02:56:21Z', 'RequestId': '5EA4F7F0A15238BAA7390A40'}}
             topic = json.loads(request.body)
+            theLogger.error(topic)
             msg = json.loads(topic['Message'])
             theLogger.error(msg)
 
@@ -344,6 +373,7 @@ class AliMtsCallBack(APIView):
             
             theLogger.error(qrset)
 
+            
             qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
             bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)

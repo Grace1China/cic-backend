@@ -93,6 +93,8 @@ urlpatterns = [
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback"),
     path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished"),
+    path("alioss_mts_finished_process",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished_process"),
+
     path('search_course',search_course,name='search_course'),
     path('oss_object_exists/<path:key>',alioss_directup_views.oss_object_exists,name='oss_object_exists'),
  
