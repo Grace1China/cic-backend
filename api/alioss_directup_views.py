@@ -76,7 +76,7 @@ class AliOssSignature(APIView):
             # array_item.append(user_path)
             
             from church.confs.base import get_ALIOSS_DESTINATIONS
-            condition_array.append({"bucket":get_ALIOSS_DESTINATIONS(typ)})
+            condition_array.append({"bucket":get_ALIOSS_DESTINATIONS(typ)['bucket']})
             policy_dict['conditions'] = condition_array
             policy = json.dumps(policy_dict).strip()
             theLogger.info(policy)
