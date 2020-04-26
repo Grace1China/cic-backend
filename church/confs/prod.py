@@ -85,7 +85,7 @@ DATABASES = {
 MAINSITE_API_V1 = 'http://47.95.199.234/mainsite_api_v1/mst/MakeSermon'
 APP_SERVER_IP = "13.231.255.163"  #singpore 54.169.143.92
 
-ALIOSS_MEDIA_CALLBACK_SERVER = 'luxmundi.bicf.org' # 用来指定alioss媒体上传和转码后的回调地址
+ALIOSS_MEDIA_CALLBACK_SERVER = '13.231.255.163' # 用来指定alioss媒体上传和转码后的回调地址 因为是阿里云调用，所以，不确定国内，国外网络环境。只能用ip地址。而且要随着服务器改变
 MEDIA_BROWSE_API_SERVER = 'luxmundi.bicf.org'  #测试的时候调用本地，回调是用test.l3,本地数据库要与test.l3保持一致 
 #await axios.get(`http://${par.host}/alioss_list${par.path=='/'?'/':'/'+par.path}` 在媒体库的store.js中要看使用那个地址来取内容，测试当然是本地;
 # test.l3环境就是test.l3， product 的luxmundi.bicf.org就是 luxmundi.bicf.org
