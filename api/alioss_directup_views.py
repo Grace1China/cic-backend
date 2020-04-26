@@ -18,7 +18,7 @@ from oss2.models import Tagging, TaggingRule
 from rest_framework.decorators import api_view, authentication_classes,permission_classes
 from rest_framework.permissions import IsAuthenticated,AllowAny
 import logging
-
+from django.conf import settings
 theLogger = logging.getLogger('church.all')
 from .utill import CICUtill
 # permission_classes=CICUtill.getPermissionClass()
@@ -51,7 +51,7 @@ class AliOssSignature(APIView):
 
     
     @classmethod
-    def cls_get_token(cls,user_path):
+    def cls_get_token(cls,user_path,typ='images'):
         '''
         因为一个教会所有用户共享目录，所以user_path就是church的根目录。也就是church code
         '''
@@ -74,6 +74,8 @@ class AliOssSignature(APIView):
             #     # pprint.PrettyPrinter(6).pprint(request.user)
             #     # raise Exception('user or church of user is null')
             # array_item.append(user_path)
+            settings.get_ALIOSS_DESTINATIONS(typ)
+
             condition_array.append({"bucket":"bicf-media-destination"})
             policy_dict['conditions'] = condition_array
             policy = json.dumps(policy_dict).strip()

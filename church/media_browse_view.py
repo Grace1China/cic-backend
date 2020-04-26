@@ -38,7 +38,7 @@ def browse(request):
             sereis_dict[i['res_path']] = i['title']
     
         from api.alioss_directup_views import AliOssSignature
-        token = AliOssSignature.cls_get_token(request.user.church.code)#这个参数有还要在此方法内加入校验。
+        token = AliOssSignature.cls_get_token(request.user.church.code,typ=typ)#这个参数有还要在此方法内加入校验。
         lg.info(token)
 
         # {"accessid": "LTAI4Fd1JMHM3WSUN4vrHcj8", "host": "https://bicf-media-source.oss-accelerate.aliyuncs.com", "desthost": "https://bicf-media-destination.oss-accelerate.aliyuncs.com", "policy": "eyJleHBpcmF0aW9uIjogIjIwMjAtMDQtMThUMDc6NDc6NDlaIiwgImNvbmRpdGlvbnMiOiBbWyJzdGFydHMtd2l0aCIsICIka2V5IiwgIkwzIl1dfQ==", "signature": "cnmgjhxg5wo65PuGU58/UlT/7No=", "expire": 1587196069, "dir": "L3/", "callback": "eyJjYWxsYmFja1VybCI6ICJodHRwOi8vdGVzdC5sMy5iaWNmLm9yZy9yYXBpL2FsaW9zc19kaXJlY3R1cF9jYWxsYmFjayIsICJjYWxsYmFja0JvZHkiOiAiZmlsZW5hbWU9JHtvYmplY3R9JnNpemU9JHtzaXplfSZtaW1lVHlwZT0ke21pbWVUeXBlfSZoZWlnaHQ9JHtpbWFnZUluZm8uaGVpZ2h0fSZ3aWR0aD0ke2ltYWdlSW5mby53aWR0aH0iLCAiY2FsbGJhY2tCb2R5VHlwZSI6ICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQifQ=="}
