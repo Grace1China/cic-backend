@@ -83,10 +83,6 @@
                                 {% endfor %}
                             </el-select>
                         {% endif %}
-                        {% comment %} <form action="" method="post">
-                            {% csrf_token %}
-                            {{ form }}
-                        </form> {% endcomment %}
                     </div>
                    
                     <el-button-group>
@@ -213,6 +209,7 @@
                 el: '#page',
                 data () {
                     return {
+                        church:'{{ churchcode }}'
                         curdir: '{{ dirs.0 }}',
                         activeName: 'images',
                         dialogImageUrl: '',
@@ -445,10 +442,11 @@
                         fd.append('policy', '{{ policy }}')
                         fd.append('Signature', '{{ Signature }}')
                         fd.append('callback', '{{ callback }}')
-                        fd.append('key', `L3${(this.curdir||'').length>1?'/'+this.curdir:''}/${this.guid()}`)//这个是oss中的key,随机
+                        fd.append('key', `${this.guid()}`)//这个是oss中的key,随机 不用这个前缀方式了L3${(this.curdir||'').length>1?'/'+this.curdir:''}/
                         fd.append('x:originname', file.name)//文件原有名称 x是自定义oss回调变量
                         fd.append('x:dest', '{{ type }}')//所属的文件目标桶类型
                         fd.append('x:seriesrespath', `${ this.curdir }`)
+                        fd.append('x:church', `${ this.curdir }`)
                         fd.append('file', file)
                         option = {
                             'f':fd,
