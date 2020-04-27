@@ -87,8 +87,11 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
                 # 每一个类型的文件都有一个系列存储位置
                 theLogger.info('dictB[%s]=%s' % (k,dictB[k]))
                 b = oss2.Bucket(auth, dictB[k], k)
+                theLogger.info(b)
                 r  = b.list_objects(path,max_keys=1)
+                theLogger.info(r)
                 l = len(r.object_list)
+                theLogger.info(l)
                 if l <= 0 :
                     # 不存在这个prefix，可以保存一个readme,来建立这个前缀
                     b.put_object('%s/readme.md' % path,'this is for series:%s' % instance.res_path)
