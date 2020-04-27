@@ -83,7 +83,7 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
                     dictB[v['bucket']] = v['endpoint.acc']
                 
 
-            for k,v dictB:
+            for k,v in dictB:
                 # 每一个类型的文件都有一个系列存储位置
                 b = oss2.Bucket(auth, v, k)
                 r  = b.list_objects(path,max_keys=1)
