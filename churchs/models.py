@@ -76,9 +76,16 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
             d = settings.ALIOSS_DESTINATIONS
             theLogger.info('-----------create_oss_dir------------')
             theLogger.info(path)
+            
+            dictB = dict()
             for k,v in d.items():
+                if v['bucket'] not in dictB:
+                    dictB[v['bucket']] = v['endpoint.acc']
+                
+
+            for k,v dictB:
                 # 每一个类型的文件都有一个系列存储位置
-                b = oss2.Bucket(auth, v['endpoint'], v['bucket'])
+                b = oss2.Bucket(auth, v, k)
                 r  = b.list_objects(path,max_keys=1)
                 l = len(r.object_list)
                 if l <= 0 :
@@ -92,10 +99,11 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
                     cnt = str(r.read(), encoding = "utf-8")
                     if cnt != 'this is for series:%s' % instance.res_path:
                         raise Exception('the resource path:%s is exists and it is not for series: %s' % (path, instance.res_path))                
-    except:
+    except Exception as e:
         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-    finally:
-        pass
+        raise e
+    # finally:
+        # pass
 
 pre_save.connect(create_oss_dir, sender=SermonSeries)
 

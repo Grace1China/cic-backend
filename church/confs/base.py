@@ -387,6 +387,7 @@ ALIOSS_SOURCE_ENDPOINT = os.environ.get('ALIOSS_SOURCE_BUCKET_NAME', 'https://os
 ALIOSS_DESTINATION_ENDPOINT = os.environ.get('ALIOSS_DESTINATION_BUCKET_NAME', 'https://oss-cn-beijing.aliyuncs.com')
 
 
+
 ALIOSS_SOURCE_LOCATION = os.environ.get('ALIOSS_SOURCE_LOCATION', 'oss-cn-beijing.aliyuncs.com')
 ALIOSS_DESTINATION_LOCATION = os.environ.get('ALIOSS_DESTINATION_LOCATION', 'oss-cn-beijing.aliyuncs.com')
 
@@ -420,6 +421,7 @@ def get_ALIOSS_DESTINATIONS(typ='images'):
 ALIOSS_DESTINATIONS = {
     'images':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
@@ -428,6 +430,7 @@ ALIOSS_DESTINATIONS = {
     },
     'pdfs':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
@@ -436,6 +439,7 @@ ALIOSS_DESTINATIONS = {
     },
     'source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
         'location':ALIOSS_SOURCE_LOCATION,
         'bucket':ALIOSS_SOURCE_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediasource',
@@ -444,6 +448,7 @@ ALIOSS_DESTINATIONS = {
     },
     'videos.source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
         'location':ALIOSS_SOURCE_LOCATION,
         'bucket':ALIOSS_SOURCE_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediasource',
@@ -452,6 +457,7 @@ ALIOSS_DESTINATIONS = {
     },
     'destination':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
@@ -460,6 +466,7 @@ ALIOSS_DESTINATIONS = {
     },
     'videos.destination':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
@@ -468,6 +475,7 @@ ALIOSS_DESTINATIONS = {
     },
     'audios':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
         'location':ALIOSS_DESTINATION_LOCATION,
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
