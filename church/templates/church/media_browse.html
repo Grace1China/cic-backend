@@ -315,9 +315,9 @@
                         console.log(file)
                     },
                     onprogress(e, rawFile,fileList){
-                        console.log('-------onprogress---------')
+                        /*console.log('-------onprogress---------')
                         console.log(e)
-                        console.log(rawFile)
+                        console.log(rawFile)*/
 
                         this.fileArr = fileList
                         this.fileArr.forEach(item=>{
@@ -454,6 +454,7 @@
                         console.log('-----------diyUpload------------')
                         console.log(fileType)
                         dest = this.getTyp(fileType)
+                        console.log(dest)
                         
                         let fd = new FormData()
                         fd.append('OSSAccessKeyId', '{{ OSSAccessKeyId }}')
