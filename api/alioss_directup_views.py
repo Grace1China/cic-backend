@@ -21,7 +21,8 @@ import logging
 from django.conf import settings
 theLogger = logging.getLogger('church.all')
 from .utill import CICUtill
-# permission_classes=CICUtill.getPermissionClass()
+from church.confs.base import get_ALIOSS_DESTINATIONS
+
 class AliOssSignature(APIView):
     '''
     给aliyun oss直传提供签名
@@ -75,7 +76,6 @@ class AliOssSignature(APIView):
             #     # raise Exception('user or church of user is null')
             # array_item.append(user_path)
             
-            from church.confs.base import get_ALIOSS_DESTINATIONS
             condition_array.append({"bucket":get_ALIOSS_DESTINATIONS(typ)['bucket']})
             policy_dict['conditions'] = condition_array
             policy = json.dumps(policy_dict).strip()
@@ -259,11 +259,11 @@ class AliOssCallBack(APIView):
             # if key:
             #     arrkey = key.split('/',1)
             
-            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=data.get('church',''),series_prefix=data.get('seriesrespath', ''),origin_name=data.get('originname',''), mime_type=data.get('mimeType',''),endpoint=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'],bucket=settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
+            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=data.get('church',''),series_prefix=data.get('seriesrespath', ''),origin_name=data.get('originname',''), mime_type=data.get('mimeType',''),endpoint=get_ALIOSS_DESTINATIONS(data.get('dest', ''))['endpoint'],bucket=get_ALIOSS_DESTINATIONS(data.get('dest', ''))['bucket'])
             theLogger.info(mfile)
 
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['endpoint'], settings.ALIOSS_DESTINATIONS[data.get('dest', '')]['bucket'])
+            bucket = oss2.Bucket(auth, get_ALIOSS_DESTINATIONS(data.get('dest', ''))['endpoint'], get_ALIOSS_DESTINATIONS(data.get('dest', ''))['bucket'])
 
             rule = TaggingRule()
             rule.add('originname', data.get('originname',''))
