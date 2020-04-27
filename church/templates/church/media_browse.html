@@ -329,6 +329,22 @@
                             }
                         })
                     },
+                    getTyp(filetype){
+                        if(filetype.match('image/')){
+                            return 'images'
+                            
+                        }
+                        if(filetype.match('video/')){
+                            return 'videos'
+                        }
+                        if(filetype.match('audio/')){
+                            return 'audios'
+                        }
+                        if(filetype.match('pdf/')){
+                            return 'pdfs'
+                        }
+                        return 'destination'
+                    },
                     onchange(e,fileList){
                         console.log('-------onchange---------')
                         console.log(e)
@@ -437,10 +453,8 @@
                             isLt2M = file.size / 1024 / 1024 < 2;
                         console.log('-----------diyUpload------------')
                         console.log(fileType)
-                        dest = 'images'
-                        if(fileType == 'image'){
-                            dest = 'images'
-                        }
+                        dest = this.getTyp(file.type)
+                        
                         let fd = new FormData()
                         fd.append('OSSAccessKeyId', '{{ OSSAccessKeyId }}')
                         fd.append('policy', '{{ policy }}')
