@@ -453,7 +453,7 @@
                             isLt2M = file.size / 1024 / 1024 < 2;
                         console.log('-----------diyUpload------------')
                         console.log(fileType)
-                        dest = this.getTyp(file.type)
+                        dest = this.getTyp(filetype)
                         
                         let fd = new FormData()
                         fd.append('OSSAccessKeyId', '{{ OSSAccessKeyId }}')
