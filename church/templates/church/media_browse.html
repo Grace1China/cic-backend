@@ -287,7 +287,7 @@
                     
                     showFiles:function(type,series,page){
                         vm = this
-                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','type':type,'series':series,'page':page}).then(function(){
+                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','runtime':'{{ runtime }}','type':type,'series':series,'page':page}).then(function(){
                             console.log('then(function(){})')
                             vm.$forceUpdate()
                             vm.loading = false

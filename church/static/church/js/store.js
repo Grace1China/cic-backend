@@ -1,6 +1,10 @@
 async function getImages (context,par) {
+    host = document.location.host
+    if (par.runtime =='sandbox'){
+      host = par.MEDIA_BROWSE_API_SERVER
+    }
     console.log(`getImages==============path==${par.series}=`)
-    await axios.get(`http://${par.MEDIA_BROWSE_API_SERVER}/alioss_list${par.series=='/'?'/':'/'+par.series}`,{params: { 'type': par.type,'page':par.page ,'series':par.series}})
+    await axios.get(`http://${host}/alioss_list${par.series=='/'?'/':'/'+par.series}`,{params: { 'type': par.type,'page':par.page ,'series':par.series}})
     .then(function (res) {
         console.log(res)
         if (res.data.errCode == '0'){

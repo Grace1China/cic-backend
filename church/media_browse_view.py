@@ -56,6 +56,7 @@ def browse(request):
             'callback': token['callback'],
             'type':typ,
             'churchcode':request.user.church.code,
+            'runtime':settings.RUNTIME,
 
         }
         lg.info(context)
