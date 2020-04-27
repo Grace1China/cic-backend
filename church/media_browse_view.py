@@ -57,6 +57,7 @@ def browse(request):
             'type':typ,
             'churchcode':request.user.church.code,
             'runtime':settings.RUNTIME,
+            'ALIOSS_DESTINATIONS':json.dumps(settings.ALIOSS_DESTINATIONS),
 
         }
         lg.info(context)

@@ -225,6 +225,7 @@
                             'audios':1
                         },
                         loading:false,
+                        ALIOSS_DESTINATIONS:JSON.parse({{ ALIOSS_DESTINATIONS }}),
                     }
                 },
                 computed: {
@@ -455,6 +456,8 @@
                         console.log(fileType)
                         dest = this.getTyp(fileType)
                         console.log(dest)
+                        //https://bicf-media-destination.oss-accelerate.aliyuncs.com
+                        host = `https://${this.ALIOSS_DESTINATIONS[dest]['bucket']}.${this.ALIOSS_DESTINATIONS[dest]['endpoint.acc']}`
                         
                         let fd = new FormData()
                         fd.append('OSSAccessKeyId', '{{ OSSAccessKeyId }}')
@@ -468,7 +471,8 @@
                         fd.append('x:church', `${ this.church }`)
                         fd.append('file', file)
                         option = {
-                            'f':fd,
+                            'host':host,
+                            'form':fd,
                             'uploader':params
                         }
                         return store.dispatch('upload2oss',option)

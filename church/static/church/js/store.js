@@ -24,12 +24,12 @@ async function upload2oss (context,options) {
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: function (e) {
           // console.log("进度：");
-          console.log(e);
+          // console.log(e);
           percent = (e.loaded / e.total)*100
           options.uploader.onProgress({percent:percent})
       }
   };
-  await axios.post('https://bicf-media-destination.oss-accelerate.aliyuncs.com',options.f,config).then(function (res) {
+  await axios.post(options.host,options.form,config).then(function (res) {//'https://bicf-media-destination.oss-accelerate.aliyuncs.com'
       console.log(res)
       options.uploader.onSuccess()
   })
