@@ -457,7 +457,7 @@
                         dest = this.getTyp(fileType)
                         //console.log(dest)
                         //https://bicf-media-destination.oss-accelerate.aliyuncs.com
-                        host = `https://${this.ALIOSS_DESTINATIONS[dest]['bucket']}.${this.ALIOSS_DESTINATIONS[dest]['endpoint.acc']}`
+                        host = `https://${this.ALIOSS_DESTINATIONS[dest=='videos'?`${dest}.source`:dest]['bucket']}.${this.ALIOSS_DESTINATIONS[dest=='videos'?`${dest}.source`:dest]['endpoint.acc']}`
 
                         console.log(`dest:${dest};host:${host}`)
                         
