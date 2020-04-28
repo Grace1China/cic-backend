@@ -225,7 +225,7 @@
                             'audios':1
                         },
                         loading:false,
-                        ALIOSS_DESTINATIONS:JSON.parse({{ ALIOSS_DESTINATIONS|safe }}),
+                        ALIOSS_DESTINATIONS:JSON.parse(`{{ ALIOSS_DESTINATIONS|safe }}`),
                     }
                 },
                 computed: {
@@ -455,9 +455,11 @@
                         console.log('-----------diyUpload------------')
                         console.log(fileType)
                         dest = this.getTyp(fileType)
-                        console.log(dest)
+                        //console.log(dest)
                         //https://bicf-media-destination.oss-accelerate.aliyuncs.com
                         host = `https://${this.ALIOSS_DESTINATIONS[dest]['bucket']}.${this.ALIOSS_DESTINATIONS[dest]['endpoint.acc']}`
+
+                        console.log(`dest:${dest};host:${host}`)
                         
                         let fd = new FormData()
                         fd.append('OSSAccessKeyId', '{{ OSSAccessKeyId }}')
