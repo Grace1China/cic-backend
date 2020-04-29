@@ -105,12 +105,7 @@ class AliOssSignature(APIView):
             # token_dict['datetime_prefix'] = self.get_datetime_prefix()
             # token_dict['x-oss-object-acl'] = settings.ALIOSS_DESTINATIONS[]
 
-            # if request.user.church == None:
-            #     token_dict['dir'] = 'l3/'
-            # else:
-            token_dict['dir'] = '%s/' % user_path
-
-
+            token_dict['dir'] = '%s/' % object_prefix
             token_dict['callback'] = base64_callback_body.decode()
             return token_dict
 
