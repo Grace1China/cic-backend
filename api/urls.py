@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .views import ChurchViewSet,EweeklyViewSet,SermonViewOneSet,SermonListViewSet
 from .user_view import CustomUserViewSet,CustomUserInfoViewSet
 from . import views
-from .alioss_directup_views import AliOssSignature, AliOssCallBack
+from .alioss_directup_views import AliOssSignature, AliOssCallBack,AliOssSignatureV2
 from . import alioss_directup_views
 from rest_framework import permissions
 
@@ -91,6 +91,7 @@ urlpatterns = [
 
     path("course/<int:pk>",course,name="course"),
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
+    path("alioss_directup_signature_v2",AliOssSignatureV2.as_view(),name="alioss_directup_signature_v2"),
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback"),
     path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished"),
     path("alioss_mts_finished_process",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished_process"),
@@ -98,8 +99,4 @@ urlpatterns = [
     path('search_course',search_course,name='search_course'),
     path('oss_object_exists/<path:key>',alioss_directup_views.oss_object_exists,name='oss_object_exists'),
  
-
-
-    
-
 ]

@@ -22,6 +22,10 @@ from django.conf import settings
 theLogger = logging.getLogger('church.all')
 from .utill import CICUtill
 from church.confs.base import get_ALIOSS_DESTINATIONS
+import pprint
+from churchs.models import MediaFile
+from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
+
 
 class AliOssSignature(APIView):
     '''
@@ -52,11 +56,12 @@ class AliOssSignature(APIView):
 
     
     @classmethod
-    def cls_get_token(cls,user_path,typ='images'):
+    def cls_get_token(cls,object_prefix,typ='images'):
         '''
-        因为一个教会所有用户共享目录，所以user_path就是church的根目录。也就是church code
+        因为一个教会所有用户共享目录，所以object_prefix就是church的根目录。根据阿里文档 需要以/结尾, 如L3/ L3/Series_1/
         '''
         try:
+            #user_path = '' #因为不再用这个目录来区分文件，所以设置为空，但不影响原来的上下游代码
             theLogger.info('---------cls_get_token-----')
             now = int(time.time())
             expire_syncpoint = now + 30000
@@ -66,17 +71,12 @@ class AliOssSignature(APIView):
             policy_dict = {}
             policy_dict['expiration'] = expire
             condition_array = []
-            # array_item = []
-            
-            # array_item.append('starts-with')
-            # array_item.append('$key')
-            # # if (request.user.church == None):
-            #     # import pprint
-            #     # pprint.PrettyPrinter(6).pprint(request.user)
-            #     # raise Exception('user or church of user is null')
-            # array_item.append(user_path)
-            
+            starts_array = []
+            starts_array.append('starts-with')
+            starts_array.append('$key')
+            starts_array.append(object_prefix)
             condition_array.append({"bucket":get_ALIOSS_DESTINATIONS(typ)['bucket']})
+            condition_array.append(starts_array)
             policy_dict['conditions'] = condition_array
             policy = json.dumps(policy_dict).strip()
             theLogger.info(policy)
@@ -121,6 +121,9 @@ class AliOssSignature(APIView):
 
 
     def get_token(self,request):
+        '''
+        作为老方法保留
+        '''
         try:
             #import logging
             #logger = logging.getLogger('church.all')
@@ -137,8 +140,6 @@ class AliOssSignature(APIView):
             array_item.append('starts-with')
             array_item.append('$key')
             if (request.user.church == None):
-                # import pprint
-                # pprint.PrettyPrinter(6).pprint(request.user)
                 raise Exception('user or church of user is null')
             array_item.append(request.user.church.code)
             condition_array.append(array_item)
@@ -185,24 +186,53 @@ class AliOssSignature(APIView):
         finally:
             pass
 
-
-
-    # @permission_classes([CICUtill.getPermissionClass()])
-    # @permission_classes([IsAuthenticated])
-    from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
     @permission_classes([IsAdminUser])
     def get(self, request, *args, **kwargs):
         """
-        启用 Get 调用处理逻辑
-        :param server: Web HTTP Server 服务
-        :return:
         """
-        print("********************* do_GET ")
-        token = self.get_token(request)
-        return JsonResponse({'errCode': '0', 'token': token}, safe=False)
+        ret = {'errCode': '1001', 'msg':'not complete','token': ''}
+        try:
+            if request.method == 'GET':
+                token = self.get_token(request)
+                ret = {'errCode': '0', 'msg':'success','token': token}
+        except Exception as e:
+            import traceback
+            ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
+            lg.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+        finally:
+            return JsonResponse(ret, safe=False)
 
-import pprint
-from churchs.models import MediaFile
+
+class AliOssSignatureV2(AliOssSignature):
+    @permission_classes([IsAdminUser])
+    def get(self, request, *args, **kwargs):
+        """
+        """
+        ret = {'errCode': '1001', 'msg':'not complete','token': ''}
+        try:
+            if request.method == 'GET':
+                data = request.GET
+                typ = data.get('type','images')
+                object_prefix = data.get('object_prefix','')
+
+                token = super(AliOssSignatureV2).cls_get_token(object_prefix,typ=typ)#现在存储结构，不按教会在物理上分了。只在数据库中分。是在回写中，带入了前端传入的教会名称。
+                # AliOssSignature.cls_get_token(request.user.church.code,typ=typ)
+                # token = self.get_token(request)
+                ret = {'errCode': '0', 'msg':'success','token': token}
+        except Exception as e:
+            import traceback
+            ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
+            lg.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+        finally:
+            return JsonResponse(ret, safe=False)
+            
+    @classmethod
+    def cls_get_token(cls,object_prefix,typ='images'):
+        return super(AliOssSignatureV2).cls_get_token(object_prefix,typ=typ)
+
+
 class AliOssCallBack(APIView):
     '''
     阿里上传完成视频后进行回写
@@ -391,12 +421,6 @@ class AliMtsCallBack_process(APIView):
             raise e
         finally:
             return Response(data='',status=status.HTTP_204_NO_CONTENT)
-
-# from .utill import CICUtill
-
-# @api_view(['GET'])
-# @permission_classes([CICUtill.getPermissionClass()])
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
