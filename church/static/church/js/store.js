@@ -39,6 +39,18 @@ async function upload2oss (context,options) {
   });
 }
 
+async function getOssToken (context,options) {
+  console.log(`getOssToken=============`)
+  console.log(options)
+  host = store.getters.getHost()
+  await axios.get(`${host}/alioss_directup_signature_v2`,{params: { 'type': options.type,'object_prefix':options.object_prefix}}).then(function (res) {//'https://bicf-media-destination.oss-accelerate.aliyuncs.com'
+      console.log(res)
+  })
+  .catch(function (err) {
+    console.log(err)
+  });
+}
+
 const store = new Vuex.Store({
     state: {
       count: 0,
@@ -51,6 +63,19 @@ const store = new Vuex.Store({
       },
       setImages(state, pimages){
         state.images = pimages
+      },
+    },
+    getters: {
+      // ...
+      getTodoById: (state) => (id) => {
+        return state.todos.find(todo => todo.id === id)
+      },
+      getHost: (state) => (par={}) => {
+        host = document.location.host
+        if (par.runtime =='sandbox'){
+          host = par.MEDIA_BROWSE_API_SERVER
+        }
+        return host
       }
     },
     actions: {
