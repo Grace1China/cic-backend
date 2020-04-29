@@ -342,6 +342,7 @@ class AliMtsCallBack(APIView):
         04/25/2020 现在用这个prod环境 接收alioss的转码回调。但这个方法里不处理逻辑，而是往不同环境里发送执行逻辑请求。
         '''
         try:
+
             topic = json.loads(request.body)
             theLogger.info(topic)
             import urllib.request
@@ -362,13 +363,13 @@ class AliMtsCallBack(APIView):
             theLogger.info(url2)
 
             try:
-                with urllib.request.urlopen(url1, data) as f:
+                with urllib.request.urlopen(url1, data=data) as f:
                     theLogger.info(f.read().decode('utf-8'))
             except Exception as e:
                 theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
             try:
-                with urllib.request.urlopen(url2, data) as f:
+                with urllib.request.urlopen(url2, data=data) as f:
                     theLogger.info(f.read().decode('utf-8'))
             except Exception as e:
                 theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
