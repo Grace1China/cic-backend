@@ -347,6 +347,9 @@ class AliMtsCallBack(APIView):
             import urllib.parse
             data = urllib.parse.urlencode(topic)
             data = data.encode('ascii')
+
+            theLogger.info(request.META)
+
             ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
             ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
 
