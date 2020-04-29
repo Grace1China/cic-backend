@@ -354,9 +354,9 @@ class AliMtsCallBack(APIView):
 
             # ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
             # ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
-            url1 = "http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
+            url1 = "http://%s/rapi/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
 
-            url2 = "http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
+            url2 = "http://%s/rapi/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
 
             theLogger.info(url1)
             theLogger.info(url2)
