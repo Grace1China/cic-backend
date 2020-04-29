@@ -230,7 +230,7 @@ class AliOssSignatureV2(AliOssSignature):
             
     @classmethod
     def cls_get_token(cls,object_prefix,typ='images'):
-        return super(AliOssSignatureV2).cls_get_token(object_prefix,typ=typ)
+        return AliOssSignature.cls_get_token(object_prefix,typ=typ)
 
 
 class AliOssCallBack(APIView):
