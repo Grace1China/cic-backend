@@ -361,15 +361,21 @@ class AliMtsCallBack(APIView):
             theLogger.info(url1)
             theLogger.info(url2)
 
+            try:
+                with urllib.request.urlopen(url1, data) as f:
+                    theLogger.info(f.read().decode('utf-8'))
+            except Exception as e:
+                theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
-            with urllib.request.urlopen(url1, data) as f:
-                theLogger.info(f.read().decode('utf-8'))
-            with urllib.request.urlopen(url2, data) as f:
-                theLogger.info(f.read().decode('utf-8'))
+            try:
+                with urllib.request.urlopen(url2, data) as f:
+                    theLogger.info(f.read().decode('utf-8'))
+            except Exception as e:
+                theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
         except Exception as e:
             import traceback
-            ret = {'errCode': '1001', 'msg': 'there is an exception check logs','sysErrMsg':traceback.format_exc()}
+            # ret = {'errCode': '1001', 'msg': 'there is an exception check logs','sysErrMsg':traceback.format_exc()}
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e
         finally:
