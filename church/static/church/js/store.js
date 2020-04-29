@@ -90,7 +90,7 @@ const store = new Vuex.Store({
      
       getImages,
       upload2oss,
-      getOssToken,yes
+      getOssToken,
       
     }
   })
