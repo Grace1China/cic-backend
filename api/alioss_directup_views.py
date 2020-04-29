@@ -332,6 +332,7 @@ class AliOssCallBack(APIView):
         return [permission() for permission in permission_classes]
 
 class AliMtsCallBack(APIView):
+    permission_classes = [AllowAny]
     def post(self,request,*args,**kwargs):
         '''
         用原文件来定位media,
@@ -363,6 +364,7 @@ class AliMtsCallBack(APIView):
             return Response(data='',status=status.HTTP_204_NO_CONTENT)
 
 class AliMtsCallBack_process(APIView):
+    permission_classes = [AllowAny]
     def post(self,request,*args,**kwargs):
         '''
         逻辑处理

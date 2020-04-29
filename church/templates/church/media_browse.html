@@ -286,6 +286,7 @@
                         this.activeTab = page
                     },
                     onSeriesChange:function(sereis){
+                        if (sereis == 'upload') {return}
                         this.showFiles(this.activeTab,sereis,this.page[this.activeTab])
                     },
                     showFiles:function(type,series,page){
