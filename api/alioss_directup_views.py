@@ -354,10 +354,17 @@ class AliMtsCallBack(APIView):
 
             # ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
             # ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
+            url1 = "http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
 
-            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox'], data) as f:
+            url2 = "http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
+
+            theLogger.info(url1)
+            theLogger.info(url2)
+
+
+            with urllib.request.urlopen(url1, data) as f:
                 theLogger.info(f.read().decode('utf-8'))
-            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod'], data) as f:
+            with urllib.request.urlopen(url2, data) as f:
                 theLogger.info(f.read().decode('utf-8'))
 
         except Exception as e:
