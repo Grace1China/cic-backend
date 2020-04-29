@@ -72,7 +72,7 @@
                             <el-select 
                                 v-model="curdir" 
                                 filterable placeholder="请选择专栏系列"
-                                @change="showFiles"
+                                @change="onSeriesChange(activeTab,1)"
                             >
                                 {% for key,value in series.items %}
                                     <el-option
@@ -94,7 +94,7 @@
             </el-header>
             <el-container id="container">
                 <el-main>
-                    <el-tabs v-model="activeName" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
+                    <el-tabs v-model="activeTab" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
                         <el-tab-pane label="图片" name="images">
                             <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
                                 <el-col :span="4" v-for="jj in 6" :key="jj">
@@ -211,7 +211,7 @@
                     return {
                         church:'{{ churchcode }}',
                         curdir: '{{ dirs.0 }}',
-                        activeName: 'images',
+                        activeTab: 'images',
                         dialogImageUrl: '',
                         dialogVisible: false,
                         errorDisplay:'none',
@@ -246,7 +246,7 @@
                         //存放在一个store里面
                         //自动绑定到相关的页面里面
                         console.log('-------showImages----------')
-                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','type':this.activeName,'series':path,'page':1})
+                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','type':this.activeTab,'series':path,'page':1})
                     },
                     
                     theImage(i,j){
@@ -267,8 +267,8 @@
                                  store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
                             }
                         }*/
-                        this.page[this.activeName] = (++this.page[this.activeName] >=1 ? this.page[this.activeName] : 1)
-                        this.showFiles(tab.name,this.curdir,this.page[this.activeName])
+                        this.page[this.activeTab] = (++this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
+                        this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
                     },
                     prev:function(){
                         //dl = document.getElementsByClassName('image')
@@ -278,14 +278,16 @@
                         //store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':''} )
                         //    }
                         //}
-                        this.page[this.activeName] = (--this.page[this.activeName] >=1 ? this.page[this.activeName] : 1)
-                        this.showFiles(tab.name,this.curdir,this.page[this.activeName])
+                        this.page[this.activeTab] = (--this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
+                        this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
 
                     },
                     goTab(page){
-                        this.activeName = page
+                        this.activeTab = page
                     },
-                    
+                    onSeriesChange:function(sereis){
+                        this.showFiles(this.activeTab,sereis,this.page[this.activeTab])
+                    },
                     showFiles:function(type,series,page){
                         vm = this
                         store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','runtime':'{{ runtime }}','type':type,'series':series,'page':page}).then(function(){
@@ -296,7 +298,7 @@
                     },
                     handleClick(tab, event) {
                         console.log(tab, event)
-                        console.log(`-----------this.activeName -------${this.activeName}----`)
+                        console.log(`-----------this.activeTab -------${this.activeTab}----`)
                         /*if (tab.name == "videos"){
                             store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
                         }
@@ -307,7 +309,7 @@
                             store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
                         }*/
                         this.loading = true
-                        this.activeName = tab.name
+                        this.activeTab = tab.name
                         this.showFiles(tab.name,this.curdir,this.page.image)
                         
                     },
