@@ -473,7 +473,8 @@ class AliyunMediaStorage(AliyunBaseStorage):
 
                 visible_filename = rc.origin_name
                 # lg.info('key : %s' % key)
-                if is_valid_image_extension(visible_filename):
+                # if is_valid_image_extension(visible_filename):
+                if rc.mime_type.startswith( 'image/' ):
                     thumb = self.get_thumb_filename(media_url)
                 else:
                     thumb = utils.get_icon_filename(visible_filename)
