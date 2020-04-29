@@ -45,7 +45,7 @@ function getOssToken (context,options) {
     console.log(`getOssToken=============`)
     console.log(options)
     host = store.getters.getHost()
-    axios.get(`${host}/alioss_directup_signature_v2`,{params: { 'type': options.type,'object_prefix':options.object_prefix}}).then(function (res) {//'https://bicf-media-destination.oss-accelerate.aliyuncs.com'
+    axios.get(`${host}/rapi/alioss_directup_signature_v2`,{params: { 'type': options.type,'object_prefix':options.object_prefix}}).then(function (res) {//'https://bicf-media-destination.oss-accelerate.aliyuncs.com'
         console.log(res)
         resolve(res)
     })
@@ -90,7 +90,7 @@ const store = new Vuex.Store({
      
       getImages,
       upload2oss,
-      getOssToken,
+      getOssToken,yes
       
     }
   })
