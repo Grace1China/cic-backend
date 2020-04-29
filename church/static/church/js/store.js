@@ -18,6 +18,7 @@ async function getImages (context,par) {
 }
 
 async function upload2oss (context,options) {
+  
   console.log(`upload2oss=============`)
   console.log(options)
   var config = {
@@ -39,15 +40,19 @@ async function upload2oss (context,options) {
   });
 }
 
-async function getOssToken (context,options) {
-  console.log(`getOssToken=============`)
-  console.log(options)
-  host = store.getters.getHost()
-  await axios.get(`${host}/alioss_directup_signature_v2`,{params: { 'type': options.type,'object_prefix':options.object_prefix}}).then(function (res) {//'https://bicf-media-destination.oss-accelerate.aliyuncs.com'
-      console.log(res)
-  })
-  .catch(function (err) {
-    console.log(err)
+function getOssToken (context,options) {
+  return new Promise((resolve, reject) =>{        
+    console.log(`getOssToken=============`)
+    console.log(options)
+    host = store.getters.getHost()
+    await axios.get(`${host}/alioss_directup_signature_v2`,{params: { 'type': options.type,'object_prefix':options.object_prefix}}).then(function (res) {//'https://bicf-media-destination.oss-accelerate.aliyuncs.com'
+        console.log(res)
+        resolve(res)
+    })
+    .catch(function (err) {
+      console.log(err)
+      reject(err)
+    });
   });
 }
 
