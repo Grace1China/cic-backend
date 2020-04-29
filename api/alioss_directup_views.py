@@ -343,19 +343,21 @@ class AliMtsCallBack(APIView):
         '''
         try:
             topic = json.loads(request.body)
+            theLogger.info(topic)
             import urllib.request
             import urllib.parse
             data = urllib.parse.urlencode(topic)
             data = data.encode('ascii')
 
             theLogger.info(request.META)
+            #request.META.HTTP_HOST 是ALIOSS MNS消息设置的地址。但由于只能设置一个地址，所以prod,sandbox都要用到这一个入口。再根据配置文件来选择要处理逻辑的服务器。还因为都布署在日本，所以他们访问的dns目标ip地址自然也就是日本的服务器。
 
-            ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
-            ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
+            # ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox']
+            # ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod']
 
-            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox'], data) as f:
+            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['sandbox'], data) as f:
                 theLogger.info(f.read().decode('utf-8'))
-            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod'], data) as f:
+            with urllib.request.urlopen("http://%s/alioss_mts_finished_process" % settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['prod'], data) as f:
                 theLogger.info(f.read().decode('utf-8'))
 
         except Exception as e:
