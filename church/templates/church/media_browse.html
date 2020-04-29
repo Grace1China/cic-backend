@@ -448,20 +448,20 @@
                         return (this.S4()+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+this.S4()+this.S4());
                     },
                     diyUpload(params) {
-                        const file = params.file,
-                            fileType = file.type,
+                        const thefile = params.file,
+                            fileType = thefile.type,
                             isImage = fileType.indexOf("image") != -1,
-                            isLt2M = file.size / 1024 / 1024 < 2;
+                            isLt2M = thefile.size / 1024 / 1024 < 2;
                         console.log('-----------diyUpload------------')
                         console.log(fileType)
-                        dest = this.getTyp(fileType)
+                        thedest = this.getTyp(fileType)
                         //console.log(dest)
                         //https://bicf-media-destination.oss-accelerate.aliyuncs.com
-                        host = `https://${this.ALIOSS_DESTINATIONS[dest=='videos'?`${dest}.source`:dest]['bucket']}.${this.ALIOSS_DESTINATIONS[dest=='videos'?`${dest}.source`:dest]['endpoint.acc']}`
+                        thehost = `https://${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['bucket']}.${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['endpoint.acc']}`
 
-                        console.log(`dest:${dest};host:${host}`)
+                        console.log(`dest:${thedest};host:${thehost}`)
                         
-                        tokenParams ={'type':dest,'object_prefix':`${this.church}/${this.curdir}/`}
+                        tokenParams ={'type':thedest,'object_prefix':`${this.church}/${this.curdir}/`}
                         thisV = this
                         store.dispatch('getOssToken',tokenParams).then((res)=>{
                             console.log('---------getOssToken----------')
@@ -474,12 +474,12 @@
                             fd.append('callback', res.data.token['callback'])
                             fd.append('key', `${thisV.church}/${thisV.curdir}/${thisV.guid()}`)//这个是oss中的key,随机 不用这个前缀方式了L3${(this.curdir||'').length>1?'/'+this.curdir:''}/
                             fd.append('x:originname', thisV.name)//文件原有名称 x是自定义oss回调变量
-                            fd.append('x:dest', `${dest}`)//所属的文件目标桶类型
+                            fd.append('x:dest', `${thedest}`)//所属的文件目标桶类型
                             fd.append('x:seriesrespath', `${ thisV.curdir }`)
                             fd.append('x:church', `${ thisV.church }`)
-                            fd.append('file', file)
+                            fd.append('file', thefile)
                             option = {
-                                'host':host,
+                                'host':thehost,
                                 'form':fd,
                                 'uploader':params
                             }
