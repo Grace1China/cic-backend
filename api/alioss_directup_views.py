@@ -211,7 +211,7 @@ class AliOssSignatureV2(AliOssSignature):
                 typ = data.get('type','images')
                 object_prefix = data.get('object_prefix','')
 
-                token = super(AliOssSignatureV2).cls_get_token(object_prefix,typ=typ)#现在存储结构，不按教会在物理上分了。只在数据库中分。是在回写中，带入了前端传入的教会名称。
+                token = AliOssSignature.cls_get_token(object_prefix,typ=typ)#现在存储结构，不按教会在物理上分了。只在数据库中分。是在回写中，带入了前端传入的教会名称。
                 # AliOssSignature.cls_get_token(request.user.church.code,typ=typ)
                 # token = self.get_token(request)
                 ret = {'errCode': '0', 'msg':'success','token': token}
