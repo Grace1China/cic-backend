@@ -224,7 +224,9 @@ class AliOssSignatureV2(AliOssSignature):
             return JsonResponse(ret, safe=False)
             
     @classmethod
-    def cls_get_token(cls,object_prefix,typ='images'):
+    def cls_get_token(cls,object_prefix,typ='images',host=''):
+        if host != '':
+            AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback" %  host
         return AliOssSignature.cls_get_token(object_prefix,typ=typ)
 
 
