@@ -91,6 +91,7 @@ class AliOssSignature(APIView):
             callback_dict['callbackBodyType'] = 'application/x-www-form-urlencoded'
 
             #import logging
+            theLogger.info('------------callback_dict---------------')
             theLogger.info(callback_dict)
             callback_param = json.dumps(callback_dict).strip()
             base64_callback_body = base64.b64encode(callback_param.encode())
