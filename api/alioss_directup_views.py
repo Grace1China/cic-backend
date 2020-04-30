@@ -499,6 +499,8 @@ class AliMtsCallBack_process(APIView):
         '''
         在alist中找出，typ和name相等的工作流，查看其成功状态
         '''
+        theLogger.info('----------------_is_sucess alist----------------')
+        theLogger.info(alist)
         for ite in alist:
             if ite['Type'] == typ and ite['Name'] == name:
                 return ite['State'] == 'Success'
