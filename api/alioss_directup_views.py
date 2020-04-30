@@ -503,7 +503,7 @@ class AliMtsCallBack_process(APIView):
             if ite['Type'] == type and ite['Name'] == name:
                 return ite['State'] == 'Success'
             else:
-                raise Exception ("the type(%s) and name(%s) is not find." % {typ,name})
+                raise Exception ("the type(%s) and name(%s) is not find." % (typ,name))
         return False
 
 
