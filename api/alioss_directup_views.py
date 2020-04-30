@@ -400,7 +400,7 @@ class AliMtsCallBack_process(APIView):
 
             # init:uploaded
 
-            topic = json.loads(request.data)
+            topic = request.data
             theLogger.error(topic)
             msg = json.loads(topic['Message'])
             theLogger.info(msg)
