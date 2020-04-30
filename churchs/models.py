@@ -116,6 +116,16 @@ class MediaFile(models.Model):
     '''
     用来存储oss的单个媒体文件
     '''  
+
+    STATUS_UPLOADED = 1
+    STATUS_TRANSCODING = 2
+    STATUS_TRANSCODED = 3
+    MEDIA_STATUS = (
+        (STATUS_UPLOADED,'上传完成'),
+        (STATUS_TRANSCODING,'正在转码'),
+        (STATUS_TRANSCODED,'转码发布')
+    )
+
     id = models.AutoField(primary_key=True)
     # church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     # user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
@@ -129,6 +139,9 @@ class MediaFile(models.Model):
     mime_type = models.CharField(max_length=50, default='',verbose_name='媒体类型')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    video_file_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_UPLOADED,verbose_name='视频文件状态')
+    video_file_tcinfo = models.CharField(max_length=1000, default='{"image1":"00001.jpg","image2":"00002.jpg","image3":"00003.jpg","sd":"sd.mp4","hd":"hd.mp4","ld":"ld.mp4","audio":"320.mp3"}',verbose_name='视频转码文件')
     # pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
     # status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
 

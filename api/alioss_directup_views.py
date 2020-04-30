@@ -395,49 +395,109 @@ class AliMtsCallBack_process(APIView):
 
             theLogger.error('-------------------in post ----------------------')
             # {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'MediaWorkflowExecution': {'MediaWorkflowId': 'cf66e7b257ef47d089c03b323a30840c', 'Name': 'base', 'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'MediaId': '2300c53ed1ab411fbca2f66519f153a2', 'Input': {'InputFile': {'Bucket': 'bicf-media-source', 'Location': 'oss-cn-beijing', 'Object': 'zgc/20200426ZGCENGM.mp4'}}, 'State': 'Completed', 'ActivityList': [{'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'Act-Report', 'Type': 'Report', 'State': 'Success', 'StartTime': '2020-04-26T03:08:10Z', 'EndTime': '2020-04-26T03:08:10Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'Act-Start', 'Type': 'Start', 'JobId': 'eb27a74949eb43b9b5a472c10294eec6', 'State': 'Success', 'StartTime': '2020-04-26T02:56:21Z', 'EndTime': '2020-04-26T02:56:22Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'base', 'Type': 'Snapshot', 'JobId': 'e2a2574e9db04ff7afab0a2c780f847c', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T02:56:24Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'HD', 'Type': 'Transcode', 'JobId': 'ba9cd39ad7ad47869044e47361ce6b45', 'TemplateId': 'S00000001-200030', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T03:08:10Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'LD', 'Type': 'Transcode', 'JobId': 'acf40e2037a642c78032b7f138366c3b', 'TemplateId': 'S00000001-200010', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T03:01:44Z'}, {'RunId': '10ec94999fe441eaa665f2d7a509d4b5', 'Name': 'SD', 'Type': 'Transcode', 'JobId': '55ee0050ecfd4e09a840e7de09cdc760', 'TemplateId': 'S00000001-200020', 'State': 'Success', 'StartTime': '2020-04-26T02:56:22Z', 'EndTime': '2020-04-26T03:03:34Z'}], 'CreationTime': '2020-04-26T02:56:21Z', 'RequestId': '5EA4F7F0A15238BAA7390A40'}}
-            theLogger.info(request.data)
-            topic = json.loads(request.body)
+            # theLogger.info(request.data)
+            # <QueryDict: {'TopicOwner': ['1033804772597714'], 'Message': ['{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"Act-Start","Type":"Start","JobId":"80206293a5fe4ad08dc1fe7e7c92bcef","State":"Success","MediaWorkflowExecution":{"MediaWorkflowId":"cf66e7b257ef47d089c03b323a30840c","Name":"base","RunId":"8c1bd382359f40cbbf5494b80608d223","MediaId":"883a6df7ecf44407b1c05ed35a7586be","Input":{"InputFile":{"Bucket":"bicf-media-source","Location":"oss-cn-beijing","Object":"L3/series_2/d6916688-5935-9414-bc7c-6517fff2da49"}},"State":"Running","ActivityList":[{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"Act-Start","Type":"Start","JobId":"80206293a5fe4ad08dc1fe7e7c92bcef","State":"Success","StartTime":"2020-04-29T11:33:32Z","EndTime":"2020-04-29T11:33:33Z"}],"CreationTime":"2020-04-29T11:33:32Z","RequestId":"5EA965FB9AB67D0F74E47D1F"}}'], 'Subscriber': ['1033804772597714'], 'PublishTime': ['1588160013206'], 'SubscriptionName': ['alioss-mts-finished'], 'MessageMD5': ['13FCF4F656F11B85B8629F77C27A3218'], 'TopicName': ['Media-upload'], 'MessageId': ['21680D1B7EFC7FF44A2F94647B954153']}>
+
+            # init:uploaded
+
+            topic = json.loads(request.data)
             theLogger.error(topic)
             msg = json.loads(topic['Message'])
-            theLogger.error(msg)
+            theLogger.info(msg)
 
-            if msg['MediaWorkflowExecution']['State'] != 'Completed':
+            if msg['Name'] == 'Act-Start' and msg['Type'] == 'Start' and msg['State'] == "Success":
+                Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
+                Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
+                Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
+
+                mfile = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
+                mfile.video_file_status = MediaFile.STATUS_TRANSCODING
+                mfile.save()
+                theLogger.info(mfile)
+               
+            if msg['Name'] == 'Act-Report' and msg['Type'] == 'Report' and msg['State'] == "Success" and msg['MediaWorkflowExecution']['State'] == 'Completed':
+                
+                Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
+                Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
+                Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
+
+                mfile = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
+                mfile.video_file_status = MediaFile.STATUS_TRANSCODED
+                dictInfo = dict()
+                dictInfo['image1'] = '00001.jpg' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Snapshot','base') else ''
+                dictInfo['image2'] = '00002.jpg' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Snapshot','base') else ''
+                dictInfo['image3'] = '00003.jpg' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Snapshot','base') else ''
+                dictInfo['sd'] = 'sd.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','SD') else ''
+                dictInfo['hd'] = 'hd.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','HD') else ''
+                dictInfo['ld'] = 'ld.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','LD') else ''
+                dictInfo['audio'] = 'ld.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','TRANSCODE_1588052100160') else ''
+                mfile.video_file_tcinfo = json.dumps(dictInfo)
+                mfile.save()
+                theLogger.info(mfile)
+
+                auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+                bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+                bucket.put_object_acl('%s/%s' % (Object,dictInfo['image1']), oss2.OBJECT_ACL_PUBLIC_READ)
+                bucket.put_object_acl('%s/%s' % (Object,dictInfo['image2']), oss2.OBJECT_ACL_PUBLIC_READ)
+                bucket.put_object_acl('%s/%s' % (Object,dictInfo['image3']), oss2.OBJECT_ACL_PUBLIC_READ)
+                bucket.put_object_acl('%s/%s' % (Object,dictInfo['sd']), oss2.OBJECT_ACL_PUBLIC_READ)
                 return Response(data='',status=status.HTTP_204_NO_CONTENT)
 
-            Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
-            Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
-            Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
 
-            key_arr = Object.split('/')
-            filename_arr = key_arr[1].rsplit('.',1)
 
-            quotedfn = urllib.parse.quote(filename_arr[0])
-
-            alioss_video = '%s/%s.%s' % (key_arr[0],quotedfn,filename_arr[1])
-            alioss_SHD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4')
-            alioss_HD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4')
-            alioss_SD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4')
-            alioss_image = '%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg')
-
-            theLogger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
-            qrset = md.Media.objects.filter(alioss_video__iexact=alioss_video)
+                # <QueryDict: {'TopicOwner': ['1033804772597714'], 'Message': ['{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"Act-Report","Type":"Report","State":"Success","MediaWorkflowExecution":{"MediaWorkflowId":"cf66e7b257ef47d089c03b323a30840c","Name":"base","RunId":"8c1bd382359f40cbbf5494b80608d223","MediaId":"883a6df7ecf44407b1c05ed35a7586be","Input":{"InputFile":{"Bucket":"bicf-media-source","Location":"oss-cn-beijing","Object":"L3/series_2/d6916688-5935-9414-bc7c-6517fff2da49"}},"State":"Completed","ActivityList":[{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"Act-Report","Type":"Report","State":"Success","StartTime":"2020-04-29T11:35:54Z","EndTime":"2020-04-29T11:35:54Z"},{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"Act-Start","Type":"Start","JobId":"80206293a5fe4ad08dc1fe7e7c92bcef","State":"Success","StartTime":"2020-04-29T11:33:32Z","EndTime":"2020-04-29T11:33:33Z"},{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"base","Type":"Snapshot","JobId":"462003644bcb41ff8a3bbc6617f560db","State":"Success","StartTime":"2020-04-29T11:33:33Z","EndTime":"2020-04-29T11:33:35Z"},{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"HD","Type":"Transcode","JobId":"4c3a659d3b7543128b214a9dd4327da9","TemplateId":"S00000001-200030","State":"Success","StartTime":"2020-04-29T11:33:33Z","EndTime":"2020-04-29T11:35:53Z"},{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"LD","Type":"Transcode","JobId":"604e257495fa4b70bad5411b4b598f71","TemplateId":"S00000001-200010","State":"Success","StartTime":"2020-04-29T11:33:33Z","EndTime":"2020-04-29T11:34:32Z"},{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"SD","Type":"Transcode","JobId":"6b7b21159fa04b11a94e5d6804d30e1d","TemplateId":"S00000001-200020","State":"Success","StartTime":"2020-04-29T11:33:33Z","EndTime":"2020-04-29T11:34:53Z"},{"RunId":"8c1bd382359f40cbbf5494b80608d223","Name":"TRANSCODE_1588052100160","Type":"Transcode","JobId":"7aaf6bc2334d4e63ac104b8db308632d","TemplateId":"S00000001-300050","State":"Success","StartTime":"2020-04-29T11:33:33Z","EndTime":"2020-04-29T11:34:27Z"}],"CreationTime":"2020-04-29T11:33:32Z","RequestId":"5EA965FB9AB67D0F74E47D1F"}}'], 'Subscriber': ['1033804772597714'], 'PublishTime': ['1588160154126'], 'SubscriptionName': ['alioss-mts-finished'], 'MessageMD5': ['CE86DE579D44FB631D8200FB501493F3'], 'TopicName': ['Media-upload'], 'MessageId': ['21680D1B7EFC7FF47A249466A20E5666']}>
+            
 
             
-            theLogger.error(qrset)
 
-            
-            qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
-            auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
-            bucket.put_object_acl(alioss_image, oss2.OBJECT_ACL_PUBLIC_READ)
-            bucket.put_object_acl(alioss_HD_URL, oss2.OBJECT_ACL_PUBLIC_READ)
+                # if msg['MediaWorkflowExecution']['State'] != 'Completed':
+
+                # Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
+                # Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
+                # Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
+
+                # key_arr = Object.split('/')
+                # filename_arr = key_arr[1].rsplit('.',1)
+
+                # quotedfn = urllib.parse.quote(filename_arr[0])
+
+                # alioss_video = '%s/%s.%s' % (key_arr[0],quotedfn,filename_arr[1])
+                # alioss_SHD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-hd',filename_arr[0],'mp4')
+                # alioss_HD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-sd',filename_arr[0],'mp4')
+                # alioss_SD_URL = '%s/%s/%s.%s' % (key_arr[0],'mp4-ld',filename_arr[0],'mp4')
+                # alioss_image = '%s/%s.%s' % (key_arr[0],filename_arr[0],'jpg')
+
+                # theLogger.error('alioss_video:%s \n alioss_SHD_URL:%s \n alioss_HD_URL:%s \n alioss_SD_URL:%s \n alioss_image:%s \n' % (alioss_video,alioss_SHD_URL,alioss_HD_URL,alioss_SD_URL,alioss_image))
+                # qrset = md.Media.objects.filter(alioss_video__iexact=alioss_video)
+
+                
+                # theLogger.error(qrset)
+
+                
+                # qrset.update(alioss_video_status=md.Media.STATUS_DISTRIBUTED,alioss_SHD_URL=alioss_SHD_URL,alioss_HD_URL=alioss_HD_URL,alioss_SD_URL=alioss_SD_URL,alioss_image=alioss_image)
+                # auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+                # bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATION_ENDPOINT, settings.ALIOSS_DESTINATION_BUCKET_NAME)
+                # bucket.put_object_acl(alioss_image, oss2.OBJECT_ACL_PUBLIC_READ)
+                # bucket.put_object_acl(alioss_HD_URL, oss2.OBJECT_ACL_PUBLIC_READ)
         except Exception as e:
             import traceback
-            ret = {'errCode': '1001', 'msg': 'there is an exception check logs','sysErrMsg':traceback.format_exc()}
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e
         finally:
             return Response(data='',status=status.HTTP_204_NO_CONTENT)
+    
+    def _is_sucess(self,alist,typ,name):
+        '''
+        在alist中找出，typ和name相等的工作流，查看其成功状态
+        '''
+        for ite in alist:
+            if ite['Type'] == type and ite['Name'] == name:
+                return ite['State'] == 'Success'
+            else:
+                raise Exception ("the type(%s) and name(%s) is not find." % {typ,name})
+        return False
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
