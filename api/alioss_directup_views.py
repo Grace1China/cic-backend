@@ -410,7 +410,10 @@ class AliMtsCallBack_process(APIView):
                 Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
                 Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
 
-                mfile = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
+                qrset = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
+                if len(qrset) != 1:
+                    raise Exception ('file record count is %d, need be 1' % len(qrset))
+                mfile = qrset[0]
                 mfile.video_file_status = MediaFile.STATUS_TRANSCODING
                 mfile.save()
                 theLogger.info(mfile)
@@ -421,7 +424,10 @@ class AliMtsCallBack_process(APIView):
                 Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
                 Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
 
-                mfile = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
+                qrset = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
+                if len(qrset) != 1:
+                    raise Exception ('file record count is %d, need be 1' % len(qrset))
+                mfile = qrset[0]
                 mfile.video_file_status = MediaFile.STATUS_TRANSCODED
                 dictInfo = dict()
                 dictInfo['image1'] = '00001.jpg' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Snapshot','base') else ''
