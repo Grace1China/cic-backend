@@ -409,6 +409,7 @@ class AliMtsCallBack_process(APIView):
                 Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
                 Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
                 Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
+                theLogger.info('Bucket %s Object %s Location %s' % (Bucket,Object,Location))
 
                 qrset = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
                 if len(qrset) != 1:
@@ -419,12 +420,11 @@ class AliMtsCallBack_process(APIView):
                 theLogger.info(mfile)
                
             if msg['Name'] == 'Act-Report' and msg['Type'] == 'Report' and msg['State'] == "Success" and msg['MediaWorkflowExecution']['State'] == 'Completed':
-                
                 Bucket = msg['MediaWorkflowExecution']['Input']['InputFile']['Bucket']
                 Object = msg['MediaWorkflowExecution']['Input']['InputFile']['Object']
                 Location = msg['MediaWorkflowExecution']['Input']['InputFile']['Location']
-
-                qrset = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
+                theLogger.info('Bucket %s Object %s Location %s' % (Bucket,Object,Location))
+                mfile = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
                 if len(qrset) != 1:
                     raise Exception ('file record count is %d, need be 1' % len(qrset))
                 mfile = qrset[0]
