@@ -129,7 +129,7 @@ class MediaFile(models.Model):
     id = models.AutoField(primary_key=True)
     # church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     # user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
-    name = models.CharField(max_length=200, default='',unique=True,verbose_name='oss存储key GUID')
+    name = models.CharField(max_length=200, default='',unique=True,verbose_name='oss存储key GUID') #目前保持唯一。guid也应该是唯一
     origin_name = models.CharField(max_length=200, default='',verbose_name='媒体原有文件名')
     endpoint = models.CharField(max_length=200, default='',verbose_name='桶地址')
     bucket = models.CharField(max_length=200, default='',verbose_name='桶名称')
