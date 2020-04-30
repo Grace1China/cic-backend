@@ -500,7 +500,7 @@ class AliMtsCallBack_process(APIView):
         在alist中找出，typ和name相等的工作流，查看其成功状态
         '''
         for ite in alist:
-            if ite['Type'] == type and ite['Name'] == name:
+            if ite['Type'] == typ and ite['Name'] == name:
                 return ite['State'] == 'Success'
             else:
                 raise Exception ("the type(%s) and name(%s) is not find." % (typ,name))
