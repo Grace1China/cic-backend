@@ -504,11 +504,8 @@ class AliMtsCallBack_process(APIView):
         for ite in alist:
             if ite['Type'] == typ and ite['Name'] == name:
                 return ite['State'] == 'Success'
-            else:
-                raise Exception ("the type(%s) and name(%s) is not find." % (typ,name))
-        return False
-
-
+        
+        raise Exception ("the type(%s) and name(%s) is not find." % (typ,name))
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
