@@ -384,7 +384,7 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
         Generate thumb filename by adding _thumb to end of
         filename before . (if present)
         """
-        return '%s?%s' % (file_name,'x-oss-process=style/wh100_auto')
+        return '%s?%s' % (file_name,'x-oss-process=style/wh124')
 
     def get_files_browse_urls(self,user=None,typ=None,path='',marker = ''):
         """
@@ -457,7 +457,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
             from .utils import is_valid_image_extension
             lg.info(typ)
             files = []
-            dirs = set()
+            # dirs = set()
             for rc in results :
                 
                 filename = rc.name  #bucket key
@@ -472,8 +472,6 @@ class AliyunMediaStorage(AliyunBaseStorage):
                 media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
 
                 visible_filename = rc.origin_name
-                # lg.info('key : %s' % key)
-                # if is_valid_image_extension(visible_filename):
                 if rc.mime_type.startswith( 'image/' ):
                     thumb = self.get_thumb_filename(media_url)
                 else:
@@ -486,9 +484,10 @@ class AliyunMediaStorage(AliyunBaseStorage):
                     'visible_filename': visible_filename,
                 })
                 
-            lg.info('last (files dirs):')
-            lg.info((files,dirs))
-            return (files,dirs)
+            # lg.info('last (files dirs):')
+            # lg.info((files,dirs))
+            lg.info('-----get_files_from_db----files---')
+            return files
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e
@@ -532,6 +531,143 @@ class AliyunMediaStorage(AliyunBaseStorage):
         key = urlquote(key, safe='/?=')
         p = urlparse(self.end_point)
         return '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
+    
+    def media_url_v2(self,key,addUpath=False,dest="source"):
+        auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+        bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
+        theLogger.info(bucket)
+
+        theLogger.info(key)
+
+        if not bucket.object_exists(key) :
+            return "" #不存在文件 返回空
+
+        retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+
+        if bucket.get_object_acl(key).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+            retval = retval.split('?')[0]
+        else:
+            pass
+            #通过nginx来转发，国内国外请求，可以减少费用。但是目前还不是很稳定，所以等后台有了动态配置功能后再实施？
+        from oss2.compat import urlquote,urlparse
+        key = urlquote(retval, safe='/?=')
+        p = urlparse(self.end_point)
+        return '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
+
+from oss2.compat import urlquote,urlparse
+@deconstructible
+class AliyunVideoStorage(AliyunBaseStorage):
+    
+    location = '/'#settings.MEDIA_ROOT
+    destination = "source" #在父类url中使用取得redirect url getattr(self, 'out')# 获取子类的out()方法
+    def get_files_from_db(self,user=None,typ=None,series='',page=1):
+        '''
+        从数据库中，查找媒体记录
+        '''
+        try:
+            if typ != 'videos':
+                raise Exception(' typ should be videos ')
+            self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url  同时会对self.destination进行赋值
+            lg.info('mime_type:%s chuAliyunVideoStoragerch_prefix%s series_prefix%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series))
+            qrset = MediaFile.objects.filter(mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],church_prefix=user.church.code,series_prefix=series).order_by('-update_time')
+            lg.info(qrset)
+            pg = Paginator(qrset, 18)
+            results = pg.page(page)
+
+            from  ckeditor_uploader import utils 
+            from .utils import is_valid_image_extension
+            lg.info(typ)
+            files = []
+            # dirs = set()
+            for rc in results :
+                filename = rc.name  #bucket key
+                key = self._normalize_name(self._clean_name(filename))
+                key = key.encode('utf8')
+                # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+                
+                key = urlquote(key, safe='/?=')
+                dest = self._get_destination(typ)  
+                enp = settings.ALIOSS_DESTINATIONS[dest]['endpoint'] #这里得到源桶
+                if enp != rc.endpoint :
+                    raise Exception(' settings and db endpoint not match. ')
+                p = urlparse(enp)
+
+                media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
+                signed_url = self.bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+                
+                '%s.destination' % typ
+                tcinfo ={"image1": "00001.jpg", "image2": "00002.jpg", "image3": "00003.jpg", "sd": "sd.mp4", "hd": "hd.mp4", "ld": "ld.mp4", "audio": "ld.mp4"}
+                tcinfo['image1'] = self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['image1']))
+                tcinfo['image2'] = self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['image2']))
+                tcinfo['image3'] = self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['image3']))
+                tcinfo['sd'] = self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['sd']))
+                tcinfo['hd'] = self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['hd']))
+                tcinfo['ld'] = self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['ld']))
+                tcinfo['audio'] =self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['audio']))
+
+                   
+                #视频需求返回的数据有源桶的signed_url,只要存在就可以；2 要返回状态 3 返回redirecturl
+                #images只要返回thumb src 
+                visible_filename = rc.origin_name
+                thumb = utils.get_icon_filename(visible_filename)
+
+                files.append({
+                    'thumb': thumb,
+                    'src': signed_url,
+                    'is_image': False,
+                    'visible_filename': visible_filename,
+                    'video_status':rc.video_file_status,
+                    'video_tcinfo':tcinfo,
+                })
+                
+            # lg.info('last (files dirs):')
+            # lg.info((files,dirs))
+            lg.info('-----get_files_from_db----files---')
+            lg.info(files)
+            return files
+        except Exception as e:
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+    def _media_url(self,dest,key):
+        if dest not in settings.ALIOSS_DESTINATIONS:
+            raise Exception('dest %s not in ALIOSS_DESTINATIONS' % dest)
+        
+        enp = settings.ALIOSS_DESTINATIONS[dest]['endpoint'] #
+        p = urlparse(enp)
+        media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
+        return media_url
+
+        # signed_url = self.bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+
+    def _get_destination(self,dest="destination"):
+        '''
+        '''
+        return '%s.source' % dest
+
+    def _set_bucket(self,dest="destination"):
+        '''
+        这个里面包含了，源桶和目标桶的逻辑。比如。当videos取不到时，取videos的源桶。videos.source
+        '''
+        if dest not in settings.ALIOSS_DESTINATIONS:
+            if '%s.source' % dest not in settings.ALIOSS_DESTINATIONS:
+                raise Exception('%s or %s not find the destination bucket' % (dest,'%s.source' % dest))
+            else:
+                self.destination = '%s.source' % dest
+                self.bucket_name = settings.ALIOSS_DESTINATIONS['%s.source' % dest]['bucket']
+        else:
+            self.destination = dest
+            self.bucket_name = settings.ALIOSS_DESTINATIONS[dest]['bucket']
+        
+        try:
+            if self.bucket_name not in super()._list_bucket(self.service):
+                # create bucket if not exists
+                self.bucket = super()._create_bucket(self.auth)
+            else:
+                # change bucket acl if not consists
+                self.bucket = super()._check_bucket_acl(self._get_bucket(self.auth))
+        except AccessDenied:
+            # 当启用了RAM访问策略，是不允许list和create bucket的
+            self.bucket = super()._get_bucket(self.auth)
 
 @deconstructible
 class AliyunStaticStorage(AliyunBaseStorage):

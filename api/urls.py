@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .views import ChurchViewSet,EweeklyViewSet,SermonViewOneSet,SermonListViewSet
 from .user_view import CustomUserViewSet,CustomUserInfoViewSet
 from . import views
-from .alioss_directup_views import AliOssSignature, AliOssCallBack,AliOssSignatureV2
+from .alioss_directup_views import AliOssSignature, AliOssCallBack,AliOssSignatureV2,AliOssCallBack_V2
 from . import alioss_directup_views
 from rest_framework import permissions
 
@@ -93,6 +93,8 @@ urlpatterns = [
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
     path("alioss_directup_signature_v2",AliOssSignatureV2.as_view(),name="alioss_directup_signature_v2"),
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback"),
+    path("alioss_directup_callback_v2",AliOssCallBack_V2.as_view(),name="alioss_directup_callback_v2"),
+
     path("alioss_mts_finished",alioss_directup_views.AliMtsCallBack.as_view(),name="alioss_mts_finished"),
     path("alioss_mts_finished_process",alioss_directup_views.AliMtsCallBack_process.as_view(),name="alioss_mts_finished_process"),
 

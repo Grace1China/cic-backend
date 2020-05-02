@@ -15,19 +15,30 @@
             a.thumb { text-align: center; display: block; float: left; width: 75px; height: 75px; word-wrap: break-word; line-height: 1.2em; overflow: hidden; }
             a.thumb img { display: inline-block; }
             span.filename { color: #666; font-size: 0.95em; }
-            #container { min-width: 880px; }
+            #gallery { min-width: 880px; }
             #search {
                 display:flex;
                 
             }
             .image_check{
-                width: 134px;
-                height: 145px !important;
+                width: 100%;
+                {% comment %} height: 100px !important; {% endcomment %}
             }
-            .image {
-                width: 125px;
+
+            .mediacard{
+                width:128px;
+                min-width:128px;
+            }
+
+
+            .thumbimg {
+                width: 100%;
                 height: 100px;
                 display: block;
+            }
+            .el-checkbox.is-bordered{
+                height:auto;
+                padding:0;
             }
             .el-checkbox__inner{
                 position:absolute;
@@ -43,6 +54,9 @@
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 margin-top:10px;
+                position: absolute;
+                bottom: 0;
+                left: 0;
             }
             .toolbar {
                 display: inline-flex;
@@ -61,6 +75,30 @@
                 text-align: center;
                 width: fit-content;
             }
+            .extra-bar{
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+                cursor: default;
+                text-align: center;
+                color: #fff;
+                opacity: 0;
+                font-size: 20px;
+                background-color: rgba(0,0,0,.5);
+                transition: opacity .3s;
+            }
+            .hover .extra-bar{
+                opacity: 1;
+            }
+            .el-checkbox__inner{
+                left:0 !important;
+            }
+            .cktitle span{
+                line-height : 1em;
+            }
+            
         </style>
     </head>
     <body>
@@ -92,44 +130,101 @@
                     <el-button type="primary" @click="goTab('upload')">上传upload<i class="el-icon-upload"></i></el-button>
                 </div>
             </el-header>
-            <el-container id="container">
+            <el-container id="gallery">
                 <el-main>
                     <el-tabs v-model="activeTab" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
                         <el-tab-pane label="图片" name="images">
-                            <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
-                                <el-col :span="4" v-for="jj in 6" :key="jj">
-                                    <el-checkbox 
+                            <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
+                                :style="{ display: 'flex'}"
+                            >
+                                <div  v-for="jj in 6" :key="jj"
+                                    
+                                >
+                                    <el-card :body-style="{ padding: '0px' ,border: '0', position: 'relative', minWidth: '128px' }"
                                         v-if=" (theImage(ii,jj).src||'') != '' "
-                                        label="备选项1" 
-                                        border class="image_check"
+                                        class='mediacard'
                                     >
-                                        <img 
-                                            :src=`${theImage(ii,jj).thumb}` 
-                                            :data-src=`${theImage(ii,jj).src}` class="image"/>
-                                            <div class="imagetitle">
-                                                [[ theImage(ii,jj).visible_filename ]]
-                                            </div>
-                                    </el-checkbox>
-                                </el-col>
-                            </el-row>
+                                        <el-checkbox 
+                                            border
+                                            :style="{ width: '100%'}"
+                                        >
+                                            <img 
+                                                :src=`${theImage(ii,jj).thumb}` 
+                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg"
+                                                :style="{ width: '100%'}"
+                                            />
+                                            <hovercard>
+                                                <div class='extra-bar'>
+                                                    <span
+                                                        @click.stop.prevent="handlePictureCardPreview({'url':theImage(ii,jj).src})"
+                                                    >
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span
+                                                        @click="removeKey(theImage(ii,jj).src)"
+                                                    >
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </div>
+                                            </hovercard>
+                                        </el-checkbox>
+                                        <span>[[ theImage(ii,jj).visible_filename | shortname ]]
+                                        </span>
+                                    </el-card>
+                                    
+                                    
+                                    
+                                </div>
+                                    
+                            </div>
                         </el-tab-pane>
                         <el-tab-pane label="影片" name="videos">
-                            <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
-                                <el-col :span="4" v-for="jj in 6" :key="jj">
-                                    <el-checkbox 
+                            <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
+                                :style="{ display: 'flex'}"
+                            >
+                                <div :span="4" v-for="jj in 6" :key="jj">
+                                    <el-card :body-style="{ padding: '0px' , position: 'relative' , width: '100%'}"
                                         v-if=" (theImage(ii,jj).src||'') != '' "
-                                        label="备选项1" 
-                                        border class="image_check"
+                                        class='mediacard'
+                                        
                                     >
-                                        <img 
-                                            :src=`${theImage(ii,jj).thumb}` 
-                                            :data-src=`${theImage(ii,jj).src}` class="videos"/>
-                                            <div class="imagetitle">
-                                                [[ theImage(ii,jj).visible_filename ]]
+                                        <el-checkbox 
+                                            border
+                                            :style="{ width: '100%'}"
+                                            v-loading="theImage(ii,jj).video_status!=3"
+                                        >
+                                            <div class="thumbimg"
+                                            >
+                                                <img 
+                                                    :src=`${theImage(ii,jj).video_status==3?(theImage(ii,jj).video_tcinfo||{}).image3+'?x-oss-process=style/wh124':theImage(ii,jj).thumb}` 
+                                                    :data-src=`${theImage(ii,jj).video_status==3?(theImage(ii,jj).video_tcinfo||{}).sd:theImage(ii,jj).src}`
+                                                />
                                             </div>
-                                    </el-checkbox>
-                                </el-col>
-                            </el-row>
+                                            
+                                            <hovercard>
+                                                <!-- 1、上传成功 状态为1。后显示一个cover就好。 -->
+                                                <!-- 2、转码开始 状态为2。并且有转码中。。。的提示 -->
+                                                <!-- 2、转码开始 状态为3。显示一个比较好图 -->
+                                                <div class='extra-bar'>
+                                                    <span
+                                                        @click.stop.prevent="handlePictureCardPreview({'url':(theImage(ii,jj).video_tcinfo||{}).sd})"
+                                                    >
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span
+                                                        @click="removeKey(theImage(ii,jj).src)"
+                                                    >
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </div>
+                                            </hovercard>
+                                        </el-checkbox>
+                                        <span>
+                                            [[ theImage(ii,jj).visible_filename | shortname]]
+                                        </span>
+                                    </el-card>
+                                </div>
+                            </div>
                         </el-tab-pane>
                         <el-tab-pane label="音乐" name="audios">
                             <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
@@ -143,7 +238,7 @@
                                             :src=`${theImage(ii,jj).thumb}` 
                                             :data-src=`${theImage(ii,jj).src}` class="videos"/>
                                             <div class="imagetitle">
-                                                [[ theImage(ii,jj).visible_filename ]]
+                                                [[ theImage(ii,jj).visible_filename | shortname]]
                                             </div>
                                     </el-checkbox>
                                 </el-col>
@@ -192,6 +287,11 @@
                             </el-alert>
                         </el-tab-pane>
                     </el-tabs>
+                    <el-dialog :visible.sync="dialogVisible" size="tiny" id="preview_dlg" @close="(this.document.querySelector('#preview_dlg video')|| this.document.createElement('video')).pause()">
+                        <video v-if="dialogImageUrl.match('.mp4')" :src="dialogImageUrl" controls width="100%">
+                        <img v-else width="100%" :src="dialogImageUrl" alt="">
+                    </el-dialog>
+                    
                 </el-main>
             </el-container>
         </el-container>
@@ -205,6 +305,25 @@
 
         <script>
             Vue.config.delimiters = ["[[", "]]"];
+            Vue.component('hovercard', {
+                //props: ['value'],
+               
+                data: function () {
+                    return {
+                        hover: false,
+                    }
+                },
+                template: `
+                    <div
+                        @mouseover="hover = true"
+                        @mouseleave="hover = false"
+                        :class="{hover:hover}"
+                        :style="{width: '100%', minWidth: '124px'}"
+                    >
+                        <slot/>
+                    </div>
+                `
+            })
             var app = new Vue({
                 el: '#page',
                 data () {
@@ -240,6 +359,15 @@
                 mounted: function (){
                     //this.showImages(this.curdir)
                 },
+                filters: {
+                    shortname: function (value) {
+                        if (!value) return ''
+                        value = value.toString()
+                        fn_arr = value.split('.')   //["", "mp4"]
+                        
+                        return (fn_arr[0].length > 7) ? `${fn_arr[0].substring(0,7)}...${fn_arr[1]}` : value
+                    }
+                },
                 methods:{
                     showImages_del:function(path){
                         //我现在要，做的是，通过目录查找oss相关目录的图片
@@ -257,27 +385,12 @@
                     next:function(){
                         //当没有18个图片的时候，说明就结束了
                         console.log('------next------')
-                        /*console.log(path)
-                        //dl = document.getElementsByClassName('image')
-                        if (this.images.length == 18){
-                            key = decodeURI(this.images[this.images.length-1].src).match('{{ rediret_url_prefix }}/(.*)')[1]
-                            //取域名后面的 纯key https://bicf-media-destination.oss-cn-beijing.aliyuncs.com/L3/DISC_1_Title8.jpg"
-                            console.log(key)
-                            if( key ){
-                                 store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
-                            }
-                        }*/
+                       
                         this.page[this.activeTab] = (++this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
                         this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
                     },
                     prev:function(){
-                        //dl = document.getElementsByClassName('image')
-                        //if (this.images.length > 0){
-                        //    key = decodeURI(this.images[0].src).match('//.*?/(.*)')[1]
-                        //    if( key ){
-                        //store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':''} )
-                        //    }
-                        //}
+              
                         this.page[this.activeTab] = (--this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
                         this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
 
@@ -291,8 +404,7 @@
                     },
                     showFiles:function(type,series,page){
                         vm = this
-                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','runtime':'{{ runtime }}','type':type,'series':series,'page':page}).then(function(){
-                            console.log('then(function(){})')
+                        store.dispatch('getImages',{'type':type,'series':series,'page':page}).then(function(){
                             vm.$forceUpdate()
                             vm.loading = false
                         })
@@ -300,15 +412,7 @@
                     handleClick(tab, event) {
                         console.log(tab, event)
                         console.log(`-----------this.activeTab -------${this.activeTab}----`)
-                        /*if (tab.name == "videos"){
-                            store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
-                        }
-                        if (tab.name == "audios"){
-                            store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
-                        }
-                        if (tab.name == "images"){
-                            store.dispatch('getImages', {'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','path':path,'marker':key} )
-                        }*/
+                   
                         this.loading = true
                         this.activeTab = tab.name
                         this.showFiles(tab.name,this.curdir,this.page.image)
@@ -319,10 +423,7 @@
                         console.log(file)
                     },
                     onprogress(e, rawFile,fileList){
-                        /*console.log('-------onprogress---------')
-                        console.log(e)
-                        console.log(rawFile)*/
-
+              
                         this.fileArr = fileList
                         this.fileArr.forEach(item=>{
                             if (item.percentage == 100) {
@@ -437,9 +538,15 @@
                     //handleRemove(file, fileList) {
                     //    console.log(file, fileList);
                     //},
+                    removeKey(key){
+                        console.log(`-----need to delete the bucket file and db record---of--${key}--`)
+                    },
                     handlePictureCardPreview(file) {
+                        console.log('------------handlePictureCardPreview---------------')
+                        console.log(file)
                         this.dialogImageUrl = file.url;
                         this.dialogVisible = true;
+                        return false
                     },
                     parsePercentage(val) {
                         return parseInt(val, 10);

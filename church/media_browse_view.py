@@ -13,7 +13,7 @@ from django.utils.module_loading import import_string
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 
-from .alioss_storage_backends_v3 import AliyunMediaStorage
+from .alioss_storage_backends_v3 import AliyunMediaStorage,AliyunVideoStorage
 from .utils import storage
 
 
@@ -97,8 +97,12 @@ def list_img(request,path=''):
             
             # path = '%s%s' % (storage._get_user_path(request.user), '' if path=='' else '/'+path) #教会的目录是本函数负责加上
             if series != '':
-                # files = _list_img(request.user,typ=typ,path=path,marker=marker)
-                files,dirs = storage.get_files_from_db(user=request.user,typ=typ,series=series,page=page)
+                files = list()
+                if typ == 'videos':
+                    stg = AliyunVideoStorage()
+                    files = stg.get_files_from_db(user=request.user,typ=typ,series=series,page=page)
+                else:
+                    files = storage.get_files_from_db(user=request.user,typ=typ,series=series,page=page)
                 ret = {'errCode': '0','msg':'success','data':files}
             else:
                 raise Exception('series key must not null.')   

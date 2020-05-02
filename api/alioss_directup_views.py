@@ -227,33 +227,67 @@ class AliOssSignatureV2(AliOssSignature):
     @classmethod
     def cls_get_token(cls,object_prefix,typ='images',host=''):
         if host != '':
-            AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback" %  host
+            AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  host
         return AliOssSignature.cls_get_token(object_prefix,typ=typ)
-
 
 class AliOssCallBack(APIView):
     '''
     阿里上传完成视频后进行回写
     '''
-    permission_classes = [AllowAny]
-    # def get(self,request,*args,**kwargs):
-    #     '''
-    #     用post方法
-    #     '''
-    #     import logging
-    #     logging.debug('-------------------in get ----------------------')
-    #     auth = request.META.get('Authorization')
-    #     logging.debug(auth)
-    #     # if not request:
-    #     #     return None
-    #     logging.debug(request)
-    #     logging.debug(args)
-    #     logging.debug(kwargs)
-    #     pprint.PrettyPrinter(4).pprint(request)
-    #     pprint.PrettyPrinter(4).pprint(args)
-    #     pprint.PrettyPrinter(4).pprint(kwargs)
-    #     return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
+    def get(self,request,*args,**kwargs):
+        '''
+        用post方法
+        '''
+        import logging
+        logging.debug('-------------------in get ----------------------')
+        auth = request.META.get('Authorization')
+        logging.debug(auth)
+        # if not request:
+        #     return None
+        logging.debug(request)
+        logging.debug(args)
+        logging.debug(kwargs)
+        pprint.PrettyPrinter(4).pprint(request)
+        pprint.PrettyPrinter(4).pprint(args)
+        pprint.PrettyPrinter(4).pprint(kwargs)
+        return JsonResponse({'String value': 'OK', 'Key': 'Status'}, safe=False)
 
+    def post(self,request,*args,**kwargs):
+        '''
+        用post方法
+        '''
+        import logging
+        from .utill import CICUtill
+        logger = logging.getLogger('dev.error')
+        logger.error('-------------------in post ----------------------')
+
+        auth = request.META.get('Authorization')
+        logger.error(auth)
+        # if not request:
+        #     return None
+        logger.error(request)
+        logger.error(request.headers)
+        # X-Oss-Bucket
+        logger.error(request.POST)
+        data = request.data
+        # filename
+        ret_dict = {}
+        ret_dict['filename'] = data.get('filename', '')
+        ret_dict['mimeType'] = data.get('mimeType','')
+        ret_dict['signedurl'] = CICUtill.signurl(key=ret_dict['filename'],whichbucket='source')
+        ret_dict['String value'] = 'OK'
+        ret_dict['Key'] = 'Status'
+
+        logger.error(ret_dict)
+
+        return JsonResponse(ret_dict, safe=False)
+
+class AliOssCallBack_V2(APIView):
+    '''
+    阿里上传完成视频后进行回写
+    '''
+    permission_classes = [AllowAny]
+    
     def post(self,request,*args,**kwargs):
         '''
         用post方法

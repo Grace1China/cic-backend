@@ -144,7 +144,9 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			// if ( this.insertMode )
 			// 	editor.insertElement( abbr );
 			// var html = `<p><img src="https://bicf-media-destination.oss-cn-beijing.aliyuncs.com/L3/03132020.jpg"></p>`;
-			var imgs= document.getElementById('myiframe').contentDocument.querySelectorAll('label.el-checkbox.image_check.is-bordered.is-checked img')
+			var imgs= document.getElementById('myiframe').contentDocument.querySelectorAll('.el-checkbox.is-checked img')
+			console.log(imgs)
+
 			// //使用JS最基础的getElementById找到我们的iframe控件，然后再获取id为username的控件
 			// html = html + "<h2>" + your_name.value + ": </h2>";
 			// var selected_books = document.getElementById('myiframe').contentDocument.getElementsByName('yourbook');
