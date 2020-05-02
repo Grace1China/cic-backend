@@ -234,6 +234,7 @@ class AliOssCallBack(APIView):
     '''
     阿里上传完成视频后进行回写
     '''
+    permission_classes = [AllowAny]
     def get(self,request,*args,**kwargs):
         '''
         用post方法
