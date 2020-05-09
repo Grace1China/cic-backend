@@ -39,7 +39,7 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
-        'NAME': 'cic',  # test_cic数据库名，先前创建的
+        'NAME': 'cic_20200426',  # test_cic数据库名，先前创建的
 
         # 测试
         # 'NAME': 'cic_20200323',  # test_cic数据库名，先前创建的

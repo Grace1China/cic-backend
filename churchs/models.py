@@ -14,12 +14,13 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 import oss2
 import urllib
 import re
-from .widget import S3DirectField,AliOssDirectField,AliMediaField
+from .widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField
 
 import logging 
 theLogger = logging.getLogger('church.all')
 
-
+class test1(models.Model):
+    image = MediaBaseField(max_length=400,blank=True,verbose_name='封面')
 
 # Create your models here.
 
@@ -204,7 +205,8 @@ class Media(models.Model):
     # alioss_image = AliOssDirectField(dest='images',fieldname='alioss_image', blank=True,verbose_name='封面')
     # alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='讲义')
     alioss_audio = models.CharField(max_length=400,blank=True,verbose_name='音频')
-    alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
+    # alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
+    alioss_image = MediaBaseField(max_length=400,blank=True,verbose_name='封面')
     alioss_pdf = models.CharField(max_length=400,blank=True,verbose_name='讲义')
     
     content = RichTextUploadingField(blank=True,verbose_name='摘要',external_plugin_resources=[('html5video',

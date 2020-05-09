@@ -6,7 +6,7 @@ from ckeditor.widgets import CKEditorWidget
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 from .widget import AliVideoWidgetExt
 from django.forms import ModelForm,Form
-from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt
+from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
 from .forms import MeidaForm2
 
 
@@ -260,7 +260,16 @@ class SermonSeriesAdmin(admin.ModelAdmin):
     # search_fields = ('pub_time', 'title','status','user')
     # fields = ('title','speaker','scripture','series','church','pub_time','status','user')
 
-    
+from .models import test1
+class test1Admin (admin.ModelAdmin):
+    model = test1
+    list_display = ('image',)
+    formfield_overrides = {
+        test1.image: {'widget': MediaBaseWidget()},
+    }
+
+admin.site.register(churchs_models.test1,test1Admin)
+
 admin.site.register(churchs_models.Sermon, SermonAdmin)
 admin.site.register(churchs_models.Team)  
 admin.site.register(churchs_models.Donation)

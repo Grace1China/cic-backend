@@ -129,6 +129,8 @@ class AliOssDirectField(Field):
         return super(AliOssDirectField, self).formfield(*args, **kwargs)
 
 
+
+
 class AliVideoField(Field):
     def __init__(self, *args, **kwargs):
         dest = kwargs.get('dest', None)
@@ -217,3 +219,40 @@ class AliMediaWidgetExt(TextInput):
         }
 
         return mark_safe(render_to_string( 'admin/AliossMedia-wedget.tpl',ctx))
+
+
+class MediaBaseField(Field):
+    def __init__(self, *args, **kwargs):
+        self.widget = MediaBaseWidget(label=kwargs.get('verbose_name', None))
+        super(MediaBaseField, self).__init__(*args, **kwargs)
+
+    def get_internal_type(self):
+        return 'TextField'
+
+    def formfield(self, *args, **kwargs):
+        kwargs['widget'] = self.widget
+        return super(MediaBaseField, self).formfield(*args, **kwargs)
+
+
+class MediaBaseWidget(TextInput):
+    class Media:
+        pass
+
+    def __init__(self, *args, **kwargs):
+        self.label = kwargs.pop('label', None)
+        super(MediaBaseWidget, self).__init__(*args, **kwargs)
+
+
+    def render(self, name, value, **kwargs):
+        theLogger.info(name)
+        theLogger.info(value)
+        ctx = {
+            'label':self.label,
+            'name':name,
+            'value':'' if value is None else value
+        }
+
+
+        theLogger.info(mark_safe(render_to_string( 'admin/media-select.tpl',ctx)))
+        return mark_safe(render_to_string( 'admin/media-select.tpl',ctx))
+

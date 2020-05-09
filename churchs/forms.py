@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from .models import Media
-from .widget import AliVideoWidgetExt,AliOssDirectWidgetExt
+from .widget import AliVideoWidgetExt,AliOssDirectWidgetExt,MediaBaseWidget
 from ckeditor.widgets import CKEditorWidget
 
 import logging
@@ -14,7 +14,8 @@ class MeidaForm2(forms.ModelForm):
 
     alioss_video_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='source',fieldname='alioss_video_f', label='视频'),required=False)
     alioss_audio_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='audios', fieldname='alioss_audio_f',label='音频'),required=False)
-    alioss_image_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='images',fieldname='alioss_image_f', label='封面'),required=False)
+    # alioss_image_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='images',fieldname='alioss_image_f', label='封面'),required=False)
+    alioss_image_f = forms.CharField(label="",widget=MediaBaseWidget(label='封面'),required=False)
     alioss_pdf_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='pdfs', fieldname='alioss_pdf_f',label='讲义'),required=False)
 
     class Meta:

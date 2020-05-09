@@ -5,7 +5,7 @@
 {% block extrahead %}{{ block.super }}
     <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
     {{ media }}
-
+    
 {% endblock %}
 {% block extrastyle %}{{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>{% endblock %}
@@ -120,25 +120,12 @@
             methods:{
                 goBack1:function () {
                     //找到上级
-                    console.log('location.pathname:'+location.pathname)
-                    var array = location.pathname.split('/')
-                    console.log(array)
-                    if (array.length == 5||array.length==6) {
-                        console.log('new url:  /' + array[1] + '/' + array[2])
-                        window.location.href = '/' + array[1] + '/' + array[2];
-                    } else {
-                        var referrer = document.referrer;
-
-                        console.log(`document.referrer:${document.referrer} document.URL: ${document.URL}`)
-                        if (referrer && document.URL != referrer) {
-                            window.location.href = referrer;
-                        } else {
-                            window.history.go(-1);
-                        }
-                    }
-                    //http://localhost:8000/admin/churchs/sermonseries/add/
-                    //http://localhost:8000/admin/churchs/sermonseries/23/change/
-                }
+                    console.log('-------------goBackform------------')
+                    console.log(location.pathname)
+                    var array = location.pathname.split(/\/(\d+)\//g)
+                    window.location.href = array[0];
+                   
+                },
             }
         })
         if ($(".object-tools").length!=0) {
@@ -166,6 +153,107 @@
 
          new Vue({
             el: "#{{ opts.model_name }}_form",
+            components: {
+                'media-sele':{
+                    props: ['name','value','src','ro'],
+   
+                    data: function () {
+                        return {
+                            hover: false,
+                            status :1,
+                            src :'',
+                            tcinfo :{},
+                            pname: this.name,
+                            pvalue: this.value,
+                            pro:this.ro,
+                            rosrc:undefined,
+                            rokey:undefined
+                        }
+                    },
+                    computed: {
+                        inputListeners: function () {
+                        var vm = this
+                        // `Object.assign` 将所有的对象合并为一个新对象
+                        return Object.assign({},
+                            // 我们从父级添加所有的监听器
+                            this.$listeners,
+                            // 然后我们添加自定义监听器，
+                            // 或覆写一些监听器的行为
+                            {
+                            // 这里确保组件配合 `v-model` 的工作
+                            click: function (event) {
+                                console.log(1)
+                                vm.$emit('click', event.target.value)
+                            }
+                            }
+                        )
+                        },
+
+                        selectsrc:function(){
+                            return this.ro.src
+                        },
+                        thevalue:function(){
+                            if ((this.ro||{}).key){
+                                return this.ro.key
+                            }else{
+                                return this.pvalue
+                            }
+                        }
+                    },
+                    watch: {
+                        ro: {
+                            immediate: true,    // 这句重要
+                            handler (val) {
+                                console.log('action Value:' )
+                                console.log(val)
+                                if ((val||'')==''){
+                                    this.rosrc = '';
+                                }else{
+                                    roo = JSON.parse(val)
+                                    //if (roo.hasOwnProperty('src')){
+                                    this.rosrc = roo.src
+                                    //}
+                                    this.rokey = roo.key
+                                }
+                            }
+                        }
+                    },
+                    method:{
+                        openUrl:function(url){
+                            console.log(url)
+                        }
+                    },
+                    //ro = {'type':'images','src':'https://',key:'ims/...'} key是存储在media的字段中的，这样+上平台存储桶的配置，可以算出src
+                    template: `
+                    <div ref="media_select" class="media_select" :id="pname" @click="$emit('click', $event.target)">
+                        <input class="" :name="name" type="hidden" :value="rokey||value" />
+                        <!--信息来自，对话框，然后应该有一个局部加载，共享对话框中的加载逻辑-->
+                        <el-card 
+                            :body-style="{ padding: '2px' , position: 'relative' , width: '124px' ,height: '124px' ,display: 'flex',
+                            'justifyContent': 'center',
+                            alignItems: 'center' }"
+                            class='mediacard'
+                        >
+                            <hovercard v-show="(rosrc||src||'') != ''">
+                                <span
+                                    @click.stop.prevent="$emit('clickp', {'type':'images','src':rosrc} )"
+                                >
+                                    <i class="el-icon-zoom-in"></i>
+                                </span>
+                                <span
+                                    @click.stop.prevent="$emit('clickd')"
+                                >
+                                    <i class="el-icon-delete"></i>
+                                </span>
+                            </hovercard>
+                            <img v-show="(rosrc||src||'') != ''" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
+                            <i v-show="(rosrc||src||'') == ''" class="el-icon-plus" :style="{ fontSize: '3em' }"></i>
+                        </el-card>
+                    </div>
+                    `,
+                    delimiters: ["[[","]]"],
+                }
+            },
             mounted: function (){
                 /*
                 定时对服务器查找，是否已经转码成功。
