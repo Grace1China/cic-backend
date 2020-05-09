@@ -67,10 +67,10 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
     try:
         if instance.res_path  == '' or instance.res_path is None:
             ct = SermonSeries.objects.filter(church__exact = instance.church).count()
-            if ct <= 0:
-                instance.res_path = '/'
-            else:
-                instance.res_path = 'series_%d' % ct
+            # if ct <= 0:
+            #     instance.res_path = '/'
+            # else:
+            instance.res_path = 'series_%d' % (ct+1)
             #删除这一段的原因，是因为，一个原则，只在一处存储系列的集合关系。
 
             # path = '%s/%s' % (instance.church.code,instance.res_path)
@@ -195,7 +195,9 @@ class Media(models.Model):
     s3_image = S3DirectField(dest='images', blank=True,verbose_name='AWS S3 封面')
     s3_pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='AWS S3 讲义')
 
-    alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
+    # alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
+    alioss_video = MediaBaseField(max_length=400,blank=True,verbose_name='视频')
+    
     # alioss_video = models.CharField(max_length=400, blank=True,verbose_name='视频')
     alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='视频状态')
     alioss_SHD_URL = models.CharField(max_length=400, blank=True,verbose_name='高清链接')

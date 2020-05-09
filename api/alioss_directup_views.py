@@ -225,9 +225,10 @@ class AliOssSignatureV2(AliOssSignature):
             return JsonResponse(ret, safe=False)
             
     @classmethod
-    def cls_get_token(cls,object_prefix,typ='images',host=''):
-        if host != '':
+    def cls_get_token(cls,object_prefix,typ='images',cbhost=''):
+        if cbhost != '' and  'localhost' not in cbhost and '127.0.0.1' not in cbhost:
             AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  host
+            #这里是除了本地环境不能做回调地址外，product sandbox各自用自已的回调地址。就是reqeust.META['HTTP_HOST']
         return AliOssSignature.cls_get_token(object_prefix,typ=typ)
 
 class AliOssCallBack(APIView):

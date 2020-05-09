@@ -8,6 +8,8 @@ from .widget import AliVideoWidgetExt
 from django.forms import ModelForm,Form
 from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
 from .forms import MeidaForm2
+import logging
+loger = logging.getLogger('church.all')
 
 
 
@@ -79,10 +81,11 @@ class MediaInline1(GenericStackedInline):
     form = MeidaForm2
     model = Media
     readonly_fields = ('dist_video','dist_video_status','dist_audio','dist_image','dist_pdf')
-    fields = (('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status','alioss_audio_f','alioss_image_f','alioss_pdf_f','content')
+    fields = ('alioss_video_f','alioss_video_status','alioss_audio_f','alioss_image_f','alioss_pdf_f','content') #('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),
    
     extra = 0
-    max_num = 4
+    max_num = 1
+    min_num = 1
 
 
 
@@ -199,7 +202,6 @@ class SermonAdmin(admin.ModelAdmin):
     def mainsite_api_v1_makesermon(self, request, queryset):
         try:
 
-            loger = logging.getLogger('church.all')
 
             loger.info(request)
             for qr in queryset:
@@ -253,12 +255,50 @@ class SermonAdmin(admin.ModelAdmin):
         
     mainsite_api_v1_makesermon.short_description = "make sermon in mainsite"
 
+
+# class SermonSeriesListFilter(admin.SimpleListFilter):
+#     # Human-readable title which will be displayed in the
+#     # right admin sidebar just above the filter options.
+#     # title = _('创建者')
+
+#     # Parameter for the filter that will be used in the URL query.
+#     # parameter_name = 'creator'
+#     title='过滤'
+#     parameter_name = 'title'
+
+#     def queryset(self, request, queryset):
+#         """
+#         Returns the filtered queryset based on the value
+#         provided in the query string and retrievable via
+#         `self.value()`.
+#         """
+#         # Compare the requested value (either '80s' or '90s')
+#         # to decide how to filter the queryset.
+#         try:
+#             qr = queryset.filter(church=request.user.church)
+#             loger.info(qr)
+#             return qr
+#         except Exception as e:
+#             import traceback
+#             loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+#             raise e
+
 class SermonSeriesAdmin(admin.ModelAdmin):
     model = SermonSeries
     readonly_fields = ('res_path',)
     list_display = ('title','church','res_path','status')
     # search_fields = ('pub_time', 'title','status','user')
     # fields = ('title','speaker','scripture','series','church','pub_time','status','user')
+    def get_queryset(self, request):
+        try:
+            qs = super().get_queryset(request)
+            qs = qs.filter(church=request.user.church)
+            loger.info(qs)
+            return qs
+        except Exception as e:
+            import traceback
+            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
 
 from .models import test1
 class test1Admin (admin.ModelAdmin):

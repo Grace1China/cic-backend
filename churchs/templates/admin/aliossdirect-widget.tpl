@@ -18,7 +18,7 @@
     </div>
     <pre class="console"></pre>
 </div>
-<script>
+{% comment %} <script>
 console.log('widget.tpl')
 if (`{{ name  }}`.indexOf('__prefix__') < 0){
 	$(document).ready(function(){
@@ -60,4 +60,4 @@ if (`{{ name  }}`.indexOf('__prefix__') < 0){
 	});
 }
 
-</script>
+</script> {% endcomment %}

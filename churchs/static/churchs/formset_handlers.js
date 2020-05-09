@@ -2,6 +2,7 @@
     $(document).on('formset:added', function(event, $row, formsetName) {
         console.log('-----------formset:added--------------')
         console.log(formsetName)
+        console.log($row)
 
         if (formsetName == 'churchs-media-content_type-object_id') {
             // Do something
@@ -27,6 +28,24 @@
                 upfact().init()
     
             })
+        }
+
+        media_select_ctrl = $row[0].getElementsByClassName('media_select')
+        if (media_select_ctrl.length <=0){
+            media_select_ctrl = $row[0].getElementsByTagName('media-sele')
+        }
+        // 
+        for(i = 0 ; i < media_select_ctrl.length ; i++){
+            // media_select_ctrls[i].addEventListener("click", function(){formVue.popupCenter('/media_browse/?type=images&from=admin','媒体库',900,600)}, false);
+
+            new mediaSele().$mount(media_select_ctrl[i])
+            
+            ctrl2 = $row[0].getElementsByClassName('media_select')
+            new mediaSele().$mount(ctrl2[0])
+            ctrl2[0].addEventListener("click", function(){formVue.popupCenter('/media_browse/?type=images&from=admin','媒体库',900,600)}, false);
+
+            // hovercard = media_select_ctrls[i].getElementsByClassName('.extra-bar.hovercard')
+            // hovercard.addEventListener("click", function(){formVue.popupCenter('/media_browse/?type=images&from=admin','媒体库',900,600)}, false);
         }
     });
 

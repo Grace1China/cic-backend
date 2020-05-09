@@ -98,6 +98,12 @@
             .cktitle span{
                 line-height : 1em;
             }
+
+            .image-preview{
+                width:600px !important;
+                max-height:560px;
+                overflow-y: scroll;
+            }
             
         </style>
     </head>
@@ -124,21 +130,20 @@
                     </div>
                    
                     <el-button-group>
-                        <el-button type="primary" icon="el-icon-arrow-left" @click=prev(curdir)>第一页</el-button>
-                        <el-button type="primary" @click=next(curdir)>下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+                        <el-button type="primary" icon="el-icon-arrow-left" @click="prev(curdir)">第一页</el-button>
+                        <el-button type="primary" @click="next(curdir)">下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
                     </el-button-group>
                     <el-button type="primary" @click="goTab('upload')">上传upload<i class="el-icon-upload"></i></el-button>
                 </div>
             </el-header>
-            <el-container id="gallery">
-                <el-main>
-                    <el-tabs v-model="activeTab" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
-                        <el-tab-pane label="图片" name="images">
+            <el-main id="gallery">
+                <el-tabs v-model="activeTab" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
+                    <el-tab-pane label="图片" name="images">
+                        <el-checkbox-group v-model="checkedImages" >
                             <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
                                 :style="{ display: 'flex'}"
                             >
                                 <div  v-for="jj in 6" :key="jj"
-                                    
                                 >
                                     <el-card :body-style="{ padding: '0px' ,border: '0', position: 'relative', minWidth: '128px' }"
                                         v-if=" (theImage(ii,jj).src||'') != '' "
@@ -147,7 +152,10 @@
                                         <el-checkbox 
                                             border
                                             :style="{ width: '100%'}"
+                                            :label=`${theImage(ii,jj).src}` 
                                         >
+                                            <!--上面这个label是el-checkbox-group的v-model的值。它也是唯一的。可以用来反查images里的object-->
+
                                             <img 
                                                 :src=`${theImage(ii,jj).thumb}` 
                                                 :data-src=`${theImage(ii,jj).src}` class="thumbimg"
@@ -156,7 +164,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'url':theImage(ii,jj).src})"
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src})"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -168,17 +176,18 @@
                                                 </div>
                                             </hovercard>
                                         </el-checkbox>
-                                        <span>[[ theImage(ii,jj).visible_filename | shortname ]]
+                                        <span
+                                            :style="{ 'fontSize':'1rem' }"
+                                        >
+                                        [[ theImage(ii,jj).visible_filename | shortname ]]
                                         </span>
                                     </el-card>
-                                    
-                                    
-                                    
                                 </div>
-                                    
                             </div>
-                        </el-tab-pane>
-                        <el-tab-pane label="影片" name="videos">
+                        </el-checkbox-group>
+                    </el-tab-pane>
+                    <el-tab-pane label="影片" name="videos">
+                        <el-checkbox-group v-model="checkedImages" >
                             <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
                                 :style="{ display: 'flex'}"
                             >
@@ -186,12 +195,12 @@
                                     <el-card :body-style="{ padding: '0px' , position: 'relative' , width: '100%'}"
                                         v-if=" (theImage(ii,jj).src||'') != '' "
                                         class='mediacard'
-                                        
                                     >
                                         <el-checkbox 
                                             border
                                             :style="{ width: '100%'}"
                                             v-loading="theImage(ii,jj).video_status!=3"
+                                            :label=`${theImage(ii,jj).video_status==3?(theImage(ii,jj).video_tcinfo||{}).sd:theImage(ii,jj).src}` 
                                         >
                                             <div class="thumbimg"
                                             >
@@ -207,7 +216,7 @@
                                                 <!-- 2、转码开始 状态为3。显示一个比较好图 -->
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'url':(theImage(ii,jj).video_tcinfo||{}).sd})"
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':(theImage(ii,jj).video_tcinfo||{}).sd})"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -225,75 +234,79 @@
                                     </el-card>
                                 </div>
                             </div>
-                        </el-tab-pane>
-                        <el-tab-pane label="音乐" name="audios">
-                            <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
-                                <el-col :span="4" v-for="jj in 6" :key="jj">
-                                    <el-checkbox 
-                                        v-if=" (theImage(ii,jj).src||'') != '' "
-                                        label="备选项1" 
-                                        border class="image_check"
-                                    >
-                                        <img 
-                                            :src=`${theImage(ii,jj).thumb}` 
-                                            :data-src=`${theImage(ii,jj).src}` class="videos"/>
-                                            <div class="imagetitle">
-                                                [[ theImage(ii,jj).visible_filename | shortname]]
-                                            </div>
-                                    </el-checkbox>
-                                </el-col>
-                            </el-row>
-                        </el-tab-pane>
-                        <el-tab-pane label="上传" name="upload">
-                            <el-upload
-                                class="upload"
-                                ref="upload"
-                                :with-credentials="true"
-                                action=""
-                                list-type="picture-card"
-                                :auto-upload='false'
-                                :before-upload="onbeforeUpload"
-                                :on-progress="onprogress"
-                                :on-change="onchange"
-                                :on-error="onerror"
-                                :on-success="onsuccess"
-                                :on-remove="onremove"
-                                :on-preview="handlePictureCardPreview"
-                                :on-exceed="onexceed"
-                                :show-file-list="true"
-                                :http-request="diyUpload"
-                                :limit="10"
-                                multiple
-                                drag
+                        </el-checkbox-group>
+                    </el-tab-pane>
+                    <el-tab-pane label="音乐" name="audios">
+                        <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
+                            <el-col :span="4" v-for="jj in 6" :key="jj">
+                                <el-checkbox 
+                                    v-if=" (theImage(ii,jj).src||'') != '' "
+                                    label="备选项1" 
+                                    border class="image_check"
+                                    @change='checkij(val,$event)'
                                 >
-                                <i class="el-icon-upload"></i>
-                            </el-upload> 
-                            <el-button style="margin-left: 10px;float:right;" size="small" type="success" @click="submitUpload"
-                                :disabled="!filePrepared"
+                                    <img 
+                                        :src=`${theImage(ii,jj).thumb}` 
+                                        :data-src=`${theImage(ii,jj).src}` class="videos"/>
+                                        <div class="imagetitle">
+                                            [[ theImage(ii,jj).visible_filename | shortname]]
+                                        </div>
+                                </el-checkbox>
+                            </el-col>
+                        </el-row>
+                    </el-tab-pane>
+                    <el-tab-pane label="上传" name="upload">
+                        <el-upload
+                            class="upload"
+                            ref="upload"
+                            :with-credentials="true"
+                            action=""
+                            list-type="picture-card"
+                            :auto-upload='false'
+                            :before-upload="onbeforeUpload"
+                            :on-progress="onprogress"
+                            :on-change="onchange"
+                            :on-error="onerror"
+                            :on-success="onsuccess"
+                            :on-remove="onremove"
+                            :on-preview="handlePictureCardPreview"
+                            :on-exceed="onexceed"
+                            :show-file-list="true"
+                            :http-request="diyUpload"
+                            :limit="10"
+                            multiple
+                            drag
                             >
-                                把这些文件上传到服务器
-                            </el-button>
+                            <i class="el-icon-upload"></i>
+                        </el-upload> 
+                        <el-button style="margin-left: 10px;float:right;" size="small" type="success" @click="submitUpload"
+                            :disabled="!filePrepared"
+                        >
+                            把这些文件上传到服务器
+                        </el-button>
 
-                            <el-dialog :visible.sync="dialogVisible" size="tiny">
-                                <img width="100%" :src="dialogImageUrl" alt="">
-                            </el-dialog>
-                            
-                            <el-alert 
-                                :title="errorMsg"
-                                type="error"
-                                :closable="false"
-                                :style="{ display: errorDisplay }"
-                            >
-                            </el-alert>
-                        </el-tab-pane>
-                    </el-tabs>
-                    <el-dialog :visible.sync="dialogVisible" size="tiny" id="preview_dlg" @close="(this.document.querySelector('#preview_dlg video')|| this.document.createElement('video')).pause()">
-                        <video v-if="dialogImageUrl.match('.mp4')" :src="dialogImageUrl" controls width="100%">
-                        <img v-else width="100%" :src="dialogImageUrl" alt="">
-                    </el-dialog>
-                    
-                </el-main>
-            </el-container>
+                        <el-dialog :visible.sync="dialogVisible" size="tiny">
+                            <img width="100%" :src="dialogImageUrl" alt="">
+                        </el-dialog>
+                        
+                        <el-alert 
+                            :title="errorMsg"
+                            type="error"
+                            :closable="false"
+                            :style="{ display: errorDisplay }"
+                        >
+                        </el-alert>
+                    </el-tab-pane>
+                </el-tabs>
+                <el-dialog :visible.sync="dialogVisible" size="tiny" id="preview_dlg" @close="(this.document.querySelector('#preview_dlg video')|| this.document.createElement('video')).pause()">
+                    <video v-if="dialogImageUrl.match('(.mp4$)')" :src="dialogImageUrl" controls width="100%">
+                    <img v-if="dialogImageUrl.match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')" width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
+                
+            </el-main>
+            <el-footer>
+                <el-button type="primary" @click=mediaReturn('ok')>确定<i class="el-icon-upload"></i></el-button>
+            </el-footer>
         </el-container>
 
         <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
@@ -345,6 +358,9 @@
                         },
                         loading:false,
                         ALIOSS_DESTINATIONS:JSON.parse(`{{ ALIOSS_DESTINATIONS|safe }}`),
+                        checkedImages:[],
+                        checkedImages1:[]
+
                     }
                 },
                 computed: {
@@ -369,6 +385,28 @@
                     }
                 },
                 methods:{
+                    checkij(value,ev){
+                        console.log(`${value}-${ev}`)
+                    },
+                    mediaReturn(o){
+                        console.log('-----mediaReturn-----------')
+                        console.log(o)
+                        console.log(window.opener.window.formVue)
+                        console.log(this.checkedImages)
+                        //ro = {'type':'images','src':'https://',key:'ims/...'} key是存储在media的字段中的，这样+上平台存储桶的配置，可以算出src
+                        window.opener.window.formVue.setRo(`{ "type":"images","src":"${this.checkedImages[0]}","key":"${this.checkedImages[0]}", "from":"${this.getQueryVariable('from')}" }`)
+                        
+                        //window.close()
+                    },
+                    getQueryVariable(variable){
+                        var query = window.location.search.substring(1);
+                        var vars = query.split("&");
+                        for (var i=0;i<vars.length;i++) {
+                                var pair = vars[i].split("=");
+                                if(pair[0] == variable){return pair[1];}
+                        }
+                        return(false);
+                    },
                     showImages_del:function(path){
                         //我现在要，做的是，通过目录查找oss相关目录的图片
                         //存放在一个store里面
@@ -416,7 +454,7 @@
                         this.loading = true
                         this.activeTab = tab.name
                         this.showFiles(tab.name,this.curdir,this.page.image)
-                        
+                        this.checkedImages = []
                     },
                     onbeforeUpload(file){
                         console.log('--------onbeforeUpload----------')
@@ -544,8 +582,29 @@
                     handlePictureCardPreview(file) {
                         console.log('------------handlePictureCardPreview---------------')
                         console.log(file)
-                        this.dialogImageUrl = file.url;
-                        this.dialogVisible = true;
+                        
+                        //this.dialogImageUrl = file.url;
+                        //this.dialogVisible = true;
+                        
+                        if (((file||{}).oname||'').match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')){
+                            this.$alert(`<img style="width:100%;height:auto;" src="${file.url}">`, {
+                                dangerouslyUseHTMLString: true,
+                                customClass:"image-preview"
+                            });
+                            return
+                        }
+                        if (((file||{}).oname||'').match('(.mp4$)')){
+                            this.$alert(`<video id="media-preview" style="width:100%;height:auto;" controls src="${file.url}">`, {
+                                dangerouslyUseHTMLString: true,
+                                customClass:"image-preview",
+                                beforeClose:(action,instance,done)=>{
+                                    //console.log(instance)
+                                    (instance.$el.querySelector('video#media-preview')||this.document.createElement('video')).pause()
+                                    done()
+                                }
+                            });
+                            return
+                        }
                         return false
                     },
                     parsePercentage(val) {
@@ -571,7 +630,7 @@
 
                         console.log(`dest:${thedest};host:${thehost}`)
                         
-                        tokenParams ={'type':thedest,'object_prefix':`${this.church}/${this.curdir}/`}
+                        tokenParams ={'type':thedest,'object_prefix':`${this.church}${(this.curdir||''=='')?'':'/'+this.curdir+'/'}`}
                         thisV = this
                         store.dispatch('getOssToken',tokenParams).then((res)=>{
                             console.log('---------getOssToken----------')

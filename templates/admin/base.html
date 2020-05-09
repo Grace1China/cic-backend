@@ -26,12 +26,10 @@
     {% if "SIMPLEUI_STATIC_OFFLINE"|get_config %}
         <script type="text/javascript" src="{% static 'admin/simpleui-x/js/vue.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'admin/simpleui-x/elementui/index.js' %}"></script>
-        <link type="text/javascript" src="{% static "church/js/VueBase.js" %}"/>
     {% else %}
-{#        <script src="https://cdn.jsdelivr.net/npm/vue"></script>#}
+    {#        <script src="https://cdn.jsdelivr.net/npm/vue"></script>#}
         <script src="https://unpkg.com/vue@2.6.0/dist/vue.min.js"></script>
         <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-        <link type="text/javascript" src="{% static "church/js/VueBase.js" %}"/>
     {% endif %}
 
         <script type="text/javascript" src="{% static 'admin/simpleui-x/js/language.js' %}?_=2.1.2"></script>
@@ -66,6 +64,10 @@
         <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
     </head>
     {% load i18n %}
+
+    {% block beforeBody %}
+
+    {% endblock beforeBody %}
 
     <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
           data-admin-utc-offset="{% now "Z" %}">
