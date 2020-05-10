@@ -227,7 +227,7 @@ class AliOssSignatureV2(AliOssSignature):
     @classmethod
     def cls_get_token(cls,object_prefix,typ='images',cbhost=''):
         if cbhost != '' and  'localhost' not in cbhost and '127.0.0.1' not in cbhost:
-            AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  host
+            AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  cbhost
         else:
             AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['localhost']
             #这里是除了本地环境不能做回调地址外，product sandbox各自用自已的回调地址。就是reqeust.META['HTTP_HOST']  本地是用服务器ip地址
