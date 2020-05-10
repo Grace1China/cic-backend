@@ -240,6 +240,8 @@ class MediaBaseWidget(TextInput):
 
     def __init__(self, *args, **kwargs):
         self.label = kwargs.pop('label', None)
+        self.typ = kwargs.pop('typ', None)
+
         super(MediaBaseWidget, self).__init__(*args, **kwargs)
 
 
@@ -247,6 +249,7 @@ class MediaBaseWidget(TextInput):
         theLogger.info(name)
         theLogger.info(value)
         ctx = {
+            'typ':self.typ,
             'label':self.label,
             'name':name,
             'value':'' if value is None else value

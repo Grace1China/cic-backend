@@ -13,11 +13,11 @@ class MeidaForm2(forms.ModelForm):
     dist_SD_URL = forms.CharField(label="",widget=AliVideoWidgetExt(dest="destination",label="流畅视频"),required=False)
 
     # alioss_video_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='source',fieldname='alioss_video_f', label='视频'),required=False)
-    alioss_video_f = forms.CharField(label="",widget=MediaBaseWidget(label='视频'),required=False)
-    alioss_audio_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='audios', fieldname='alioss_audio_f',label='音频'),required=False)
+    alioss_video_f = forms.CharField(label="",widget=MediaBaseWidget(label='视频',typ='videos'),required=False)
+    alioss_audio_f = forms.CharField(label="",widget=MediaBaseWidget(label='音频',typ='audios'),required=False)
     # alioss_image_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='images',fieldname='alioss_image_f', label='封面'),required=False)
-    alioss_image_f = forms.CharField(label="",widget=MediaBaseWidget(label='封面'),required=False)
-    alioss_pdf_f = forms.CharField(label="",widget=AliOssDirectWidgetExt(dest='pdfs', fieldname='alioss_pdf_f',label='讲义'),required=False)
+    alioss_image_f = forms.CharField(label="",widget=MediaBaseWidget(label='封面',typ='images'),required=False)
+    alioss_pdf_f = forms.CharField(label="",widget=MediaBaseWidget(label='文档',typ='pdfs'),required=False)
 
     class Meta:
         model = Media

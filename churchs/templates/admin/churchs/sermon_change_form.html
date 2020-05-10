@@ -5,6 +5,12 @@
 {% block beforeBody %}
    {{ block.super }}
    <script type="text/javascript" src="{% static 'church/js/VueBase.js' %}?v={{ now |timeticks }}"></script>
+   <style>
+   .form-row .fieldBox{
+        float:left;
+        margin-right: 20px;
+   }
+   </style>
 
 {% endblock beforeBody %}
 

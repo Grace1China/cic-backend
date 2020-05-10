@@ -81,7 +81,7 @@ class MediaInline1(GenericStackedInline):
     form = MeidaForm2
     model = Media
     readonly_fields = ('dist_video','dist_video_status','dist_audio','dist_image','dist_pdf')
-    fields = ('alioss_video_f','alioss_video_status','alioss_audio_f','alioss_image_f','alioss_pdf_f','content') #('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),
+    fields = (('alioss_video_f','alioss_audio_f','alioss_image_f','alioss_pdf_f'),'alioss_video_status','content') #('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),
    
     extra = 0
     max_num = 1
@@ -89,12 +89,12 @@ class MediaInline1(GenericStackedInline):
 
 
 
-class MediaInline(GenericStackedInline):
-    model = Media
-    readonly_fields = ('dist_video','dist_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','dist_audio','dist_image','dist_pdf')
-    fields = (('alioss_video','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status',('alioss_audio','alioss_image','alioss_pdf'),'content')
-    extra = 0
-    max_num = 4
+# class MediaInline(GenericStackedInline):
+#     model = Media
+#     readonly_fields = ('dist_video','dist_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','dist_audio','dist_image','dist_pdf')
+#     fields = (('alioss_video','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status',('alioss_audio','alioss_image','alioss_pdf'),'content')
+#     extra = 0
+#     max_num = 4
 
 
 from django.db.models.signals import post_save
@@ -177,11 +177,11 @@ class SermonAdmin(admin.ModelAdmin):
     search_fields = ('pub_time', 'title','status','user')
     fields = ('title','cover','speaker','scripture','series','church','pub_time','status','user')
 
-    def get_formsets_with_inlines(self, request, obj=None):
-        for inline in self.get_inline_instances(request, obj):
-            # hide MyInline in the add view
-            if not isinstance(inline, MediaInline) or obj is not None:
-                yield inline.get_formset(request, obj), inline
+    # def get_formsets_with_inlines(self, request, obj=None):
+    #     for inline in self.get_inline_instances(request, obj):
+    #         # hide MyInline in the add view
+    #         if not isinstance(inline, MediaInline) or obj is not None:
+    #             yield inline.get_formset(request, obj), inline
 
     change_form_template ="admin/churchs/sermon_change_form.html"
 

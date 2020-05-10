@@ -23,22 +23,24 @@ class ChurchAdmin(admin.ModelAdmin):
     
 
 
-class MediaInline(GenericStackedInline):
-    model = Media
-    readonly_fields = ('dist_video','dist_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','dist_audio','dist_image','dist_pdf')
-    fields = ('alioss_video','alioss_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','alioss_audio','alioss_image','alioss_pdf','content')
-    # exclude = ['name']
+# class MediaInline(GenericStackedInline):
+#     model = Media
+#     readonly_fields = ('dist_video','dist_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','dist_audio','dist_image','dist_pdf')
+#     fields = ('alioss_video','alioss_video_status','dist_SHD_URL','dist_HD_URL','dist_SD_URL','alioss_audio','alioss_image','alioss_pdf','content')
+#     # exclude = ['name']
 
-    extra = 1
+#     extra = 1
 
-class MediaInline1(GenericStackedInline):
-    form = MeidaForm2
-    model = Media
-    readonly_fields = ('dist_video','dist_video_status','dist_audio','dist_image','dist_pdf')
-    fields = (('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),'alioss_video_status','alioss_audio_f','alioss_image_f','alioss_pdf_f','content')
+# class MediaInline1(GenericStackedInline):
+#     form = MeidaForm2
+#     model = Media
+#     readonly_fields = ('dist_video','dist_video_status','dist_audio','dist_image','dist_pdf')
+#     fields = (('alioss_video_f','alioss_audio_f','alioss_image_f','alioss_pdf_f'),'alioss_video_status','content')
+#     #,'dist_SHD_URL','dist_HD_URL','dist_SD_URL'
    
-    extra = 0
-    max_num = 4
+#     extra = 0
+#     max_num = 4
+from churchs.admin import MediaInline1
 class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
     inlines = [
         MediaInline1,

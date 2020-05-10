@@ -31,9 +31,10 @@ def browse(request):
         typ = request.GET["type"]
         res_path = SermonSeries.objects.filter(church=request.user.church).values('res_path','title')
         ls_res_path = list(res_path)
-        path = ls_res_path[0]['res_path'] if len(ls_res_path)>0 else '/'  #默认显示根目录的文件 同专栏系列的默认设置保持一致
-        files = _list_img(request.user,typ='images',path=path,marker='')
+        # path = ls_res_path[0]['res_path'] if len(ls_res_path)>0 else 'default'  #默认显示根目录的文件 同专栏系列的默认设置保持一致
+        # files = _list_img(request.user,typ='images',path=path,marker='')
         sereis_dict = dict()
+        sereis_dict['default'] = '默认系列专栏'
         for i in ls_res_path:
             sereis_dict[i['res_path']] = i['title']
     
@@ -42,14 +43,14 @@ def browse(request):
         lg.info(token)
 
         # {"accessid": "LTAI4Fd1JMHM3WSUN4vrHcj8", "host": "https://bicf-media-source.oss-accelerate.aliyuncs.com", "desthost": "https://bicf-media-destination.oss-accelerate.aliyuncs.com", "policy": "eyJleHBpcmF0aW9uIjogIjIwMjAtMDQtMThUMDc6NDc6NDlaIiwgImNvbmRpdGlvbnMiOiBbWyJzdGFydHMtd2l0aCIsICIka2V5IiwgIkwzIl1dfQ==", "signature": "cnmgjhxg5wo65PuGU58/UlT/7No=", "expire": 1587196069, "dir": "L3/", "callback": "eyJjYWxsYmFja1VybCI6ICJodHRwOi8vdGVzdC5sMy5iaWNmLm9yZy9yYXBpL2FsaW9zc19kaXJlY3R1cF9jYWxsYmFjayIsICJjYWxsYmFja0JvZHkiOiAiZmlsZW5hbWU9JHtvYmplY3R9JnNpemU9JHtzaXplfSZtaW1lVHlwZT0ke21pbWVUeXBlfSZoZWlnaHQ9JHtpbWFnZUluZm8uaGVpZ2h0fSZ3aWR0aD0ke2ltYWdlSW5mby53aWR0aH0iLCAiY2FsbGJhY2tCb2R5VHlwZSI6ICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQifQ=="}
-
+        from church.confs.base import get_ALIOSS_DESTINATIONS
         context = {
             'show_dirs': True,#这个可能没有什么用发，目前留着
             'series': sereis_dict,
-            'files': files,
+            # 'files': files,
             'form': None ,#form
             'MEDIA_BROWSE_API_SERVER':settings.MEDIA_BROWSE_API_SERVER, #就是首次加载图片的地址，为了实现本地调试sandbox的api,但在sandbox和product中用的各自外网地址
-            'rediret_url_prefix':settings.ALIOSS_DESTINATIONS[typ]['redirecturl'],#跨国的redirect 是国内外的nginx配置，参考设计文档
+            'rediret_url_prefix':get_ALIOSS_DESTINATIONS(typ)['redirecturl'],#跨国的redirect 是国内外的nginx配置，参考设计文档
             'OSSAccessKeyId': token['accessid'],
             'policy': token['policy'],
             'Signature': token['signature'],

@@ -200,7 +200,7 @@
                                             border
                                             :style="{ width: '100%'}"
                                             v-loading="theImage(ii,jj).video_status!=3"
-                                            :label=`${theImage(ii,jj).video_status==3?(theImage(ii,jj).video_tcinfo||{}).sd:theImage(ii,jj).src}` 
+                                            :label=`${ii}-${jj}`
                                         >
                                             <div class="thumbimg"
                                             >
@@ -228,7 +228,9 @@
                                                 </div>
                                             </hovercard>
                                         </el-checkbox>
-                                        <span>
+                                        <span
+                                            :style="{ 'fontSize':'1rem' }"
+                                        >
                                             [[ theImage(ii,jj).visible_filename | shortname]]
                                         </span>
                                     </el-card>
@@ -393,8 +395,35 @@
                         console.log(o)
                         console.log(window.opener.window.formVue)
                         console.log(this.checkedImages)
+                        console.log(this.images)
+                        arr = this.checkedImages[0].split('-')
+                        index = (arr[0]-1)*6+arr[1]-1
+
+                        /*is_image: false
+                        src: "https://bicf-media-source.oss-cn-beijing.aliyuncs.com/L3%2Fdefault%2Fc03d8af6-b353-5373-f100-afde430b8aa8?OSSAccessKeyId=LTAI4Fd1JMHM3WSUN4vrHcj8&Expires=1589181148&Signature=oniIfk0%2BGuoslpz6E3neQfNbNtg%3D"
+                        key:
+                        thumb: "/static/ckeditor/file-icons/file.png"
+                        video_status: 3
+                        video_tcinfo: Object
+                        audio: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/ld.mp4"
+                        hd: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/hd.mp4"
+                        image1: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/00001.jpg"
+                        image2: (...)
+                        image3: (...)
+                        ld: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/ld.mp4"
+                        sd: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/sd.mp4"
+                        */
+
                         //ro = {'type':'images','src':'https://',key:'ims/...'} key是存储在media的字段中的，这样+上平台存储桶的配置，可以算出src
-                        window.opener.window.formVue.setRo(`{ "type":"images","src":"${this.checkedImages[0]}","key":"${this.checkedImages[0]}", "from":"${this.getQueryVariable('from')}" }`)
+
+                        typ = this.getQueryVariable('type')
+                        src = this.images[index].src
+                        key = this.images[index].key
+                        from = this.getQueryVariable('from')
+                        o = this.images[index]
+
+
+                        window.opener.window.formVue.setRo({ "type":`${typ}`,"src":`${src}`, "key":`${key}`, "from":`${from}`, "obj":o } )
                         
                         //window.close()
                     },

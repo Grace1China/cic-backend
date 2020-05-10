@@ -480,6 +480,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
                 files.append({
                     'thumb': thumb,
                     'src': media_url,
+                    'key':key,
                     'is_image': is_valid_image_extension(filename),
                     'visible_filename': visible_filename,
                 })
@@ -614,6 +615,7 @@ class AliyunVideoStorage(AliyunBaseStorage):
                 files.append({
                     'thumb': thumb,
                     'src': signed_url,
+                    'key':key,
                     'is_image': False,
                     'visible_filename': visible_filename,
                     'video_status':rc.video_file_status,
