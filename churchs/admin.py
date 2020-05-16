@@ -8,6 +8,7 @@ from .widget import AliVideoWidgetExt
 from django.forms import ModelForm,Form
 from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
 from .forms import MeidaForm2
+from users.models import CustomUser
 import logging
 loger = logging.getLogger('church.all')
 
@@ -74,7 +75,7 @@ class MeidaForm(forms.Form):
 #             'dist_HD_URL': AliVideoWidgetExt,
 #         }
 
-
+from django.contrib.admin.helpers import InlineAdminFormSet 
 
 
 class MediaInline1(GenericStackedInline):
@@ -84,10 +85,10 @@ class MediaInline1(GenericStackedInline):
     fields = (('alioss_video_f','alioss_audio_f','alioss_image_f','alioss_pdf_f'),'alioss_video_status','content') #('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),
    
     extra = 0
-    max_num = 1
+    max_num = 4
     min_num = 1
 
-
+from django.contrib.admin.helpers import InlineAdminFormSet
 
 # class MediaInline(GenericStackedInline):
 #     model = Media
@@ -283,12 +284,55 @@ class SermonAdmin(admin.ModelAdmin):
 #             loger.exception('There is and exceptin',exc_info=True,stack_info=True)
 #             raise e
 
+
+from django.forms import widgets as Fwidgets
+
+from django.forms import fields
+class SereisForm(forms.ModelForm):
+
+    user=fields.ChoiceField(
+       #反正要重新赋值，静态字段就没有必要赋值了
+        choices=[]
+    )
+    class Meta:
+        model = SermonSeries
+        fields = ('title','user','church','pub_time','status','res_path',)
+        
+        # widgets = {
+        #     'user': Fwidgets.Select(attrs={'disabled': True,'class':'daniel'})
+        # }
+    def clean_user(self):
+        # do something that validates your data
+        loger.info('--------clean_user-------')
+        loger.info(self.__dict__)
+        return self.cleaned_data["user"]
+    def __init__(self, *args, **kwargs):
+        super(SereisForm, self).__init__(*args, **kwargs)
+        loger.info(kwargs)
+        loger.info(args)
+        self.fields['user'].choices=CustomUser.objects.filter(id=kwargs['initial']['user']).values_list('id','email')
+
+        self.fields['user'].required = False
+
+
+      
+
+
+   
+    
 class SermonSeriesAdmin(admin.ModelAdmin):
     model = SermonSeries
-    readonly_fields = ('res_path',)
+    # readonly_fields = ('res_path','user','church')
     list_display = ('title','church','res_path','status')
-    # search_fields = ('pub_time', 'title','status','user')
-    # fields = ('title','speaker','scripture','series','church','pub_time','status','user')
+    search_fields = ('pub_time', 'title','status','user')
+    # fields = ('title','user','church','pub_time','status','res_path')
+    # exclude = ('user','church')
+
+    # formfield_overrides = {
+    #     models.CharField: {'widget': TextInput(attrs={'size':'20'})},
+    #     models.TextField: {'widget': Textarea(attrs={'rows':4, 'cols':40})},
+    # }
+
     def get_queryset(self, request):
         try:
             qs = super().get_queryset(request)
@@ -299,6 +343,65 @@ class SermonSeriesAdmin(admin.ModelAdmin):
             import traceback
             loger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e
+    
+    # def clean():
+
+
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = SereisForm
+        # form.fields['user'].widget.attrs['readonly'] = True
+        # form.fields['user'].widget.attrs['disabled'] = True
+        tp = CustomUser.objects.filter(id=request.user.id).values_list('id','email')
+        tp=tuple(tp)
+      
+
+        #约束条件，初始化，建form
+
+
+
+
+        # form.base_fields['church'].widget.attrs['readonly'] = True # text input
+        # form.base_fields['church'].widget.attrs['disabled'] = True # text input
+
+        # form.base_fields['res_path'].widget.attrs['readonly'] = True # text input
+        # form.base_fields['res_path'].widget.attrs['disabled'] = True # text input
+        kwargs['form'] = form
+        return super().get_form(request, obj, **kwargs)
+    
+    # def get_readonly_fields(self, request, obj=None):
+    #     return ['res_path','user','church']
+
+    def get_changeform_initial_data(self, request):
+        rd =  {
+            'title': '' ,
+            'user':request.user.id,
+            'church':request.user.church.id,
+            'pub_time':datetime.now(),
+            'status':SermonSeries.STATUS_OPEN,
+            'res_path':'(unknown now)'
+        }   
+        loger.info(rd)
+        return rd
+
+    
+
+
+
+    # def instance_forms(self):
+    #     super().instance_forms()
+    #     # 判断是否为新建操作，
+    #     loger.info(self.__dict__)
+    #     if not self.org_obj:
+    #         self.form_obj.initial['title'] = 'xx2'
+    #         self.form_obj.initial['user'] = self.request.user.id
+    #         self.form_obj.initial['church'] = self.request.user.church.id
+    #         self.form_obj.initial['pub_time'] = datetime.now()
+    #         self.form_obj.initial['status'] = SermonSeries.STATUS_OPEN
+    #         self.form_obj.initial['res_path'] = '(unknown now)'
+
+
+
 
 from .models import test1
 class test1Admin (admin.ModelAdmin):

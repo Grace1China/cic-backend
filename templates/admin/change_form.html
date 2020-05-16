@@ -121,7 +121,8 @@
 {% endblock %}
 
 {% block afterEndBody %}
-
+<script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
+<script type="text/javascript" src="{% static "church/js/store.js" %}"></script>
 <script type="text/javascript">
         new Vue({
             el:'.page-header',
@@ -130,7 +131,7 @@
                     //找到上级
                     console.log('-------------goBackform------------')
                     console.log(location.pathname)
-                    var array = location.pathname.split(/\/(\d+)\//g)
+                    var array = location.pathname.split(/\/(\d+)|(add)\//g)
                     window.location.href = array[0];
                 },
             }
@@ -155,108 +156,6 @@
                 el: '#alert'
             })
         }
-
-
-        var mediaSele = Vue.extend({
-            delimiters: ["[[","]]"],
-            template: `
-                    <div ref="media_select" class="media_select" :id="pname" @click="$emit('click', $event.target)">
-                        <input class="" :name="name" type="hidden" :value="rokey||value" />
-                        <!--信息来自，对话框，然后应该有一个局部加载，共享对话框中的加载逻辑-->
-                        <el-card 
-                            :body-style="{ padding: '2px' , position: 'relative' , width: '124px' ,height: '124px' ,display: 'flex',
-                            'justifyContent': 'center',
-                            alignItems: 'center' }"
-                            class='mediacard'
-                        >
-                            <hovercard v-show="(rosrc||src||'') != ''">
-                                <span
-                                    @click.stop.prevent="$emit('clickp', {'type':'images','src':rosrc} )"
-                                >
-                                    <i class="el-icon-zoom-in"></i>
-                                </span>
-                                <span
-                                    @click.stop.prevent="$emit('clickd')"
-                                >
-                                    <i class="el-icon-delete"></i>
-                                </span>
-                            </hovercard>
-                            <img v-show="(rosrc||src||'') != ''" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
-                            <i v-show="(rosrc||src||'') == ''" class="el-icon-plus" :style="{ fontSize: '3em' }"></i>
-                        </el-card>
-                    </div>
-                    `,
-            props: ['name','value','src','ro'],
-   
-            data: function () {
-                return {
-                    hover: false,
-                    status :1,
-                    src :'',
-                    tcinfo :{},
-                    pname: this.name,
-                    pvalue: this.value,
-                    pro:this.ro,
-                    rosrc:undefined,
-                    rokey:undefined
-                }
-            },
-            computed: {
-                inputListeners: function () {
-                var vm = this
-                // `Object.assign` 将所有的对象合并为一个新对象
-                return Object.assign({},
-                    // 我们从父级添加所有的监听器
-                    this.$listeners,
-                    // 然后我们添加自定义监听器，
-                    // 或覆写一些监听器的行为
-                    {
-                    // 这里确保组件配合 `v-model` 的工作
-                        click: function (event) {
-                            console.log(1)
-                            vm.$emit('click', event.target.value)
-                        }
-                    }
-                )
-                },
-
-                selectsrc:function(){
-                    return this.ro.src
-                },
-                thevalue:function(){
-                    if ((this.ro||{}).key){
-                        return this.ro.key
-                    }else{
-                        return this.pvalue
-                    }
-                }
-            },
-            watch: {
-                ro: {
-                    immediate: true,    // 这句重要
-                    handler (val) {
-                        console.log('action Value:' )
-                        console.log(val)
-                        if ((val||'')==''){
-                            this.rosrc = '';
-                        }else{
-                            roo = JSON.parse(val)
-                            //if (roo.hasOwnProperty('src')){
-                            this.rosrc = roo.src
-                            //}
-                            this.rokey = roo.key
-                        }
-                    }
-                }
-            },
-            method:{
-                openUrl:function(url){
-                    console.log(url)
-                }
-            },
-        })
-        // 创建 Profile 实例，并挂载到一个元素上。
-        {% comment %} new mediaSele().$mount('#mount-point') {% endcomment %}
 
 
         formVue = new Vue({
@@ -297,7 +196,8 @@
                             `
                         }
                     },
-                    props: ['name','value','src','ro'],
+                    props: ['name','value','src','ro','ptyp'],
+                    //value是key, name是控件字段 src是对像url,ro好像没有用，因为是通过setRo处理的选择媒体
    
                     data: function () {
                         return {
@@ -309,7 +209,9 @@
                             pvalue: this.value,
                             pro:this.ro,
                             rosrc:undefined,
-                            rokey:undefined
+                            rokey:undefined,
+                            video_tcinfo:{},
+                            typ:undefined,//加载后preview的时候，根据类型,默认为undefined后可取ptyp
                         }
                     },
                     computed: {
@@ -343,28 +245,59 @@
                         }
                     },
                     watch: {
-                        ro: {//当对像被删除时处理
+                        ro_del: {//当对像被删除时处理
                             immediate: true,    // 这句重要
                             handler (val) {
                                 console.log('action Value:' )
                                 console.log(val)
                                 if ((val||'')==''){
                                     this.rosrc = '';
+                                    this.rokey = ''
+                                    this.video_tcinfo = {}
+                                    this.typ = ''
                                 }else{
-                                    roo = JSON.parse(val)
+                                    /*roo = JSON.parse(val)
                                     this.rosrc = roo.src
                                     this.rokey = roo.key
+                                    this.video_tcinfo = o
+                                    this.typ = o.type*/
                                 }
                             }
                         }
                     },
-                    method:{
-                        /*setRo:function(o){
-                            console.log(o)
-                            pro = o
-                        }*/
+                    mounted: function (){
+                        console.log('-------mounted---media-sele')
+                        console.log(this)
+                        //对于以key加载的控件，重新加载一次，对于图像自动扩展url,对于video要执行一次回调
+                        if (this.value == '__empty__'){
+                            return
+                        }
+                        if (this.ptyp == 'images'){
+                            //只需要对src进行设置
+                            this.rosrc = `https://api.bicf.org/mediabase/${this.value}`
+                        }else if(this.ptyp == 'videos'){
+                            this.rosrc = `https://api.bicf.org/mediabase/${this.value}/00003.jpg`
+                            this.video_tcinfo = {
+                                audio: `https://api.bicf.org/mediabase/${this.value}/ld.mp4`,
+                                hd: `https://api.bicf.org/mediabase/L3/${this.value}/hd.mp4`,
+                                image1: `https://api.bicf.org/mediabase/${this.value}/00001.jpg`,
+                                image2: `https://api.bicf.org/mediabase/${this.value}/00002.jpg`,
+                                image3: `https://api.bicf.org/mediabase/${this.value}/00003.jpg`,
+                                ld: `https://api.bicf.org/mediabase/${this.value}/ld.mp4`,
+                                sd: `https://api.bicf.org/mediabase/${this.value}/sd.mp4`
+                            }
+                        }
                     },
-                    //ro = {'type':'images','src':'https://',key:'ims/...'} key是存储在media的字段中的，这样+上平台存储桶的配置，可以算出src
+                    method:{
+                        clearo_del:function(){
+                            console.log('-----clearo-------')
+                            this.rosrc = '';
+                            this.rokey = ''
+                            this.video_tcinfo = {}
+                            this.typ = ''
+                        }
+                    },
+
                     template: `
                     <div ref="media_select" class="media_select" :id="pname" @click="$emit('click', $event.target)">
                         <input class="" :name="name" type="hidden" :value="rokey||value" />
@@ -377,14 +310,13 @@
                         >
                             <hovercard v-show="(rosrc||src||'') != ''">
                                 <span
-                                    @click.stop.prevent="$emit('clickp', {'type':'images','src':rosrc} )"
+                                    @click.stop.prevent="$emit('clickp', { 'type':( ((typ||ptyp)||'')=='' ) ? 'images' : (typ||ptyp) ,'src':(typ||ptyp)=='videos'? video_tcinfo.sd:rosrc} )"
                                 >
                                     <i class="el-icon-zoom-in"></i>
                                 </span>
                                 <span
-                                    @click.stop.prevent="ro=undefined" 
+                                    @click.stop.prevent="$emit('clickd',name)" 
                                 >
-                                    
                                     <i class="el-icon-delete"></i>
                                 </span>
                             </hovercard>
@@ -405,7 +337,6 @@
                 定时对服务器查找，是否已经转码成功。
                 要求：通过可设定查寻对象的api来处理查寻请求
                 */
-
                 console.log(window.location.href)
                 gb = document.getElementById('goback_bt')
                 if (gb){
@@ -420,14 +351,16 @@
                     dl.addEventListener('click',this.del)
                 }
                 //this.$nexttrick()
+                /*
                 ck_imageBtn = document.getElementById('cke_74')
                 if (ck_imageBtn){
                     document.removeEventListener('click',invokeMediaBrowse,{capture:true},true)
                     document.addEventListener('click',invokeMediaBrowse,{capture:true},true)
-                }
+                }*/
+
             },
             methods:{
-                 invokeMediaBrowse:function(e) {
+                invokeMediaBrowse:function(e) {
                     console.log(e)
                     console.log(e.target)
                     console.log('invokeMediaBrowse')
@@ -439,15 +372,39 @@
                     });
                 },
                 preview:function(media){
-                    if (media.type = "images"){
+                    console.log('-----------preview-------------')
+                    console.log(media)
+
+                    if (media.type == "images"){
                         this.$alert(`<img style="width:100%;height:auto;" src="${media.src}">`, {
                             dangerouslyUseHTMLString: true,
                             customClass:"image-preview"
                         });
                         return
+                    }else if (media.type == 'videos'){
+                        this.$alert(`<video style="width:100%;height:auto;" controls src="${media.src}">`, {
+                            dangerouslyUseHTMLString: true,
+                            customClass:"image-preview",
+                            callback:function(action, instance){
+                                console.log(instance)
+                                instance.$el.getElementsByTagName('video')[0].pause()
+                            }
+                        });
+                        return
                     }
                 },
-
+                deletep:function(name){
+                    for (i = 0 ; i < this.$children.length ; i++){
+                        //从媒体选择对话框处理不同的控件
+                        if (this.$children[i].$el.id == name){
+                            
+                            this.$children[i].rosrc = ""
+                            this.$children[i].rokey = ""
+                            this.$children[i].video_tcinfo = {}
+                            this.$children[i].typ = ""
+                        }
+                    }
+                },
                 openUrl(url){
                     newWin= window.open(url,"","dialogWidth=900px;dialogHeight=500px;status=no;help=no;scrollbars=no");
                     console.log(this.ro)
@@ -460,23 +417,25 @@
                     for (i = 0 ; i < this.$children.length ; i++){
                         //从媒体选择对话框处理不同的控件
                         if (this.$children[i].$el.id == o.from){
-                            
                             if ((o||'')==''){
                                 this.$children[i].rosrc = '';
                             }else{
-                                //roo = JSON.parse(o)
-                                this.$children[i].rosrc = o.obj.video_tcinfo.image3
-                                this.$children[i].rokey = o.key
+                                this.$children[i].rosrc = o.obj.src
+                                this.$children[i].rokey = o.obj.key
+                                this.$children[i].typ = o.obj.typ
+                                if(o.obj.typ == 'videos'){
+                                    this.$children[i].video_tcinfo = o.obj.video_tcinfo
+                                    this.$children[i].rosrc = o.obj.video_tcinfo.image3//
+                                }
                             }
                         }
                     }
-                    //this.ro = o
                 },
                 goBack1:function () {
                     //找到上级
                     console.log('-------------goBackform------------')
                     console.log(location.pathname)
-                    var array = location.pathname.split(/\/(\d+)\//g)
+                    var array = location.pathname.split(/\/(\d+)|(add)\//g)
                     window.location.href = array[0];
                    
                 },
@@ -513,6 +472,9 @@
                     console.log('-----------formSubmit--------')
                     $("#actionName").attr('name', name).val(v);
                     $("form").submit();
+                },
+                on_mounted:function(e){
+                    console.log(e)
                 },
             }
         })

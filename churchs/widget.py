@@ -246,16 +246,12 @@ class MediaBaseWidget(TextInput):
 
 
     def render(self, name, value, **kwargs):
-        theLogger.info(name)
-        theLogger.info(value)
         ctx = {
             'typ':self.typ,
             'label':self.label,
             'name':name,
             'value':'' if value is None else value
         }
-
-
         theLogger.info(mark_safe(render_to_string( 'admin/media-select.tpl',ctx)))
         return mark_safe(render_to_string( 'admin/media-select.tpl',ctx))
 

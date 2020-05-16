@@ -11,6 +11,11 @@ from rest_framework import permissions
 
 from django.contrib.auth.decorators import login_required,permission_required,user_passes_test
 from django.contrib.auth.models import Group
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.cache import never_cache
+from .media_base import get_media
+
 #----------------------------v1---------------------------------------------------------
 
 #-------register----login-------
@@ -100,5 +105,6 @@ urlpatterns = [
 
     path('search_course',search_course,name='search_course'),
     path('oss_object_exists/<path:key>',alioss_directup_views.oss_object_exists,name='oss_object_exists'),
+    path('get_media_by_key',never_cache(staff_member_required(get_media)),name='get_media_by_key'),
  
 ]

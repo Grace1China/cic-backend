@@ -441,6 +441,47 @@ class AliyunMediaStorage(AliyunBaseStorage):
         self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url
         return super().get_files_browse_urls(user=user,typ=typ,path=path,marker = marker)
 
+    def get_media_from_db(self,typ='images',key=''):
+        '''
+        '''
+        try:
+            if key == '' :
+                raise Exception(' key should not be null ')
+            self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url  同时会对self.destination进行赋值
+            qrset = MediaFile.objects.filter(name=key)
+            from  ckeditor_uploader import utils 
+            from .utils import is_valid_image_extension
+            
+            key = self._normalize_name(self._clean_name(key))
+            key = key.encode('utf8')
+            # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+            from oss2.compat import urlquote,urlparse
+            key = urlquote(key, safe='/?=')
+            p = urlparse(rc.endpoint)
+
+            media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
+
+            thumb = self.get_thumb_filename(media_url)
+
+            qs = MediaFile.objects.filter(name=key)
+            if len(qs) != 1:
+                raise Exception(' media record is not unique ')
+
+            ro = {
+                'thumb': thumb,
+                'src': media_url,
+                'key':key,
+                'is_image': is_valid_image_extension(qs[0].origin_name),
+                'typ':typ,
+                'visible_filename': qs[0].origin_name,
+            }
+                
+            return files
+        except Exception as e:
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+
+
     def get_files_from_db(self,user=None,typ=None,series='',page=1):
         '''
         从数据库中，查找媒体记录
@@ -482,6 +523,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
                     'src': media_url,
                     'key':key,
                     'is_image': is_valid_image_extension(filename),
+                    'typ':typ,
                     'visible_filename': visible_filename,
                 })
                 
@@ -561,6 +603,47 @@ class AliyunVideoStorage(AliyunBaseStorage):
     
     location = '/'#settings.MEDIA_ROOT
     destination = "source" #在父类url中使用取得redirect url getattr(self, 'out')# 获取子类的out()方法
+    def get_media_from_db(self,typ='videos',key=''):
+        '''
+        从数据库中取单个的媒体对像
+        '''
+        try:
+            if key == '':
+                raise Exception(' key should not be null ')
+            key = self._normalize_name(self._clean_name(key))
+            key = key.encode('utf8')
+            # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+            
+            key = urlquote(key, safe='/?=')
+            dest = self._get_destination(typ)  
+            enp = settings.ALIOSS_DESTINATIONS[dest]['endpoint'] #这里得到源桶
+            if enp != rc.endpoint :
+                raise Exception(' settings and db endpoint not match. ')
+            p = urlparse(enp)
+
+            media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
+            signed_url = self.bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+            
+            qs = MediaFile.objects.filter(name=key)
+            if len(qs) != 1:
+                raise Exception(' media record not unique ')
+
+            ro ={
+                'thumb': utils.get_icon_filename(qs[0].origin_name),
+                'src': signed_url,
+                'key':key,
+                'is_image': False,
+                'typ':typ,
+                'visible_filename': qs[0].origin_name,
+                'video_status':qs[0].video_file_status,
+                'video_tcinfo':qs[0].video_file_tcinfo,
+            }
+            return ro
+            
+        except Exception as e:
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+
     def get_files_from_db(self,user=None,typ=None,series='',page=1):
         '''
         从数据库中，查找媒体记录
@@ -617,6 +700,7 @@ class AliyunVideoStorage(AliyunBaseStorage):
                     'src': signed_url,
                     'key':key,
                     'is_image': False,
+                    'typ':typ,
                     'visible_filename': visible_filename,
                     'video_status':rc.video_file_status,
                     'video_tcinfo':tcinfo,

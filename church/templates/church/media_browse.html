@@ -128,6 +128,9 @@
                             </el-select>
                         {% endif %}
                     </div>
+                    <div>
+                    xxxxx{{ series.default }}
+                    </div>
                    
                     <el-button-group>
                         <el-button type="primary" icon="el-icon-arrow-left" @click="prev(curdir)">第一页</el-button>
@@ -138,7 +141,7 @@
             </el-header>
             <el-main id="gallery">
                 <el-tabs v-model="activeTab" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
-                    <el-tab-pane label="图片" name="images">
+                    <el-tab-pane v-if="getQueryVariable('type')=='images'" label="图片" name="images">
                         <el-checkbox-group v-model="checkedImages" >
                             <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
                                 :style="{ display: 'flex'}"
@@ -152,7 +155,7 @@
                                         <el-checkbox 
                                             border
                                             :style="{ width: '100%'}"
-                                            :label=`${theImage(ii,jj).src}` 
+                                            :label=`${ii}-${jj}`
                                         >
                                             <!--上面这个label是el-checkbox-group的v-model的值。它也是唯一的。可以用来反查images里的object-->
 
@@ -186,7 +189,7 @@
                             </div>
                         </el-checkbox-group>
                     </el-tab-pane>
-                    <el-tab-pane label="影片" name="videos">
+                    <el-tab-pane v-if="getQueryVariable('type')=='videos'" label="影片" name="videos">
                         <el-checkbox-group v-model="checkedImages" >
                             <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
                                 :style="{ display: 'flex'}"
@@ -344,8 +347,8 @@
                 data () {
                     return {
                         church:'{{ churchcode }}',
-                        curdir: '{{ dirs.0 }}',
-                        activeTab: 'images',
+                        curdir: 'default',
+                        activeTab: '{{ type }}',
                         dialogImageUrl: '',
                         dialogVisible: false,
                         errorDisplay:'none',
@@ -416,14 +419,14 @@
 
                         //ro = {'type':'images','src':'https://',key:'ims/...'} key是存储在media的字段中的，这样+上平台存储桶的配置，可以算出src
 
-                        typ = this.getQueryVariable('type')
-                        src = this.images[index].src
-                        key = this.images[index].key
+                        //typ = this.getQueryVariable('type')
+                        //src = this.images[index].src
+                        //key = this.images[index].key
                         from = this.getQueryVariable('from')
                         o = this.images[index]
 
 
-                        window.opener.window.formVue.setRo({ "type":`${typ}`,"src":`${src}`, "key":`${key}`, "from":`${from}`, "obj":o } )
+                        window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
                         
                         //window.close()
                     },
@@ -436,13 +439,13 @@
                         }
                         return(false);
                     },
-                    showImages_del:function(path){
+                    /*showImages_del:function(path){
                         //我现在要，做的是，通过目录查找oss相关目录的图片
                         //存放在一个store里面
                         //自动绑定到相关的页面里面
                         console.log('-------showImages----------')
                         store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','type':this.activeTab,'series':path,'page':1})
-                    },
+                    },*/
                     
                     theImage(i,j){
                         //console.log(store.state.images)

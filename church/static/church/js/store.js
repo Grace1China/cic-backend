@@ -56,6 +56,35 @@ function getOssToken (context,options) {
   });
 }
 
+function getObjByKey(context,options) {
+  return new Promise((resolve, reject) =>{        
+    console.log(`getObjByKey=============`)
+    console.log(options)
+    host = store.getters.getHost()
+    axios.get(`http://${host}/rapi/get_media_by_key`,{params: { 'typ':options.typ ,'key':options.key}}).then(function (res) {
+        console.log(res)
+        resolve(res)
+    })
+    .catch(function (err) {
+      console.log(err)
+      reject(err)
+    });
+  });
+}
+
+// async function getObjByKey (context,par) {
+//   host = document.location.host
+//   console.log(`getObjByKey=============`)
+//   console.log(options)
+//   host = store.getters.getHost()
+//   axios.get(`http://${host}/rapi/get_media_by_key`,{params: { 'typ':options.typ ,'key':options.key}}).then(function (res) {
+//       console.log(res)
+//   })
+//   .catch(function (err) {
+//     console.log(err)
+//   });
+// }
+
 const store = new Vuex.Store({
     state: {
       count: 0,
@@ -91,6 +120,7 @@ const store = new Vuex.Store({
       getImages,
       upload2oss,
       getOssToken,
+      getObjByKey,
       
     }
   })
