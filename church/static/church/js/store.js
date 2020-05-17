@@ -1,4 +1,7 @@
 async function getImages (context,par) {
+  /*
+  取各种媒体对象  type 是种类，page是第几页面1-based page number，series是系列的路径
+  */
     host = document.location.host
     if (par.runtime =='sandbox'){
       host = par.MEDIA_BROWSE_API_SERVER

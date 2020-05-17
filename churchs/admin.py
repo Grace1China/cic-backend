@@ -9,6 +9,7 @@ from django.forms import ModelForm,Form
 from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
 from .forms import MeidaForm2
 from users.models import CustomUser
+from church.models import Church
 import logging
 loger = logging.getLogger('church.all')
 
@@ -186,6 +187,18 @@ class SermonAdmin(admin.ModelAdmin):
 
     change_form_template ="admin/churchs/sermon_change_form.html"
 
+    def get_queryset(self, request):
+        try:
+            qs = super().get_queryset(request)
+            if not request.user.is_superuser:
+                qs = qs.filter(church=request.user.church)
+            # loger.info(qs)
+            return qs
+        except Exception as e:
+            import traceback
+            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+             
     def get_changeform_initial_data(self, request):
         return {
             'title': datetime.now() ,
@@ -289,11 +302,15 @@ from django.forms import widgets as Fwidgets
 
 from django.forms import fields
 class SereisForm(forms.ModelForm):
-
-    user=fields.ChoiceField(
-       #反正要重新赋值，静态字段就没有必要赋值了
-        choices=[]
+    user = forms.ChoiceField (
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
     )
+    church = forms.ChoiceField (
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
+    )
+    
     class Meta:
         model = SermonSeries
         fields = ('title','user','church','pub_time','status','res_path',)
@@ -310,9 +327,19 @@ class SereisForm(forms.ModelForm):
         super(SereisForm, self).__init__(*args, **kwargs)
         loger.info(kwargs)
         loger.info(args)
-        self.fields['user'].choices=CustomUser.objects.filter(id=kwargs['initial']['user']).values_list('id','email')
+        if self.initial:
+            # when load init from model, when add from the admin
+            self.fields['user'].choices=CustomUser.objects.filter(id=self.initial['user']).values_list('id','email')
+            self.fields['church'].choices=Church.objects.filter(id=self.initial['church']).values_list('id','name')
+           
+        # self.fields['user'].required = False
+        loger.info(self.initial)
+        # want initd has the data so when save and load can use it as an filter. 
+        # if can not get value when load, then need use instance
+        self.fields['res_path'].widget.attrs.update({'readonly':'readonly'})
+        # self.fields['user'].widget.attrs.update({'readonly':'readonly','disabled':'disabled'})
+        # self.fields['church'].widget.attrs.update({'readonly':'readonly','disabled':'disabled'})
 
-        self.fields['user'].required = False
 
 
       
@@ -346,27 +373,20 @@ class SermonSeriesAdmin(admin.ModelAdmin):
     
     # def clean():
 
-
+    def save_form(self, request, form,change):
+        """
+        Given a ModelForm return an unsaved instance. ``change`` is True if
+        the object is being changed, and False if it's being added.
+        """
+        loger.info('---------save_form-------')
+        instance = form.save(commit=False)
+        instance.user = request.user
+        loger.info(request.user.church)
+        instance.church = request.user.church
+        return instance
     
     def get_form(self, request, obj=None, **kwargs):
-        form = SereisForm
-        # form.fields['user'].widget.attrs['readonly'] = True
-        # form.fields['user'].widget.attrs['disabled'] = True
-        tp = CustomUser.objects.filter(id=request.user.id).values_list('id','email')
-        tp=tuple(tp)
-      
-
-        #约束条件，初始化，建form
-
-
-
-
-        # form.base_fields['church'].widget.attrs['readonly'] = True # text input
-        # form.base_fields['church'].widget.attrs['disabled'] = True # text input
-
-        # form.base_fields['res_path'].widget.attrs['readonly'] = True # text input
-        # form.base_fields['res_path'].widget.attrs['disabled'] = True # text input
-        kwargs['form'] = form
+        kwargs['form'] = SereisForm
         return super().get_form(request, obj, **kwargs)
     
     # def get_readonly_fields(self, request, obj=None):
@@ -379,7 +399,7 @@ class SermonSeriesAdmin(admin.ModelAdmin):
             'church':request.user.church.id,
             'pub_time':datetime.now(),
             'status':SermonSeries.STATUS_OPEN,
-            'res_path':'(unknown now)'
+            'res_path':'--empty--'
         }   
         loger.info(rd)
         return rd

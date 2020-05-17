@@ -65,11 +65,12 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
     要在创建系列实例之前，把oss的目录先创建好。先分配资源，然后生成对象。分配了资源，没有保存对象,下次对象生成，依然用这个资源
     '''
     try:
-        if instance.res_path  == '' or instance.res_path is None:
+        if instance.res_path  == '' or instance.res_path is None or instance.res_path=='--empty--':
             ct = SermonSeries.objects.filter(church__exact = instance.church).count()
             # if ct <= 0:
             #     instance.res_path = '/'
             # else:
+            theLogger.info('----create_oss_dir-------')
             instance.res_path = 'series_%d' % (ct+1)
             #删除这一段的原因，是因为，一个原则，只在一处存储系列的集合关系。
 

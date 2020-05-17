@@ -15,6 +15,10 @@
             a.thumb { text-align: center; display: block; float: left; width: 75px; height: 75px; word-wrap: break-word; line-height: 1.2em; overflow: hidden; }
             a.thumb img { display: inline-block; }
             span.filename { color: #666; font-size: 0.95em; }
+
+            #page{
+                height:100%;
+            }
             #gallery { min-width: 880px; }
             #search {
                 display:flex;
@@ -67,13 +71,29 @@
             .el-icon-upload{
                 line-height:unset;
             }
+            .upload{
+                height:94%;
+                position:relative;
+            }
             .el-upload--picture-card{
-                position: fixed;
+                {% comment %} position: fixed;
                 bottom: 0;
                 left: 50%;
                 transform: translateX(-50%);
                 text-align: center;
-                width: fit-content;
+                width: fit-content; {% endcomment %}
+                {% comment %} position: absolute; {% endcomment %}
+                display: inline-flex;
+                justify-content: center;
+                width:100%;
+                height:100%;
+            }
+            .el-upload-list{
+                z-index:40;
+
+            }
+            .el-upload-dragger{
+                margin:auto;
             }
             .extra-bar{
                 position: absolute;
@@ -104,6 +124,15 @@
                 max-height:560px;
                 overflow-y: scroll;
             }
+            .el-tabs--border-card{
+                border:none;
+            }
+            .el-tabs--border-card>.el-tabs__header {
+                border:none;
+            }
+            .el-upload .el-upload--picture-card{
+            
+            }
             
         </style>
     </head>
@@ -128,9 +157,9 @@
                             </el-select>
                         {% endif %}
                     </div>
-                    <div>
-                    xxxxx{{ series.default }}
-                    </div>
+                    <el-input placeholder="请输入查找内容" v-model="searchkey" :style="{width: '30%'}" class="input-with-select">
+                        <el-button slot="append" icon="el-icon-search"></el-button>
+                    </el-input>
                    
                     <el-button-group>
                         <el-button type="primary" icon="el-icon-arrow-left" @click="prev(curdir)">第一页</el-button>
@@ -241,7 +270,7 @@
                             </div>
                         </el-checkbox-group>
                     </el-tab-pane>
-                    <el-tab-pane label="音乐" name="audios">
+                    <el-tab-pane v-if="getQueryVariable('type')=='audios'" label="音乐" name="audios">
                         <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
                             <el-col :span="4" v-for="jj in 6" :key="jj">
                                 <el-checkbox 
@@ -282,17 +311,18 @@
                             multiple
                             drag
                             >
+                            <el-button style="margin-left: 10px;float:right;" size="small" type="success" @click="submitUpload"
+                                :disabled="!filePrepared"
+                            >
+                                把这些文件上传到服务器
+                            </el-button>
                             <i class="el-icon-upload"></i>
                         </el-upload> 
-                        <el-button style="margin-left: 10px;float:right;" size="small" type="success" @click="submitUpload"
-                            :disabled="!filePrepared"
-                        >
-                            把这些文件上传到服务器
-                        </el-button>
+                        
 
-                        <el-dialog :visible.sync="dialogVisible" size="tiny">
+                        {% comment %} <el-dialog :visible.sync="dialogVisible" size="tiny">
                             <img width="100%" :src="dialogImageUrl" alt="">
-                        </el-dialog>
+                        </el-dialog> {% endcomment %}
                         
                         <el-alert 
                             :title="errorMsg"
@@ -310,7 +340,7 @@
                 
             </el-main>
             <el-footer>
-                <el-button type="primary" @click=mediaReturn('ok')>确定<i class="el-icon-upload"></i></el-button>
+                <el-button type="primary" onclick='window.close'>取消</el-button><el-button type="primary" @click=mediaReturn('ok')>确定</el-button>
             </el-footer>
         </el-container>
 
@@ -364,7 +394,8 @@
                         loading:false,
                         ALIOSS_DESTINATIONS:JSON.parse(`{{ ALIOSS_DESTINATIONS|safe }}`),
                         checkedImages:[],
-                        checkedImages1:[]
+                        checkedImages1:[],
+                        searchkey:''
 
                     }
                 },
@@ -379,6 +410,8 @@
                 store,
                 mounted: function (){
                     //this.showImages(this.curdir)
+                    typ = this.getQueryVariable('type')
+                    this.showFiles(typ,this.curdir,1)
                 },
                 filters: {
                     shortname: function (value) {
@@ -395,40 +428,13 @@
                     },
                     mediaReturn(o){
                         console.log('-----mediaReturn-----------')
-                        console.log(o)
-                        console.log(window.opener.window.formVue)
-                        console.log(this.checkedImages)
                         console.log(this.images)
                         arr = this.checkedImages[0].split('-')
                         index = (arr[0]-1)*6+arr[1]-1
-
-                        /*is_image: false
-                        src: "https://bicf-media-source.oss-cn-beijing.aliyuncs.com/L3%2Fdefault%2Fc03d8af6-b353-5373-f100-afde430b8aa8?OSSAccessKeyId=LTAI4Fd1JMHM3WSUN4vrHcj8&Expires=1589181148&Signature=oniIfk0%2BGuoslpz6E3neQfNbNtg%3D"
-                        key:
-                        thumb: "/static/ckeditor/file-icons/file.png"
-                        video_status: 3
-                        video_tcinfo: Object
-                        audio: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/ld.mp4"
-                        hd: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/hd.mp4"
-                        image1: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/00001.jpg"
-                        image2: (...)
-                        image3: (...)
-                        ld: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/ld.mp4"
-                        sd: "https://api.bicf.org/mediabase/L3/default/c03d8af6-b353-5373-f100-afde430b8aa8/sd.mp4"
-                        */
-
-                        //ro = {'type':'images','src':'https://',key:'ims/...'} key是存储在media的字段中的，这样+上平台存储桶的配置，可以算出src
-
-                        //typ = this.getQueryVariable('type')
-                        //src = this.images[index].src
-                        //key = this.images[index].key
                         from = this.getQueryVariable('from')
                         o = this.images[index]
-
-
                         window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
-                        
-                        //window.close()
+                        window.close()
                     },
                     getQueryVariable(variable){
                         var query = window.location.search.substring(1);
@@ -439,31 +445,20 @@
                         }
                         return(false);
                     },
-                    /*showImages_del:function(path){
-                        //我现在要，做的是，通过目录查找oss相关目录的图片
-                        //存放在一个store里面
-                        //自动绑定到相关的页面里面
-                        console.log('-------showImages----------')
-                        store.dispatch('getImages',{'MEDIA_BROWSE_API_SERVER':'{{ MEDIA_BROWSE_API_SERVER }}','type':this.activeTab,'series':path,'page':1})
-                    },*/
+                   
                     
                     theImage(i,j){
-                        //console.log(store.state.images)
-                        //console.log(`-------------${i}-${j}-----------------`)
                         return (store.state.images||[])[(i-1)*6 + j-1]||{}
                     },
                     next:function(){
                         //当没有18个图片的时候，说明就结束了
                         console.log('------next------')
-                       
                         this.page[this.activeTab] = (++this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
                         this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
                     },
                     prev:function(){
-              
                         this.page[this.activeTab] = (--this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
                         this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
-
                     },
                     goTab(page){
                         this.activeTab = page
@@ -473,7 +468,11 @@
                         this.showFiles(this.activeTab,sereis,this.page[this.activeTab])
                     },
                     showFiles:function(type,series,page){
+                        /*
+                        page 是从1开始的。
+                        */
                         vm = this
+                        vm.loading = true
                         store.dispatch('getImages',{'type':type,'series':series,'page':page}).then(function(){
                             vm.$forceUpdate()
                             vm.loading = false
@@ -605,18 +604,12 @@
                         console.log('--------submitUpload---------------')
                         this.$refs.upload.submit();
                     },
-                    //handleRemove(file, fileList) {
-                    //    console.log(file, fileList);
-                    //},
                     removeKey(key){
                         console.log(`-----need to delete the bucket file and db record---of--${key}--`)
                     },
                     handlePictureCardPreview(file) {
                         console.log('------------handlePictureCardPreview---------------')
                         console.log(file)
-                        
-                        //this.dialogImageUrl = file.url;
-                        //this.dialogVisible = true;
                         
                         if (((file||{}).oname||'').match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')){
                             this.$alert(`<img style="width:100%;height:auto;" src="${file.url}">`, {
@@ -656,8 +649,6 @@
                         console.log('-----------diyUpload------------')
                         console.log(fileType)
                         thedest = this.getTyp(fileType)
-                        //console.log(dest)
-                        //https://bicf-media-destination.oss-accelerate.aliyuncs.com
                         thehost = `https://${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['bucket']}.${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['endpoint.acc']}`
 
                         console.log(`dest:${thedest};host:${thehost}`)
