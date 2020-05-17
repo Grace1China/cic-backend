@@ -475,7 +475,7 @@ class AliMtsCallBack_process(APIView):
                 dictInfo['image2'] = '00002.jpg' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Snapshot','base') else ''
                 dictInfo['image3'] = '00003.jpg' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Snapshot','base') else ''
                 dictInfo['sd'] = 'sd.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','SD') else ''
-                # dictInfo['hd'] = 'hd.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','HD') else ''
+                dictInfo['hd'] = ''#should be origin file'hd.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','HD') else ''
                 dictInfo['ld'] = 'ld.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','LD') else ''
                 dictInfo['audio'] = 'ld.mp4' if self._is_sucess(msg['MediaWorkflowExecution']['ActivityList'],'Transcode','TRANSCODE_1588052100160') else ''
                 mfile.video_file_tcinfo = json.dumps(dictInfo)
