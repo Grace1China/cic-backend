@@ -38,23 +38,23 @@ def browse(request):
         for i in ls_res_path:
             sereis_dict[i['res_path']] = i['title']
     
-        from api.alioss_directup_views import AliOssSignatureV2
-        token = AliOssSignatureV2.cls_get_token(request.user.church.code,typ=typ,cbhost=request.META['HTTP_HOST'])#这个参数有还要在此方法内加入校验。
-        lg.info(token)
+        # from api.alioss_directup_views import AliOssSignatureV2
+        # token = AliOssSignatureV2.cls_get_token(request.user.church.code,typ=typ,cbhost=request.META['HTTP_HOST'])#这个参数有还要在此方法内加入校验。
+        # lg.info(token)
 
         # {"accessid": "LTAI4Fd1JMHM3WSUN4vrHcj8", "host": "https://bicf-media-source.oss-accelerate.aliyuncs.com", "desthost": "https://bicf-media-destination.oss-accelerate.aliyuncs.com", "policy": "eyJleHBpcmF0aW9uIjogIjIwMjAtMDQtMThUMDc6NDc6NDlaIiwgImNvbmRpdGlvbnMiOiBbWyJzdGFydHMtd2l0aCIsICIka2V5IiwgIkwzIl1dfQ==", "signature": "cnmgjhxg5wo65PuGU58/UlT/7No=", "expire": 1587196069, "dir": "L3/", "callback": "eyJjYWxsYmFja1VybCI6ICJodHRwOi8vdGVzdC5sMy5iaWNmLm9yZy9yYXBpL2FsaW9zc19kaXJlY3R1cF9jYWxsYmFjayIsICJjYWxsYmFja0JvZHkiOiAiZmlsZW5hbWU9JHtvYmplY3R9JnNpemU9JHtzaXplfSZtaW1lVHlwZT0ke21pbWVUeXBlfSZoZWlnaHQ9JHtpbWFnZUluZm8uaGVpZ2h0fSZ3aWR0aD0ke2ltYWdlSW5mby53aWR0aH0iLCAiY2FsbGJhY2tCb2R5VHlwZSI6ICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQifQ=="}
         from church.confs.base import get_ALIOSS_DESTINATIONS
         context = {
-            'show_dirs': True,#这个可能没有什么用发，目前留着
+            # 'show_dirs': True,#这个可能没有什么用发，目前留着
             'series': sereis_dict,
             # 'files': files,
             'form': None ,#form
             'MEDIA_BROWSE_API_SERVER':settings.MEDIA_BROWSE_API_SERVER, #就是首次加载图片的地址，为了实现本地调试sandbox的api,但在sandbox和product中用的各自外网地址
             'rediret_url_prefix':get_ALIOSS_DESTINATIONS(typ)['redirecturl'],#跨国的redirect 是国内外的nginx配置，参考设计文档
-            'OSSAccessKeyId': token['accessid'],
-            'policy': token['policy'],
-            'Signature': token['signature'],
-            'callback': token['callback'],
+            # 'OSSAccessKeyId': token['accessid'],
+            # 'policy': token['policy'],
+            # 'Signature': token['signature'],
+            # 'callback': token['callback'],
             'type':typ,
             'churchcode':request.user.church.code,
             'runtime':settings.RUNTIME,
@@ -95,16 +95,19 @@ def list_img(request,path=''):
             typ = data.get('type','images')
             page = data.get('page',1)
             series = data.get('series','/') #默认的专栏，这样在专栏生成前应该有一个预置的默认专栏。就是用这个根目录。
+            dkey = data.get('dkey','') #默认的专栏，这样在专栏生成前应该有一个预置的默认专栏。就是用这个根目录。
+            skey = data.get('skey','')
             
             # path = '%s%s' % (storage._get_user_path(request.user), '' if path=='' else '/'+path) #教会的目录是本函数负责加上
             if series != '':
                 files = list()
+                total = 0
                 if typ == 'videos':
                     stg = AliyunVideoStorage()
-                    files = stg.get_files_from_db(user=request.user,typ=typ,series=series,page=page)
+                    files,total = stg.get_files_from_db(user=request.user,typ=typ,series=series,page=page,dkey=dkey,skey=skey)
                 else:
-                    files = storage.get_files_from_db(user=request.user,typ=typ,series=series,page=page)
-                ret = {'errCode': '0','msg':'success','data':files}
+                    files,total = storage.get_files_from_db(user=request.user,typ=typ,series=series,page=page,dkey=dkey,skey=skey)
+                ret = {'errCode': '0','msg':'success','data':{'medias':files,'total':total}}
             else:
                 raise Exception('series key must not null.')   
     except Exception as e:

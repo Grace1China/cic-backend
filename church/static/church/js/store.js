@@ -7,7 +7,7 @@ async function getImages (context,par) {
       host = par.MEDIA_BROWSE_API_SERVER
     }
     console.log(`getImages==============path==${par.series}=`)
-    await axios.get(`http://${host}/alioss_list${par.series=='/'?'/':'/'+par.series}`,{params: { 'type': par.type,'page':par.page ,'series':par.series}})
+    await axios.get(`http://${host}/alioss_list${par.series=='/'?'/':'/'+par.series}`,{params: { 'type': par.type,'page':par.page ,'series':par.series,'dkey':par.delfilekey,'skey':par.searchkey}})
     .then(function (res) {
         console.log(res)
         if (res.data.errCode == '0'){
@@ -92,14 +92,16 @@ const store = new Vuex.Store({
     state: {
       count: 0,
       images:[],
+      totalmedia:0,
 
     },
     mutations: {
       increment (state) {
         state.count++
       },
-      setImages(state, pimages){
-        state.images = pimages
+      setImages(state, data){
+        state.images = data.medias
+        state.totalmedia = data.total
       },
     },
     getters: {
@@ -119,7 +121,7 @@ const store = new Vuex.Store({
       increment (context) {
         context.commit('increment')
       },
-     
+      
       getImages,
       upload2oss,
       getOssToken,

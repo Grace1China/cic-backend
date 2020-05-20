@@ -210,6 +210,7 @@
                             pro:this.ro,
                             rosrc:undefined,
                             rokey:undefined,
+                            thumb:undefined,
                             video_tcinfo:{},
                             typ:undefined,//加载后preview的时候，根据类型,默认为undefined后可取ptyp
                         }
@@ -269,9 +270,12 @@
                         console.log('-------mounted---media-sele')
                         console.log(this)
                         //对于以key加载的控件，重新加载一次，对于图像自动扩展url,对于video要执行一次回调
-                        if (this.value == '__empty__'){
+                        if (this.value == '__empty__' || this.value == ''){
+                            console.log('--------return------------')
                             return
                         }
+
+                        this.typ = this.ptyp
                         if (this.ptyp == 'images'){
                             //只需要对src进行设置
                             this.rosrc = `https://api.bicf.org/mediabase/${this.value}`
@@ -286,6 +290,12 @@
                                 ld: `https://api.bicf.org/mediabase/${this.value}/ld.mp4`,
                                 sd: `https://api.bicf.org/mediabase/${this.value}/sd.mp4`
                             }
+                        }else if(this.ptyp == 'audios'){
+                            this.rosrc = `https://api.bicf.org/mediabase/${this.value}`
+                            this.thumb = '/static/church/img/audio.jpg'
+                        }else if(this.ptyp == 'pdfs'){
+                            this.rosrc = `https://api.bicf.org/mediabase/${this.value}`
+                            this.thumb = '/static/church/img/pdf.png'
                         }
                     },
                     method:{
@@ -308,9 +318,9 @@
                             alignItems: 'center' }"
                             class='mediacard'
                         >
-                            <hovercard v-show="(rosrc||src||'') != ''">
+                            <hovercard v-show="(rosrc||thumb||'') != ''">
                                 <span
-                                    @click.stop.prevent="$emit('clickp', { 'type':( ((typ||ptyp)||'')=='' ) ? 'images' : (typ||ptyp) ,'src':(typ||ptyp)=='videos'? video_tcinfo.sd:rosrc} )"
+                                    @click.stop.prevent="$emit('clickp', { 'type':( ((typ||ptyp)||'')=='' ) ? 'images' : (typ||ptyp) ,'src':(typ||ptyp)=='videos'? video_tcinfo.sd:rosrc||thumb} )"
                                 >
                                     <i class="el-icon-zoom-in"></i>
                                 </span>
@@ -320,9 +330,11 @@
                                     <i class="el-icon-delete"></i>
                                 </span>
                             </hovercard>
-                            <img v-show="((rosrc||src||'') != '') && name.indexOf('image')>0" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
-                            <img v-show="((rosrc||src||'') != '') && name.indexOf('video')>0" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
-                            <i v-show="(rosrc||src||'') == ''" class="el-icon-plus" :style="{ fontSize: '3em' }"></i>
+                            <img v-show="((typ == 'images') && (rosrc||src||'') != '') && name.indexOf('image')>0" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
+                            <img v-show="((typ == 'videos') && (rosrc||src||'') != '') && name.indexOf('video')>0" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
+                            <img v-show="((typ == 'audios') && thumb != '') && name.indexOf('audio')>0" :src="thumb" :style="{ width: '100%', height: '100px' }"/>
+                            <img v-show="((typ == 'pdfs') && thumb != '') && name.indexOf('pdf')>0" :src="thumb" :style="{ width: '100%', height: '100px' }"/>
+                            <i v-show="(rosrc||thumb||'') == ''" class="el-icon-plus" :style="{ fontSize: '3em' }"></i>
                         </el-card>
                     </div>
                     `,
@@ -360,6 +372,12 @@
 
             },
             methods:{
+                premote:function(id){
+                    this.$alert(`<a href="${document.location.host}/blog/sermon/${id}">${document.location.host}/blog/sermon/${id}</a>`, {
+                            dangerouslyUseHTMLString: true,
+                            customClass:"link-preview"
+                        });
+                },
                 invokeMediaBrowse:function(e) {
                     console.log(e)
                     console.log(e.target)
@@ -391,7 +409,27 @@
                             }
                         });
                         return
-                    }
+                    }else if(media.type=='audios'){
+
+                        this.$alert(`<div style="display:flex;flex-direction:column;"><video controls="" autoplay="" id="media-preview" name="media"><source src="${media.src}" type="audio/mpeg"></video></div>`, {
+                            dangerouslyUseHTMLString: true,
+                            customClass:"image-preview",
+                            beforeClose:(action,instance,done)=>{
+                                //console.log(instance)
+                                (instance.$el.querySelector('video#media-preview')||this.document.createElement('audio')).pause()
+                                done()
+                            }
+                        });
+                    }else if(media.type=='pdfs'){
+                            this.$alert(`<div style="display:flex;flex-direction:column;"><iframe id="media-preview" name="media" src="${media.src}" ></iframe></div>`, {
+                                dangerouslyUseHTMLString: true,
+                                customClass:"image-preview",
+                                beforeClose:(action,instance,done)=>{
+                                    //console.log(instance)
+                                    done()
+                                }
+                            });
+                        }
                 },
                 deletep:function(name){
                     for (i = 0 ; i < this.$children.length ; i++){
@@ -400,6 +438,7 @@
                             
                             this.$children[i].rosrc = ""
                             this.$children[i].rokey = ""
+                            this.$children[i].thumb = ""
                             this.$children[i].video_tcinfo = {}
                             this.$children[i].typ = ""
                         }
@@ -420,9 +459,11 @@
                             if ((o||'')==''){
                                 this.$children[i].rosrc = '';
                             }else{
-                                this.$children[i].rosrc = o.obj.src
-                                this.$children[i].rokey = o.obj.key
+                                this.$children[i].rosrc = o.obj.src// image to show
+                                this.$children[i].rokey = o.obj.key// bucket key
                                 this.$children[i].typ = o.obj.typ
+                                this.$children[i].thumb = o.obj.thumb
+
                                 if(o.obj.typ == 'videos'){
                                     this.$children[i].video_tcinfo = o.obj.video_tcinfo
                                     this.$children[i].rosrc = o.obj.video_tcinfo.image3//

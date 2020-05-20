@@ -10,6 +10,8 @@ from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMed
 from .forms import MeidaForm2
 from users.models import CustomUser
 from church.models import Church
+from django.utils.html import format_html
+
 import logging
 loger = logging.getLogger('church.all')
 
@@ -175,7 +177,7 @@ class SermonAdmin(admin.ModelAdmin):
     ]
 
     model = Sermon
-    list_display = ('title','user','pub_time','status')
+    list_display = ('title','user','pub_time','status','promote')
     search_fields = ('pub_time', 'title','status','user')
     fields = ('title','cover','speaker','scripture','series','church','pub_time','status','user')
 
@@ -186,6 +188,12 @@ class SermonAdmin(admin.ModelAdmin):
     #             yield inline.get_formset(request, obj), inline
 
     change_form_template ="admin/churchs/sermon_change_form.html"
+
+    
+    def promote(self, obj):
+        button_html = """<a class="changelink" href="#" onclick='fontConfig.premote(%s)'>推广链接</a>""" % obj.id
+        return format_html(button_html)
+    promote.short_description = "操作"
 
     def get_queryset(self, request):
         try:
@@ -211,7 +219,7 @@ class SermonAdmin(admin.ModelAdmin):
             'user':request.user
         }
 
-    actions = ['mainsite_api_v1_makesermon']
+    # actions = ['mainsite_api_v1_makesermon']
 
     def mainsite_api_v1_makesermon(self, request, queryset):
         try:

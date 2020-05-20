@@ -23,6 +23,7 @@ import traceback, sys
 from crequest.middleware import CrequestMiddleware
 from churchs.models import MediaFile
 from django.core.paginator import Paginator
+from churchs.models import Media
 
 import logging
 theLogger = logging.getLogger('church.all')
@@ -321,7 +322,7 @@ class AliyunBaseStorage(BucketOperationMixin, Storage):
 
         raise Exception('not find the user resource path!')
 
-    def get_image_files(self,user=None, path='',marker=''):
+    def del_get_image_files(self,user=None, path='',marker=''):
         """
         Recursively walks all dirs under upload dir and generates a list of
         full paths for each file found.
@@ -441,7 +442,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
         self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url
         return super().get_files_browse_urls(user=user,typ=typ,path=path,marker = marker)
 
-    def get_media_from_db(self,typ='images',key=''):
+    def del_get_media_from_db(self,typ='images',key=''):
         '''
         '''
         try:
@@ -482,15 +483,48 @@ class AliyunMediaStorage(AliyunBaseStorage):
             raise e
 
 
-    def get_files_from_db(self,user=None,typ=None,series='',page=1):
+    def get_files_from_db(self,user=None,typ=None,series='',page=1,dkey='',skey=''):
         '''
         从数据库中，查找媒体记录
         '''
         try:
             self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url  同时会对self.destination进行赋值
             lg.info('mime_type:%s church_prefix%s series_prefix%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series))
-            qrset = MediaFile.objects.filter(mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],church_prefix=user.church.code,series_prefix=series).order_by('-update_time')
-            lg.info(qrset)
+
+            if (dkey != ''):
+                #删除上传桶
+                # self.bucket.delete_object(dkey)
+                #删除video的目标桶
+                # vdbk = Bucket(self.auth, settings.ALIOSS_DESTINATIONS['%s.destination']['endpoint.acc'], settings.ALIOSS_DESTINATIONS['%s.destination']['bucket'])
+                # vdbk.delete_object(dkey)
+                # 目前不删除文件
+
+                #删除数据库
+                from django.db.models import Q
+                MediaFile.objects.filter(name=dkey).delete()
+                medias = Media.objects.filter(Q(alioss_video=dkey) | Q(alioss_audio=dkey) |Q(alioss_image=dkey) | Q(alioss_pdf=dkey))
+                for md in medias:
+                    if md.alioss_video == dkey:
+                        md.alioss_video = ''
+                    if md.alioss_audio == dkey:
+                        md.alioss_audio = ''
+                    if md.alioss_image == dkey:
+                        md.alioss_image = ''
+                    if md.alioss_pdf == dkey:
+                        md.alioss_pdf = ''
+                    md.save()
+
+            lg.info('mime_type:%s chuAliyunVideoStoragerch_prefix%s series_prefix%s dkey%s  skey%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series,dkey,skey))
+            qrset = None
+            if skey != '':
+                qrset = MediaFile.objects.filter(church_prefix=user.church.code,origin_name__icontains=skey,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+            else:
+                qrset = MediaFile.objects.filter(series_prefix=series,church_prefix=user.church.code,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+
+            # qrset = MediaFile.objects.filter(mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],church_prefix=user.church.code,series_prefix=series).order_by('-update_time')
+            # lg.info(qrset)
+            total = qrset.count()
+
             pg = Paginator(qrset, 18)
             results = pg.page(page)
 
@@ -514,9 +548,10 @@ class AliyunMediaStorage(AliyunBaseStorage):
 
                 visible_filename = rc.origin_name
                 if rc.mime_type.startswith( 'image/' ):
-                    thumb = self.get_thumb_filename(media_url)
+                    thumb = '%s?%s' % (media_url,'x-oss-process=style/wh100_auto')#self.get_thumb_filename(media_url)
                 else:
-                    thumb = utils.get_icon_filename(visible_filename)
+                    from church.confs.base import get_icon_filename
+                    thumb = get_icon_filename(visible_filename)
 
                 files.append({
                     'thumb': thumb,
@@ -527,14 +562,12 @@ class AliyunMediaStorage(AliyunBaseStorage):
                     'visible_filename': visible_filename,
                 })
                 
-            # lg.info('last (files dirs):')
-            # lg.info((files,dirs))
             lg.info('-----get_files_from_db----files---')
-            return files
+            return (files,total)
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e
-            
+
     def get_image_files(self,user=None, path='',marker = ''):
         return super().get_image_files(user=user,path=path,marker = marker)
 
@@ -603,7 +636,7 @@ class AliyunVideoStorage(AliyunBaseStorage):
     
     location = '/'#settings.MEDIA_ROOT
     destination = "source" #在父类url中使用取得redirect url getattr(self, 'out')# 获取子类的out()方法
-    def get_media_from_db(self,typ='videos',key=''):
+    def del_get_media_from_db(self,typ='videos',key=''):
         '''
         从数据库中取单个的媒体对像
         '''
@@ -643,24 +676,53 @@ class AliyunVideoStorage(AliyunBaseStorage):
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e
-
-    def get_files_from_db(self,user=None,typ=None,series='',page=1):
+    
+    def get_files_from_db(self,user=None,typ=None,series='',page=1,dkey='',skey=''):
         '''
         从数据库中，查找媒体记录
         '''
         try:
             if typ != 'videos':
                 raise Exception(' typ should be videos ')
-            self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url  同时会对self.destination进行赋值
-            lg.info('mime_type:%s chuAliyunVideoStoragerch_prefix%s series_prefix%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series))
-            qrset = MediaFile.objects.filter(mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],church_prefix=user.church.code,series_prefix=series).order_by('-update_time')
+            self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，目的是为了上传。有不同的访问url，跨国加速url和redirect url  同时会对self.destination进行赋值
+            if (dkey != ''):
+                #删除上传桶
+                # self.bucket.delete_object(dkey)
+                #删除video的目标桶
+                # vdbk = Bucket(self.auth, settings.ALIOSS_DESTINATIONS['%s.destination']['endpoint.acc'], settings.ALIOSS_DESTINATIONS['%s.destination']['bucket'])
+                # vdbk.delete_object(dkey)
+                # 目前不删除文件
+
+                #删除数据库
+                from django.db.models import Q
+                MediaFile.objects.filter(name=dkey).delete()
+                medias = Media.objects.filter(Q(alioss_video=dkey) | Q(alioss_audio=dkey) |Q(alioss_image=dkey) | Q(alioss_pdf=dkey))
+                for md in medias:
+                    if md.alioss_video == dkey:
+                        md.alioss_video = ''
+                    if md.alioss_audio == dkey:
+                        md.alioss_audio = ''
+                    if md.alioss_image == dkey:
+                        md.alioss_image = ''
+                    if md.alioss_pdf == dkey:
+                        md.alioss_pdf = ''
+                    md.save()
+
+            lg.info('mime_type:%s chuAliyunVideoStoragerch_prefix%s series_prefix%s dkey%s  skey%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series,dkey,skey))
+            qrset = None
+            if skey != '':
+                qrset = MediaFile.objects.filter(church_prefix=user.church.code,origin_name__icontains=skey,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+            else:
+                qrset = MediaFile.objects.filter(series_prefix=series,church_prefix=user.church.code,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
             lg.info(qrset)
+
+            total = qrset.count()
             pg = Paginator(qrset, 18)
             results = pg.page(page)
 
             from  ckeditor_uploader import utils 
             from .utils import is_valid_image_extension
-            lg.info(typ)
+            
             files = []
             # dirs = set()
             for rc in results :
@@ -710,7 +772,7 @@ class AliyunVideoStorage(AliyunBaseStorage):
             # lg.info((files,dirs))
             lg.info('-----get_files_from_db----files---')
             lg.info(files)
-            return files
+            return (files,total)
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e

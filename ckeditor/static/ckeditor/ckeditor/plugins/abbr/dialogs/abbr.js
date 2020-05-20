@@ -64,7 +64,7 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 					// }
 					{
 						type: "html",
-						html: "<iframe id='myiframe' width='100%' height='100%' src='" + "/media_browse/?type=images" + "'></iframe>",
+						html: "<iframe id='myiframe' width='100%' height='100%' src='" + "/media_browse/?type=images&from=ckeditor" + "'></iframe>",
 						style: "width:920px;height:580px;padding:0;"
 					  }
 				]
@@ -144,7 +144,7 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			// if ( this.insertMode )
 			// 	editor.insertElement( abbr );
 			// var html = `<p><img src="https://bicf-media-destination.oss-cn-beijing.aliyuncs.com/L3/03132020.jpg"></p>`;
-			var imgs= document.getElementById('myiframe').contentDocument.querySelectorAll('.el-checkbox.is-checked img')
+			var imgs= document.getElementById('myiframe').contentDocument.querySelectorAll('.el-checkbox.is-checked .mediadata')
 			console.log(imgs)
 
 			// //使用JS最基础的getElementById找到我们的iframe控件，然后再获取id为username的控件
@@ -164,8 +164,31 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			
 			html = ''
 			imgs.forEach(function(e){
-				html = html + `<p><img style="width:100%;" src="${e.getAttribute('src').replace('/wh100_auto','')}"></p>` 
+				typ = e.getAttribute('typ')
+				if(typ == 'images'){
+					html = html + `<p><img style="width:100%;" src="${e.getAttribute('src').replace('/wh100_auto','')}"></p>` 
+				}else if(typ == 'videos'){
+					html = html + `<div class="ckeditor-html5-video" style="text-align:center">
+						<video controls="controls" controlslist="nodownload"  src="${e.getAttribute('data-src')}" width="100%">&nbsp;</video>
+					</div>`
+				}else if(typ == 'audios'){
+					//html = html + `<p><audio controls="" autoplay="" name="media" src="${e.getAttribute('data-src')}"></audio></p>` 
+					html = html + `<div class="ckeditor-html5-video" style="text-align:center">
+						<audio controls="controls" controlslist="nodownload" controlslist="nodownload" src="${e.getAttribute('data-src')}" width="100%" type="audio/mpeg">&nbsp;</audio>
+					</div>`
+				}else if(typ == 'pdfs'){
+					html = html + `<p><iframe frameborder="0" scrolling="no" src="${e.getAttribute('data-src')}"></iframe></p>`
+				}
 			})
+			// var sel = editor.getSelection();
+			// var range = sel.getRanges()[0];
+
+			// // no range, means the editor is empty. Select the range.
+			// if (!range) {
+			// range = editor.createRange();
+			// range.selectNodeContents( editor.editable() );
+			// sel.selectRanges( [ range ] );
+			// }
 			editor.insertHtml(html);
 			this.commitContent();
 		},

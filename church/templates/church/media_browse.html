@@ -26,9 +26,7 @@
             }
             .image_check{
                 width: 100%;
-                {% comment %} height: 100px !important; {% endcomment %}
             }
-
             .mediacard{
                 width:128px;
                 min-width:128px;
@@ -76,24 +74,26 @@
                 position:relative;
             }
             .el-upload--picture-card{
-                {% comment %} position: fixed;
-                bottom: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                text-align: center;
-                width: fit-content; {% endcomment %}
-                {% comment %} position: absolute; {% endcomment %}
                 display: inline-flex;
                 justify-content: center;
                 width:100%;
                 height:100%;
+                position:absolute;
+                left:0;
             }
             .el-upload-list{
                 z-index:40;
-
+                position:absolute;
+                left:0;
+                width:100%;
             }
             .el-upload-dragger{
-                margin:auto;
+                margin: auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: none;
+                border: none;
             }
             .extra-bar{
                 position: absolute;
@@ -140,38 +140,44 @@
         <el-container id="page">
             <el-header>
                 <div class="toolbar">
-                    <div id="search">
-                        {% if show_dirs %}
-                            <el-select 
-                                v-model="curdir" 
-                                filterable placeholder="请选择专栏系列"
-                                @change="onSeriesChange($event)"
-                            >
-                                {% for key,value in series.items %}
-                                    <el-option
-                                        key="{{ key }}"
-                                        label="{{ value }}-{{key}}"
-                                        value="{{ key }}">
-                                    </el-option>
-                                {% endfor %}
-                            </el-select>
-                        {% endif %}
-                    </div>
-                    <el-input placeholder="请输入查找内容" v-model="searchkey" :style="{width: '30%'}" class="input-with-select">
-                        <el-button slot="append" icon="el-icon-search"></el-button>
+                    <el-select 
+                        v-model="curdir" 
+                        filterable placeholder="请选择专栏系列"
+                        @change="onSeriesChange($event)"
+                    >
+                        {% for key,value in series.items %}
+                            <el-option
+                                key="{{ key }}"
+                                label="{{ value }}-{{key}}"
+                                value="{{ key }}">
+                            </el-option>
+                        {% endfor %}
+                    </el-select>
+                
+                    <el-input placeholder="请输入查找内容" v-model="searchkey" :style="{width: '30%'}" class="input-with-select" @keyup.enter.native="showFiles(activeTab,curdir,1,{'search':searchkey})">
+                        <el-button slot="append" icon="el-icon-search" @click="showFiles(activeTab,curdir,1,{'search':searchkey})"></el-button>
                     </el-input>
                    
                     <el-button-group>
-                        <el-button type="primary" icon="el-icon-arrow-left" @click="prev(curdir)">第一页</el-button>
-                        <el-button type="primary" @click="next(curdir)">下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+                        <el-pagination
+                            background
+                            layout="prev, pager, next"
+                            :page-size="18"	
+                            :total="totalmedia"
+                            @current-change="pageChange"
+                        >
+                        </el-pagination>
                     </el-button-group>
-                    <el-button type="primary" @click="goTab('upload')">上传upload<i class="el-icon-upload"></i></el-button>
+                    <el-button v-if="!filePrepared"  type="primary" @click="goTab('upload')"><i class="el-icon-upload"></i>去上传页</el-button>
+                    <el-button v-if="filePrepared"  type="success" @click.stop.prevent="submitUpload"><i class="el-icon-upload"></i>
+                                执行上传
+                    </el-button>
                 </div>
             </el-header>
             <el-main id="gallery">
                 <el-tabs v-model="activeTab" :tab-position="'left'" v-loading="loading" type="border-card" @tab-click="handleClick">
-                    <el-tab-pane v-if="getQueryVariable('type')=='images'" label="图片" name="images">
-                        <el-checkbox-group v-model="checkedImages" >
+                    <el-tab-pane v-if="isShow('images')" label="图片" name="images">
+                        <el-checkbox-group  v-if="activeTab == 'images'" v-model="checkedImages" >
                             <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
                                 :style="{ display: 'flex'}"
                             >
@@ -186,11 +192,10 @@
                                             :style="{ width: '100%'}"
                                             :label=`${ii}-${jj}`
                                         >
-                                            <!--上面这个label是el-checkbox-group的v-model的值。它也是唯一的。可以用来反查images里的object-->
-
                                             <img 
                                                 :src=`${theImage(ii,jj).thumb}` 
-                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg"
+                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg  mediadata"
+                                                typ='images'
                                                 :style="{ width: '100%'}"
                                             />
                                             <hovercard>
@@ -201,25 +206,26 @@
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
                                                     <span
-                                                        @click="removeKey(theImage(ii,jj).src)"
+                                                        @click="removeKey(theImage(ii,jj).key)"
                                                     >
                                                         <i class="el-icon-delete"></i>
                                                     </span>
                                                 </div>
                                             </hovercard>
                                         </el-checkbox>
-                                        <span
-                                            :style="{ 'fontSize':'1rem' }"
-                                        >
-                                        [[ theImage(ii,jj).visible_filename | shortname ]]
-                                        </span>
+                                            <span
+                                                :style="{ 'fontSize':'1rem' }" 
+                                                :title="[[ theImage(ii,jj).visible_filename  ]]"
+                                            >
+                                                [[ theImage(ii,jj).visible_filename | shortname ]]
+                                            </span>
                                     </el-card>
                                 </div>
                             </div>
                         </el-checkbox-group>
                     </el-tab-pane>
-                    <el-tab-pane v-if="getQueryVariable('type')=='videos'" label="影片" name="videos">
-                        <el-checkbox-group v-model="checkedImages" >
+                    <el-tab-pane v-if="isShow('videos')" label="影片" name="videos">
+                        <el-checkbox-group v-if="activeTab == 'videos'" v-model="checkedImages" >
                             <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
                                 :style="{ display: 'flex'}"
                             >
@@ -239,6 +245,8 @@
                                                 <img 
                                                     :src=`${theImage(ii,jj).video_status==3?(theImage(ii,jj).video_tcinfo||{}).image3+'?x-oss-process=style/wh124':theImage(ii,jj).thumb}` 
                                                     :data-src=`${theImage(ii,jj).video_status==3?(theImage(ii,jj).video_tcinfo||{}).sd:theImage(ii,jj).src}`
+                                                    typ="videos"
+                                                    class="mediadata"
                                                 />
                                             </div>
                                             
@@ -253,7 +261,7 @@
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
                                                     <span
-                                                        @click="removeKey(theImage(ii,jj).src)"
+                                                        @click="removeKey(theImage(ii,jj).key)"
                                                     >
                                                         <i class="el-icon-delete"></i>
                                                     </span>
@@ -261,7 +269,8 @@
                                             </hovercard>
                                         </el-checkbox>
                                         <span
-                                            :style="{ 'fontSize':'1rem' }"
+                                            :style="{ 'fontSize':'0.75rem' }"
+                                            :title="[[ theImage(ii,jj).visible_filename  ]]"
                                         >
                                             [[ theImage(ii,jj).visible_filename | shortname]]
                                         </span>
@@ -270,24 +279,103 @@
                             </div>
                         </el-checkbox-group>
                     </el-tab-pane>
-                    <el-tab-pane v-if="getQueryVariable('type')=='audios'" label="音乐" name="audios">
-                        <el-row v-for="ii in Math.ceil(images.length/6)" :key="ii">
-                            <el-col :span="4" v-for="jj in 6" :key="jj">
-                                <el-checkbox 
-                                    v-if=" (theImage(ii,jj).src||'') != '' "
-                                    label="备选项1" 
-                                    border class="image_check"
-                                    @change='checkij(val,$event)'
+                    <el-tab-pane v-if="isShow('audios')" label="音乐" name="audios">
+                        <el-checkbox-group v-if="activeTab == 'audios'" v-model="checkedImages" >
+                            <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
+                                :style="{ display: 'flex'}"
+                            >
+                                <div  v-for="jj in 6" :key="jj"
                                 >
-                                    <img 
-                                        :src=`${theImage(ii,jj).thumb}` 
-                                        :data-src=`${theImage(ii,jj).src}` class="videos"/>
-                                        <div class="imagetitle">
-                                            [[ theImage(ii,jj).visible_filename | shortname]]
-                                        </div>
-                                </el-checkbox>
-                            </el-col>
-                        </el-row>
+                                    <el-card :body-style="{ padding: '0px' ,border: '0', position: 'relative', minWidth: '128px' }"
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        class='mediacard'
+                                    >
+                                        <el-checkbox 
+                                            border
+                                            :style="{ width: '100%'}"
+                                            :label=`${ii}-${jj}`
+                                        >
+                                            <img 
+                                                :src=`${theImage(ii,jj).thumb}` 
+                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg mediadata"
+                                                typ='audios'
+                                                :style="{ width: '100%'}"
+                                            />
+                                            <hovercard>
+                                                <div class='extra-bar'>
+                                                    <span
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src})"
+                                                    >
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span
+                                                        @click="removeKey(theImage(ii,jj).key)"
+                                                    >
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </div>
+                                            </hovercard>
+                                        </el-checkbox>
+                                            <span
+                                                :style="{ 'fontSize':'1rem' }" 
+                                                :title="[[ theImage(ii,jj).visible_filename  ]]"
+                                            >
+                                                [[ theImage(ii,jj).visible_filename | shortname ]]
+                                            </span>
+                                    </el-card>
+                                </div>
+                            </div>
+                        </el-checkbox-group>
+                    </el-tab-pane>
+                    <el-tab-pane v-if="isShow('pdfs')" label="文档" name="pdfs">
+                        <el-checkbox-group  v-if="activeTab == 'pdfs'" v-model="checkedImages" >
+                            <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
+                                :style="{ display: 'flex'}"
+                            >
+                                <div  v-for="jj in 6" :key="jj"
+                                >
+                                    <el-card :body-style="{ padding: '0px' ,border: '0', position: 'relative', minWidth: '128px' }"
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        class='mediacard'
+                                    >
+                                        <el-checkbox 
+                                            border
+                                            :style="{ width: '100%'}"
+                                            :label=`${ii}-${jj}`
+                                        >
+                                            <!--上面这个label是el-checkbox-group的v-model的值。它也是唯一的。可以用来反查images里的object-->
+
+                                            <img 
+                                                :src=`${theImage(ii,jj).thumb}` 
+                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg mediadata"
+                                                typ='pdfs'
+                                                :style="{ width: '100%'}"
+                                            />
+                                            <hovercard>
+                                                <div class='extra-bar'>
+                                                    <span
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src})"
+                                                    >
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span
+                                                        @click="removeKey(theImage(ii,jj).key)"
+                                                    >
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </div>
+                                            </hovercard>
+                                        </el-checkbox>
+                                            <span
+                                                :style="{ 'fontSize':'1rem' }" 
+                                                :title="[[ theImage(ii,jj).visible_filename  ]]"
+                                            >
+                                                [[ theImage(ii,jj).visible_filename | shortname ]]
+                                            </span>
+                                    </el-card>
+                                </div>
+                            </div>
+                        </el-checkbox-group>
                     </el-tab-pane>
                     <el-tab-pane label="上传" name="upload">
                         <el-upload
@@ -311,12 +399,9 @@
                             multiple
                             drag
                             >
-                            <el-button style="margin-left: 10px;float:right;" size="small" type="success" @click="submitUpload"
-                                :disabled="!filePrepared"
-                            >
-                                把这些文件上传到服务器
-                            </el-button>
+                            
                             <i class="el-icon-upload"></i>
+                            
                         </el-upload> 
                         
 
@@ -331,16 +416,18 @@
                             :style="{ display: errorDisplay }"
                         >
                         </el-alert>
+                        
                     </el-tab-pane>
                 </el-tabs>
                 <el-dialog :visible.sync="dialogVisible" size="tiny" id="preview_dlg" @close="(this.document.querySelector('#preview_dlg video')|| this.document.createElement('video')).pause()">
                     <video v-if="dialogImageUrl.match('(.mp4$)')" :src="dialogImageUrl" controls width="100%">
                     <img v-if="dialogImageUrl.match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')" width="100%" :src="dialogImageUrl" alt="">
+                    <span></span>
                 </el-dialog>
                 
             </el-main>
             <el-footer>
-                <el-button type="primary" onclick='window.close'>取消</el-button><el-button type="primary" @click=mediaReturn('ok')>确定</el-button>
+                <el-button type="primary" onclick='window.close'>取消</el-button><el-button type="primary" @click=mediaReturn('ok')>确定返回结果</el-button>
             </el-footer>
         </el-container>
 
@@ -372,6 +459,30 @@
                     </div>
                 `
             })
+
+            Vue.component('hoveralter', {
+                //props: ['value'],
+               
+                data: function () {
+                    return {
+                        hover1: false,
+                    }
+                },
+                template: `
+                    <div
+                        @mouseover="hover1 = true"
+                        @mouseleave="hover1 = false"
+                        :style="{width: '100%', minWidth: '124px'}"
+                    >
+                        <div v-show="hover1" style="">
+                            <slot name="full"></slot>
+                        </div>
+                        <div v-show="!hover1">
+                            <slot></slot>
+                        </div>
+                    </div>
+                `
+            })
             var app = new Vue({
                 el: '#page',
                 data () {
@@ -389,7 +500,8 @@
                         page:{
                             'images':1,
                             'videos':1,
-                            'audios':1
+                            'audios':1,
+                            'pdfs':1
                         },
                         loading:false,
                         ALIOSS_DESTINATIONS:JSON.parse(`{{ ALIOSS_DESTINATIONS|safe }}`),
@@ -406,12 +518,18 @@
                     images(){
                         return store.state.images||[]
                     },
+                    totalmedia(){
+                        return store.state.totalmedia||0
+                    },
                 },
                 store,
-                mounted: function (){
-                    //this.showImages(this.curdir)
+                created:function(){
                     typ = this.getQueryVariable('type')
                     this.showFiles(typ,this.curdir,1)
+                },
+                mounted: function (){
+                    //this.showImages(this.curdir)
+                    
                 },
                 filters: {
                     shortname: function (value) {
@@ -419,7 +537,7 @@
                         value = value.toString()
                         fn_arr = value.split('.')   //["", "mp4"]
                         
-                        return (fn_arr[0].length > 7) ? `${fn_arr[0].substring(0,7)}...${fn_arr[1]}` : value
+                        return (fn_arr[0].length > 10) ? `${fn_arr[0].substring(0,10)}...${fn_arr[1]}` : value
                     }
                 },
                 methods:{
@@ -446,9 +564,20 @@
                         return(false);
                     },
                    
-                    
+                    isShow:function(typ='images'){
+                        if (this.getQueryVariable('from')=='ckeditor'){
+                            return true
+                        }else{
+                            return this.getQueryVariable('type') == typ
+                        }
+
+                    },                    
                     theImage(i,j){
                         return (store.state.images||[])[(i-1)*6 + j-1]||{}
+                    },
+                    pageChange:function(page){
+                        console.log(`--------pageChange(${page})----------------`)
+                        this.showFiles(this.activeTab,this.curdir,page,{'search':this.searchkey})
                     },
                     next:function(){
                         //当没有18个图片的时候，说明就结束了
@@ -467,13 +596,15 @@
                         if (sereis == 'upload') {return}
                         this.showFiles(this.activeTab,sereis,this.page[this.activeTab])
                     },
-                    showFiles:function(type,series,page){
+                    showFiles:function(type,series,page,extra){
                         /*
-                        page 是从1开始的。
+                        page 是从1开始的。有delfilekey，删除的文件key,在删除后，从新查找的逻辑
                         */
+                        //delfilekey=undefined,searchkey=undefined
+                        extra = extra||{}
                         vm = this
                         vm.loading = true
-                        store.dispatch('getImages',{'type':type,'series':series,'page':page}).then(function(){
+                        store.dispatch('getImages',{'type':type,'series':series,'page':page,'delfilekey':extra.delete,'searchkey':extra.search}).then(function(){
                             vm.$forceUpdate()
                             vm.loading = false
                         })
@@ -539,9 +670,11 @@
                         this.filePrepared = false
                         
                         fileList.forEach((item,index)=>{
-                            if(item.status == 'ready'){
-                                this.filePrepared = true
+                            allOk = true
+                            if(item.status != 'ready'){
+                                allOk = false
                             }
+                            this.filePrepared = allOk
                         })
                         if (fileList.length <= 0){
                             this.filePrepared = false
@@ -606,20 +739,20 @@
                     },
                     removeKey(key){
                         console.log(`-----need to delete the bucket file and db record---of--${key}--`)
+                        this.showFiles(this.activeTab,this.curdir,1,{'delete':key})
                     },
                     handlePictureCardPreview(file) {
                         console.log('------------handlePictureCardPreview---------------')
                         console.log(file)
                         
                         if (((file||{}).oname||'').match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')){
-                            this.$alert(`<img style="width:100%;height:auto;" src="${file.url}">`, {
+                            this.$alert(`<span>${file.oname}</span><img style="width:100%;height:auto;" src="${file.url}">`, {
                                 dangerouslyUseHTMLString: true,
                                 customClass:"image-preview"
                             });
                             return
-                        }
-                        if (((file||{}).oname||'').match('(.mp4$)')){
-                            this.$alert(`<video id="media-preview" style="width:100%;height:auto;" controls src="${file.url}">`, {
+                        } else if (((file||{}).oname||'').match('(.mp4$)')){
+                            this.$alert(`<span>${file.oname}</span><video id="media-preview" style="width:100%;height:auto;" controls src="${file.url}">`, {
                                 dangerouslyUseHTMLString: true,
                                 customClass:"image-preview",
                                 beforeClose:(action,instance,done)=>{
@@ -629,7 +762,27 @@
                                 }
                             });
                             return
+                        }else if(((file||{}).oname||'').match('(.mp3$)|(.wav$)')){
+                            this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><video controls="" autoplay="" id="media-preview" name="media"><source src="${file.url}" type="audio/mpeg"></video></div>`, {
+                                dangerouslyUseHTMLString: true,
+                                customClass:"image-preview",
+                                beforeClose:(action,instance,done)=>{
+                                    //console.log(instance)
+                                    (instance.$el.querySelector('video#media-preview')||this.document.createElement('audio')).pause()
+                                    done()
+                                }
+                            });
+                        }else if(((file||{}).oname||'').match('(.pdf$)')){
+                            this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
+                                dangerouslyUseHTMLString: true,
+                                customClass:"image-preview",
+                                beforeClose:(action,instance,done)=>{
+                                    //console.log(instance)
+                                    done()
+                                }
+                            });
                         }
+
                         return false
                     },
                     parsePercentage(val) {

@@ -435,7 +435,7 @@ ALIOSS_DESTINATIONS = {
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
         'x-oss-object-acl':'public-read',   #public-read、private、public-read-write
-        'mimetype_prefix':'pdf/'
+        'mimetype_prefix':'application/pdf'
     },
     'source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
@@ -483,6 +483,25 @@ ALIOSS_DESTINATIONS = {
         'mimetype_prefix':'audio/'
     }
 }
+
+FILEICONS = [
+    (r'\.pdf$', '/static/church/img/' + 'pdf.png'),
+    (r'\.doc$|\.docx$|\.odt$', 'church\img' + 'doc.png'),
+    (r'\.txt$', '/static/church/img/' + 'txt.png'),
+    (r'\.ppt$', '/static/church/img/' + 'ppt.png'),
+    (r'\.xls$', '/static/church/img/' + 'xls.png'),
+    (r'\.mp4$', '/static/church/img/' + 'vidoe.jpg'),
+    (r'\.mp3$', '/static/church/img/' + 'audio.jpg'),
+    ('.*', '/static/church/img/' + 'file.png'),  # Default
+]
+def get_icon_filename(file_name):
+    """
+    Return the path to a file icon that matches the file name.
+    """
+    import re
+    for regex, iconpath in FILEICONS:
+        if re.search(regex, file_name, re.I):
+            return iconpath
 
 
 AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
@@ -679,7 +698,7 @@ CKEDITOR_CONFIGS = {
 # 'xml'
             
         ]),
-        'extraAllowedContent': 'video [*]{*}(*);p [*]{*}(*); script [*]{*}(*); img [*]{*}(*)',
+        'extraAllowedContent': 'video [*]{*}(*); p [*]{*}(*); script [*]{*}(*); img [*]{*}(*); audio [*]{*}(*); source [*]{*}(*) ',
     }
 }
 
