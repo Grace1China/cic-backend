@@ -65,7 +65,7 @@ class SpeakerAdmin(admin.ModelAdmin):
 
 
 from django import forms
-class MeidaForm(forms.Form):
+class MeidaForm_del(forms.Form):
     name = forms.CharField()
     url = forms.URLField()
     comment = forms.CharField(widget=forms.Textarea)

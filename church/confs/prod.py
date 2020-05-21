@@ -112,7 +112,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {lineno:d} {process:d} {thread:d} {message}',
+            'format': '{asctime} {levelname} {module} {lineno:d} {process:d} {thread:d} {message}',
 # Attribute name											Format											Description
 # args											You shouldn’t need to format this yourself.			The tuple of arguments merged into msg to produce message, or a dict whose values are used for the merge (when there is only one argument, and it is a dictionary).
 # asctime											%(asctime)s											Human-readable time when the LogRecord was created. By default this is of the form ‘2003-07-08 16:49:45,896’ (the numbers after the comma are millisecond portion of the time).
@@ -140,7 +140,7 @@ LOGGING = {
             'style': '{',
         },
         'simple': {
-            'format': '{levelname} {module} {lineno:d} {message}',
+            'format': '{asctime} {levelname} {module} {lineno:d} {message}',
             'style': '{',
         },
     },
