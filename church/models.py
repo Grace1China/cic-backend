@@ -32,8 +32,8 @@ class Church(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_INITED,verbose_name='状态')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
-    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE,blank=True,null=True,related_name='creatoruser',verbose_name='创建者')
-    manager = models.ForeignKey(CustomUser, on_delete=models.CASCADE,blank=True,null=True,related_name='manageruser',verbose_name='管理者')
+    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,default=None,related_name='creatoruser',verbose_name='创建者')
+    manager = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,default=None,related_name='manageruser',verbose_name='管理者')
 
     class Meta:
         verbose_name = "教会"

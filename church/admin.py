@@ -16,10 +16,13 @@ from django.db.models import Q
 from django import forms
 from churchs.widget import MediaBaseWidget
 from users.models import CustomUser
+import logging
+loger = logging.getLogger('church.all')
+
 class ChurchForm(forms.ModelForm):
     promot_cover = forms.CharField(label="",widget=MediaBaseWidget(label='海报',typ='images'),required=False)
     giving_qrcode = forms.CharField(label="",widget=MediaBaseWidget(label='奉献二维码',typ='images'),required=False)
-    promot_video = forms.CharField(label="",widget=MediaBaseWidget(label='封面',typ='videos'),required=False)
+    promot_video = forms.CharField(label="",widget=MediaBaseWidget(label='海报视频',typ='videos'),required=False)
     creator = forms.ChoiceField (
         required=False,
         widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
@@ -30,9 +33,9 @@ class ChurchForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ChurchForm, self).__init__(*args, **kwargs)
-        # if self.initial:
+        if self.initial:
             # when load init from model, when in add page from the admin
-            # self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
+            self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
             # self.fields['manager'].choices=Church.objects.filter(id=self.initial['manager']).values_list('id','email')
            
 
@@ -40,12 +43,28 @@ class ChurchForm(forms.ModelForm):
     # def save(self, *args, **kwargs):
     #     return super().save(*args, **kwargs)
 class ChurchAdmin(admin.ModelAdmin):
-    form = ChurchForm
-    list_display = ('name','code','manager','promot_cover','status') 
+    # form = ChurchForm
+    list_display = ('name','code','manager','status') 
     search_fields = ('name','status')
     
+    def get_form(self, request, obj=None, **kwargs):
+        kwargs['form'] = ChurchForm
+        return super().get_form(request, obj, **kwargs)
     def get_changeform_initial_data(self, request):
-        return {'creator': request.user,'manager': request.user}
+        return {'creator': request.user.id,'manager': request.user.id}
+    
+    def save_form(self, request, form,change):
+        """
+        Given a ModelForm return an unsaved instance. ``change`` is True if
+        the object is being changed, and False if it's being added.
+        """
+        loger.info('---------save_form-------')
+        instance = form.save(commit=False)
+        loger.info(instance)
+        instance.creator = request.user
+        return instance
+
+    
     
     def get_queryset(self, request):
         try:

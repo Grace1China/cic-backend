@@ -4,42 +4,47 @@ from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q 
+
+
+import logging
+loger = logging.getLogger('church.all')
 
 
 
-class creatorListFilter(admin.SimpleListFilter):
-    # Human-readable title which will be displayed in the
-    # right admin sidebar just above the filter options.
-    title = _('创建者')
+# class creatorListFilter(admin.SimpleListFilter):
+#     # Human-readable title which will be displayed in the
+#     # right admin sidebar just above the filter options.
+#     title = _('创建者')
 
-    # Parameter for the filter that will be used in the URL query.
-    parameter_name = 'creator'
+#     # Parameter for the filter that will be used in the URL query.
+#     parameter_name = 'creator'
 
-    def lookups(self, request, model_admin):
-        """
-        Returns a list of tuples. The first element in each
-        tuple is the coded value for the option that will
-        appear in the URL query. The second element is the
-        human-readable name for the option that will appear
-        in the right sidebar.
-        """
-        return (
-            ('creator', _('创建者')),
-        )
+#     def lookups(self, request, model_admin):
+#         """
+#         Returns a list of tuples. The first element in each
+#         tuple is the coded value for the option that will
+#         appear in the URL query. The second element is the
+#         human-readable name for the option that will appear
+#         in the right sidebar.
+#         """
+#         return (
+#             ('creator', _('创建者')),
+#         )
 
-    def queryset(self, request, queryset):
-        """
-        Returns the filtered queryset based on the value
-        provided in the query string and retrievable via
-        `self.value()`.
-        """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
-        # if self.value() == 'creator':
-        if request.user.is_superuser:
-            return queryset
-        else:
-            return queryset.filter(creator=request.user)
+#     def queryset(self, request, queryset):
+#         """
+#         Returns the filtered queryset based on the value
+#         provided in the query string and retrievable via
+#         `self.value()`.
+#         """
+#         # Compare the requested value (either '80s' or '90s')
+#         # to decide how to filter the queryset.
+#         # if self.value() == 'creator':
+#         if request.user.is_superuser:
+#             return queryset
+#         else:
+#             return queryset.filter(creator=request.user)
         
 
 class CustomUserAdmin(UserAdmin):
@@ -47,7 +52,7 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = CustomUser
     list_display = ('email', 'username','groups_list', 'creator','is_active',)
-    list_filter = ('email', 'username','is_active',creatorListFilter)
+    list_filter = ('email', 'username','is_active')
     fieldsets = (
         (None, {'fields': ('email', 'username','password','creator')}),
         ('Permissions', {'fields': ('is_active','is_superuser','is_staff','groups')}),
@@ -85,6 +90,28 @@ class CustomUserAdmin(UserAdmin):
                     'fields': ('email', 'username','password1', 'password2','creator','is_active','is_staff','groups')}
                 ),)
         return super(CustomUserAdmin, self).change_view(request,object_id, form_url='', extra_context=None)
+    
+    def get_list_filter(self, request):
+        user = request.user
+        if user.is_superuser:
+            return ('email', 'username','is_active','church','creator')
+        else:
+            return ('email', 'username','is_active','creator')
+
+    def get_queryset(self, request):
+        try:
+            qs = super().get_queryset(request)
+            if not request.user.is_superuser:
+                loger.info('-----------CustomUserAdmin-----------')
+                loger.info(request.user.email)
+                qs = qs.filter(Q(creator=request.user) | Q(id=request.user.id))
+                loger.info(qs)
+                # loger.info(qs)
+            return qs
+        except Exception as e:
+            import traceback
+            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
 
 
 admin.site.register(CustomUser, CustomUserAdmin)

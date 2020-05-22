@@ -123,28 +123,28 @@ def _list_img(user,typ=None,path='',marker=''):
     return files
 
 
-@api_view(['GET'])
-def get_token(request):
-    '''
-    这个版本是媒体库开发时用的一个版本，第二个版本改用 alioss_directup_signature_v2
-    '''
-    lg.info(path)
-    ret = {'errCode': '0'}
-    try:
-        if request.method == 'GET':
-            data = request.GET
-            typ = data.get('type','images')
-            from api.alioss_directup_views import AliOssSignature
-            token = AliOssSignature.cls_get_token(request.user.church.code,typ=typ)#这个参数有还要在此方法内加入校验。
-            lg.info(token)
-            ret = {'errCode': '0','msg':'success','data':token}
-    except Exception as e:
-        import traceback
-        import sys
-        ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
-        lg.exception('There is and exceptin',exc_info=True,stack_info=True)
-    finally:
-        return JsonResponse(ret, safe=False)
+# @api_view(['GET'])
+# def get_token_del(request):
+#     '''
+#     这个版本是媒体库开发时用的一个版本，第二个版本改用 alioss_directup_signature_v2
+#     '''
+#     lg.info(path)
+#     ret = {'errCode': '0'}
+#     try:
+#         if request.method == 'GET':
+#             data = request.GET
+#             typ = data.get('type','images')
+#             from api.alioss_directup_views import AliOssSignature
+#             token = AliOssSignature.cls_get_token(request.user.church.code,typ=typ)#这个参数有还要在此方法内加入校验。
+#             lg.info(token)
+#             ret = {'errCode': '0','msg':'success','data':token}
+#     except Exception as e:
+#         import traceback
+#         import sys
+#         ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
+#         lg.exception('There is and exceptin',exc_info=True,stack_info=True)
+#     finally:
+#         return JsonResponse(ret, safe=False)
 
 
 

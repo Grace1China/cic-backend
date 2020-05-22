@@ -105,7 +105,7 @@ MEDIA_BROWSE_API_SERVER = 'luxmundi.bicf.org'  #测试的时候调用本地，�
 ALIOSS_MEDIA_CALLBACK_SERVER_ENV = {#因为alioss只能有一个回调地址，为了sandbox能够有回调测试，在此指定sandbox环境的回调地址. 这个也是在国外执行
     'localhost':'13.231.255.163',
     'sandbox':'test.l3.bicf.org',
-    'prod':ALIOSS_MEDIA_CALLBACK_SERVER
+    'prod':'13.231.255.163'
 }
 MEDIA_BROWSE_API_SERVER_ENV = {
     'sandbox':'test.l3.bicf.org',

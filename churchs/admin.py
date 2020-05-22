@@ -11,47 +11,78 @@ from .forms import MeidaForm2
 from users.models import CustomUser
 from church.models import Church
 from django.utils.html import format_html
+from django import forms
+from django.db.models import Q
+from django.forms import widgets as Fwidgets
+from django.forms import fields
 
 import logging
 loger = logging.getLogger('church.all')
 
+class WRForm(forms.ModelForm):
+    creator = forms.ChoiceField (
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
+    )
+    church = forms.ChoiceField (
+        required=False,
+        widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
+    )
 
+    image = forms.CharField(label="",widget=MediaBaseWidget(label='海报',typ='images'),required=False)
+    church
+
+    class Meta:
+        model = WeeklyReport
+        fields = ('title','creator','church','image', 'status','content')
+
+    def __init__(self, *args, **kwargs):
+        super(WRForm, self).__init__(*args, **kwargs)
+        if self.initial:
+            # when load init from model, when in add page from the admin
+            self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
+            self.fields['church'].choices=Church.objects.filter(id=self.initial['church']).values_list('id','name')
 
 
 # Register your models here.
 
 class WeeklyReportAdmin(admin.ModelAdmin):
+    form=WRForm
     list_display = ('title','creator','image', 'pub_time','status')   
     search_fields = ('pub_time', 'title','status')
-    fields = ('title','creator','church','image', 'status','content','pub_time')
+    #fields = ('title','creator','church','image', 'status','content','pub_time')
     readonly_fields = ['pub_time']
     formfield_overrides = {
         WeeklyReport.content: {'widget': CKEditorWidget()},
     }
+    
+    def get_changeform_initial_data(self, request):
+        return {'creator': request.user.id,'church': request.user.church}
 
+    def save_form(self, request, form,change):
+        """
+        Given a ModelForm return an unsaved instance. ``change`` is True if
+        the object is being changed, and False if it's being added.
+        """
+        loger.info('---------save_form-------')
+        instance = form.save(commit=False)
+        loger.info(instance)
+        instance.creator = request.user
+        instance.church = request.user.church
+        return instance
 
-    # def has_change_permission(self, request, obj=None):
-    #     has_class_permission = super(EntryAdmin, self).has_change_permission(request, obj)
-    #     if not has_class_permission:
-    #         return False
-    #     if obj is not None and not request.user.is_superuser and request.user.id != obj.author.id:
-    #         return False
-    #     return True
-
-    def queryset(self, request):
-        # qs = 
-        if request.user:
+    def get_queryset(self, request):
+        try:
             qs = super().get_queryset(request)
-            qs.filter(creator=request.user)
-        else:
-            return  super().get_queryset(request)
-
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.user = request.user
-            obj.church
-        obj.save()
-
+            if not request.user.is_superuser:
+                qs = qs.filter(Q(church=request.user.church))
+                # loger.info(qs)
+            return qs
+        except Exception as e:
+            import traceback
+            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+    
 admin.site.register(WeeklyReport, WeeklyReportAdmin)
 
 
@@ -64,11 +95,11 @@ class SpeakerAdmin(admin.ModelAdmin):
     }
 
 
-from django import forms
-class MeidaForm_del(forms.Form):
-    name = forms.CharField()
-    url = forms.URLField()
-    comment = forms.CharField(widget=forms.Textarea)
+
+# class MeidaForm_del(forms.Form):
+#     name = forms.CharField()
+#     url = forms.URLField()
+#     comment = forms.CharField(widget=forms.Textarea)
 
 # class MeidaForm1(ModelForm):
 #     class Meta:
@@ -111,64 +142,6 @@ from django.conf import settings
 import pprint
 
 
-# def mainsite_api_v1_makesermon(sender,instance, **kwargs):
-#     try:
-
-#         loger = logging.getLogger('church.all')
-#         inst1 = Sermon.objects.all().get(id=instance.id)
-#         # {'_state': <django.db.models.base.ModelState object at 0x00000187B7344BA8>, 'id': 63, 'church_id': 2, 'user_id': 20, 'title': 'ims/IMS20200301.mp4', 'speaker_id': 192, 'scripture': 'empty', 'series_id': None, 'create_time': datetime.datetime(2020, 3, 2, 9, 43, 52, 231422, tzinfo=<UTC>), 'update_time': datetime.datetime(2020, 3, 2, 12, 43, 51, 112888, tzinfo=<UTC>), 'pub_time': datetime.datetime(2020, 3, 2, 17, 43, tzinfo=<DstTzInfo 'Asia/Shanghai' CST+8:00:00 STD>), 'status': 1}
-#         # loger.info(instance.id)
-
-#         SermonSerializer4API
-#         szSermon = SermonSerializer4API(inst1)
-#         loger.info("------------------mainsite_api_v1_makesermon--1--------------------------")
-#         loger.info(inst1)
-#         loger.info(szSermon.data.__dict__)
-#         dt = szSermon.data
-
-#         # loger.info(repr(szSermon))
-#         loger.info("------------------mainsite_api_v1_makesermon--2--------------------------")
-
-
-#         # loger.info(szSermon.__dict__)
-
-#         data = {'study_name':dt["title"],
-#             'study_date':dt["pub_time"], 
-#             'publish_up':dt["pub_time"],
-#             'published':0 if dt["status"]== Sermon.STATUS_DRAFT else 0,
-#             'ministry':dt["church"]["id"], 
-#             'video_link':dt["medias"][0]['SHD_URL'] if len(dt["medias"])>0 else '', 
-#             'teacher':dt["speaker"]["id"], 
-#             'imagelrg': '%s?x-oss-process=image/resize,m_fixed,h_100,w_100' % dt["medias"][0]['image'] if len(dt["medias"])>0 else '',
-#             'audio_link': dt["medias"][0]['audio'] if len(dt["medias"])>0 else '',
-#             'slides_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else '',
-#             'notes_link': dt["medias"][0]['pdf'] if len(dt["medias"])>0 else ''
-#         }
-
-#         loger.info(data)
-
-#         if sender.status == Sermon.STATUS_DRAFT:
-#             pass
-#         else:
-#             r = None
-#             if settings.DEBUG:
-#                 r = requests.post(settings.MAINSITE_API_V1['DEVELOPMENT'], json=json.dumps(data))
-#             else:
-#                 r = requests.post(settings.MAINSITE_API_V1['DEBUG'], json=json.dumps(data))
-#             loger.info(pprint.PrettyPrinter(6).pprint(r))
-#             if r.errCode != '0':
-#                 raise Exception('There is an err\n%s' % r.sysErrMsg)
-            
-#     except Exception as e:
-#         # pprint.PrettyPrinter(4).pprint(e.__traceback__)
-#         import traceback
-#         import sys
-#         loger = logging.getLogger('church.all')
-#         loger.exception('There is and exceptin',exc_info=True,stack_info=True)
-#         # do_something_else()
-
-# post_save.connect(mainsite_api_v1_makesermon, sender=Sermon)
-    
 from datetime import datetime
 
 class SermonAdmin(admin.ModelAdmin):
@@ -278,37 +251,6 @@ class SermonAdmin(admin.ModelAdmin):
     mainsite_api_v1_makesermon.short_description = "make sermon in mainsite"
 
 
-# class SermonSeriesListFilter(admin.SimpleListFilter):
-#     # Human-readable title which will be displayed in the
-#     # right admin sidebar just above the filter options.
-#     # title = _('创建者')
-
-#     # Parameter for the filter that will be used in the URL query.
-#     # parameter_name = 'creator'
-#     title='过滤'
-#     parameter_name = 'title'
-
-#     def queryset(self, request, queryset):
-#         """
-#         Returns the filtered queryset based on the value
-#         provided in the query string and retrievable via
-#         `self.value()`.
-#         """
-#         # Compare the requested value (either '80s' or '90s')
-#         # to decide how to filter the queryset.
-#         try:
-#             qr = queryset.filter(church=request.user.church)
-#             loger.info(qr)
-#             return qr
-#         except Exception as e:
-#             import traceback
-#             loger.exception('There is and exceptin',exc_info=True,stack_info=True)
-#             raise e
-
-
-from django.forms import widgets as Fwidgets
-
-from django.forms import fields
 class SereisForm(forms.ModelForm):
     user = forms.ChoiceField (
         required=False,
@@ -347,14 +289,6 @@ class SereisForm(forms.ModelForm):
         self.fields['res_path'].widget.attrs.update({'readonly':'readonly'})
         # self.fields['user'].widget.attrs.update({'readonly':'readonly','disabled':'disabled'})
         # self.fields['church'].widget.attrs.update({'readonly':'readonly','disabled':'disabled'})
-
-
-
-      
-
-
-   
-    
 class SermonSeriesAdmin(admin.ModelAdmin):
     model = SermonSeries
     # readonly_fields = ('res_path','user','church')
@@ -412,45 +346,34 @@ class SermonSeriesAdmin(admin.ModelAdmin):
         loger.info(rd)
         return rd
 
-    
-
-
-
-    # def instance_forms(self):
-    #     super().instance_forms()
-    #     # 判断是否为新建操作，
-    #     loger.info(self.__dict__)
-    #     if not self.org_obj:
-    #         self.form_obj.initial['title'] = 'xx2'
-    #         self.form_obj.initial['user'] = self.request.user.id
-    #         self.form_obj.initial['church'] = self.request.user.church.id
-    #         self.form_obj.initial['pub_time'] = datetime.now()
-    #         self.form_obj.initial['status'] = SermonSeries.STATUS_OPEN
-    #         self.form_obj.initial['res_path'] = '(unknown now)'
+# from .models import test1
+# class test1Admin (admin.ModelAdmin):
+#     model = test1
+#     list_display = ('image',)
+#     formfield_overrides = {
+#         test1.image: {'widget': MediaBaseWidget()},
+#     }
 
 
 
 
-from .models import test1
-class test1Admin (admin.ModelAdmin):
-    model = test1
-    list_display = ('image',)
-    formfield_overrides = {
-        test1.image: {'widget': MediaBaseWidget()},
-    }
+# admin.site.register(churchs_models.test1,test1Admin)
 
-admin.site.register(churchs_models.test1,test1Admin)
+# class VenueAdmin(admin.ModelAdmin):
+
+
+
 
 admin.site.register(churchs_models.Sermon, SermonAdmin)
-admin.site.register(churchs_models.Team)  
-admin.site.register(churchs_models.Donation)
+# admin.site.register(churchs_models.Team)  
+# admin.site.register(churchs_models.Donation)
 admin.site.register(churchs_models.Venue)
 admin.site.register(churchs_models.SermonSeries,SermonSeriesAdmin)
 
-admin.site.register(churchs_models.Speaker, SpeakerAdmin)
-admin.site.register(churchs_models.Meeting)
-admin.site.register(churchs_models.BibleStudy)
-admin.site.register(churchs_models.BibleStudyComment)
-admin.site.register(churchs_models.Media)
+# admin.site.register(churchs_models.Speaker, SpeakerAdmin)
+# admin.site.register(churchs_models.Meeting)
+# admin.site.register(churchs_models.BibleStudy)
+# admin.site.register(churchs_models.BibleStudyComment)
+# admin.site.register(churchs_models.Media)
 
 

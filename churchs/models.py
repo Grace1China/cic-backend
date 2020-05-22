@@ -29,6 +29,7 @@ class Venue(models.Model):
     time = models.TimeField()
     address = models.CharField(max_length=255)
     addressUrl =  models.CharField(max_length=255)
+    createdby = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='创建者')
     class Meta:
         verbose_name = "场地"
         verbose_name_plural = "场地"

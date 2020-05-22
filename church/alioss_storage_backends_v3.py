@@ -25,6 +25,29 @@ from churchs.models import MediaFile
 from django.core.paginator import Paginator
 from churchs.models import Media
 
+import qrcode
+from io import BytesIO
+import base64
+# def make_qrcode(text):
+#     qr = qrcode.QRCode(
+#         version=5,
+#         error_correction=qrcode.constants.ERROR_CORRECT_L,
+#         box_size=8,
+#         border=4
+#     )
+#     qr.add_data(text)
+#     qr.make(fit=True)
+    
+#     img = qr.make_image()
+
+
+#     output_buffer = BytesIO()
+#     img.save(output_buffer, format='png')
+#     byte_data = output_buffer.getvalue()
+#     base64_str = base64.b64encode(byte_data)
+#     return base64_str
+
+
 import logging
 theLogger = logging.getLogger('church.all')
 lg = logging.getLogger('church.all')
@@ -544,7 +567,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
                 key = urlquote(key, safe='/?=')
                 p = urlparse(rc.endpoint)
 
-                media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
+                media_url = self._media_url(typ,key)#'{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
 
                 visible_filename = rc.origin_name
                 if rc.mime_type.startswith( 'image/' ):
@@ -563,6 +586,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
                 })
                 
             lg.info('-----get_files_from_db----files---')
+            lg.info(files)
             return (files,total)
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
@@ -597,38 +621,48 @@ class AliyunMediaStorage(AliyunBaseStorage):
             # 当启用了RAM访问策略，是不允许list和create bucket的
             self.bucket = super()._get_bucket(self.auth)
 
-    def media_url(self, fn, addUpath=False):
-        fn = self._normalize_name(self._clean_name(fn))
-        key = '%s/%s' % (self._get_user_path(None),fn) if addUpath else fn #加入用户的教会目录
-        key = key.encode('utf8')
-        # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
-        # retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
-        from oss2.compat import urlquote,urlparse
-        key = urlquote(key, safe='/?=')
-        p = urlparse(self.end_point)
-        return '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
+    def _media_url(self,dest,key):
+        if dest not in settings.ALIOSS_DESTINATIONS:
+            raise Exception('dest %s not in ALIOSS_DESTINATIONS' % dest)
+        
+        enp = settings.ALIOSS_DESTINATIONS[dest]['endpoint'] #
+        p = urlparse(enp)
+        media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
+        return media_url
+
     
-    def media_url_v2(self,key,addUpath=False,dest="source"):
-        auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-        bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
-        theLogger.info(bucket)
+    # def media_url(self, fn, addUpath=False):
+    #     fn = self._normalize_name(self._clean_name(fn))
+    #     key = '%s/%s' % (self._get_user_path(None),fn) if addUpath else fn #加入用户的教会目录
+    #     key = key.encode('utf8')
+    #     # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+    #     # retUrl = self.__url(self.bucket_name, name,safe='/?=')#self.bucket._make_url(self.bucket_name, name,slash_safe=True) 
+    #     from oss2.compat import urlquote,urlparse
+    #     key = urlquote(key, safe='/?=')
+    #     p = urlparse(self.end_point)
+    #     return '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
+    
+    # def media_url_v2(self,key,addUpath=False,dest="source"):
+    #     auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
+    #     bucket = oss2.Bucket(auth, settings.ALIOSS_DESTINATIONS[dest]['endpoint'], settings.ALIOSS_DESTINATIONS[dest]['bucket'])
+    #     theLogger.info(bucket)
 
-        theLogger.info(key)
+    #     theLogger.info(key)
 
-        if not bucket.object_exists(key) :
-            return "" #不存在文件 返回空
+    #     if not bucket.object_exists(key) :
+    #         return "" #不存在文件 返回空
 
-        retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
+    #     retval = bucket.sign_url('GET', key, settings.ALIOSS_EXPIRES)
 
-        if bucket.get_object_acl(key).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
-            retval = retval.split('?')[0]
-        else:
-            pass
-            #通过nginx来转发，国内国外请求，可以减少费用。但是目前还不是很稳定，所以等后台有了动态配置功能后再实施？
-        from oss2.compat import urlquote,urlparse
-        key = urlquote(retval, safe='/?=')
-        p = urlparse(self.end_point)
-        return '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
+    #     if bucket.get_object_acl(key).acl ==  oss2.OBJECT_ACL_PUBLIC_READ:
+    #         retval = retval.split('?')[0]
+    #     else:
+    #         pass
+    #         #通过nginx来转发，国内国外请求，可以减少费用。但是目前还不是很稳定，所以等后台有了动态配置功能后再实施？
+    #     from oss2.compat import urlquote,urlparse
+    #     key = urlquote(retval, safe='/?=')
+    #     p = urlparse(self.end_point)
+    #     return '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
 
 from oss2.compat import urlquote,urlparse
 @deconstructible

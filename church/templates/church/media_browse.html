@@ -201,7 +201,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src})"
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -256,7 +256,7 @@
                                                 <!-- 2、转码开始 状态为3。显示一个比较好图 -->
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':(theImage(ii,jj).video_tcinfo||{}).sd})"
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':(theImage(ii,jj).video_tcinfo||{}).sd,'qrcode':theImage(ii,jj).src_qrcode})"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -304,7 +304,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src})"
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -354,7 +354,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src})"
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -437,6 +437,7 @@
         <script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
         <script type="text/javascript" src="{% static "church/js/store.js" %}"></script>
         <script type="text/javascript" src="{% static "church/js/axios.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "church/js/qrcode.min.js" %}"></script>
 
         <script>
             Vue.config.delimiters = ["[[", "]]"];
@@ -548,7 +549,7 @@
                         console.log('-----mediaReturn-----------')
                         console.log(this.images)
                         arr = this.checkedImages[0].split('-')
-                        index = (arr[0]-1)*6+arr[1]-1
+                        index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
                         from = this.getQueryVariable('from')
                         o = this.images[index]
                         window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
@@ -773,7 +774,7 @@
                                 }
                             });
                         }else if(((file||{}).oname||'').match('(.pdf$)')){
-                            this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
+                            this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><div id="qrcode"></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
                                 dangerouslyUseHTMLString: true,
                                 customClass:"image-preview",
                                 beforeClose:(action,instance,done)=>{
@@ -781,7 +782,12 @@
                                     done()
                                 }
                             });
+
+                            
                         }
+                        this.$nextTick(() => {
+                            new QRCode(document.getElementById("qrcode"), file.url);  // 设置要生成二维码的链接
+                        })
 
                         return false
                     },

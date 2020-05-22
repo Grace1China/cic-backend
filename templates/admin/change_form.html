@@ -330,10 +330,10 @@
                                     <i class="el-icon-delete"></i>
                                 </span>
                             </hovercard>
-                            <img v-show="((typ == 'images') && (rosrc||src||'') != '') && name.indexOf('image')>0" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
-                            <img v-show="((typ == 'videos') && (rosrc||src||'') != '') && name.indexOf('video')>0" :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
-                            <img v-show="((typ == 'audios') && thumb != '') && name.indexOf('audio')>0" :src="thumb" :style="{ width: '100%', height: '100px' }"/>
-                            <img v-show="((typ == 'pdfs') && thumb != '') && name.indexOf('pdf')>0" :src="thumb" :style="{ width: '100%', height: '100px' }"/>
+                            <img v-if="((typ == 'images') && (rosrc||src||'') != '') " :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
+                            <img v-if="((typ == 'videos') && (rosrc||src||'') != '') " :src="rosrc||src" :style="{ width: '100%', height: '100px' }"/>
+                            <img v-if="((typ == 'audios') && thumb != '') " :src="thumb" :style="{ width: '100%', height: '100px' }"/>
+                            <img v-if="((typ == 'pdfs') && thumb != '') " :src="thumb" :style="{ width: '100%', height: '100px' }"/>
                             <i v-show="(rosrc||thumb||'') == ''" class="el-icon-plus" :style="{ fontSize: '3em' }"></i>
                         </el-card>
                     </div>
@@ -372,12 +372,7 @@
 
             },
             methods:{
-                premote:function(id){
-                    this.$alert(`<a href="${document.location.host}/blog/sermon/${id}">${document.location.host}/blog/sermon/${id}</a>`, {
-                            dangerouslyUseHTMLString: true,
-                            customClass:"link-preview"
-                        });
-                },
+                
                 invokeMediaBrowse:function(e) {
                     console.log(e)
                     console.log(e.target)

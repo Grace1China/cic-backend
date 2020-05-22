@@ -72,6 +72,7 @@ urlpatterns = [
     # url(r'^filebrowser_filer/', include('ckeditor_filebrowser_filer.urls')),
 
     url(r'^media_browse/', never_cache(staff_member_required(media_browse_view.browse)),name="media_browse"),
+    url(r'^admin/media_browse/', never_cache(staff_member_required(media_browse_view.browse)),name="media_browse"),
     path(r'alioss_list/<path:path>', never_cache(staff_member_required(media_browse_view.list_img)), name='media_list_dir'),
     path(r'alioss_list/', never_cache(staff_member_required(media_browse_view.list_img)), name='media_list_dir'),#this is for /根目录没有匹配的情况
 

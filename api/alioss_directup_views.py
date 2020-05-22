@@ -211,8 +211,16 @@ class AliOssSignatureV2(AliOssSignature):
                 data = request.GET
                 typ = data.get('type','images')
                 object_prefix = data.get('object_prefix','')
+                theLogger.info('----------AliOssSignatureV2----------')
+                theLogger.info(typ)
+                theLogger.info(object_prefix)
 
-                token = AliOssSignature.cls_get_token(object_prefix,typ=typ)#现在存储结构，不按教会在物理上分了。只在数据库中分。是在回写中，带入了前端传入的教会名称。
+                token = AliOssSignatureV2.cls_get_token(object_prefix=object_prefix,typ=typ,cbhost=request.META['HTTP_HOST']) 
+
+                theLogger.info(token)
+
+
+                # token = AliOssSignature.cls_get_token(object_prefix,typ=typ)#现在存储结构，不按教会在物理上分了。只在数据库中分。是在回写中，带入了前端传入的教会名称。
                 # AliOssSignature.cls_get_token(request.user.church.code,typ=typ)
                 # token = self.get_token(request)
                 ret = {'errCode': '0', 'msg':'success','token': token}
@@ -225,7 +233,7 @@ class AliOssSignatureV2(AliOssSignature):
             return JsonResponse(ret, safe=False)
             
     @classmethod
-    def cls_get_token(cls,object_prefix,typ='images',cbhost=''):
+    def cls_get_token(cls,object_prefix='',typ='images',cbhost=''):
         if cbhost != '' and  'localhost' not in cbhost and '127.0.0.1' not in cbhost:
             AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  cbhost
         else:
