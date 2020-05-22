@@ -566,7 +566,7 @@
                     },
                    
                     isShow:function(typ='images'){
-                        if (this.getQueryVariable('from')=='ckeditor'){
+                        if (this.getQueryVariable('from')=='ckeditor' || this.getQueryVariable('from')=='admin' ){
                             return true
                         }else{
                             return this.getQueryVariable('type') == typ
