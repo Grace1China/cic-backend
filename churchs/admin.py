@@ -20,17 +20,16 @@ import logging
 loger = logging.getLogger('church.all')
 
 class WRForm(forms.ModelForm):
-    creator = forms.ChoiceField (
-        required=False,
-        widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
-    )
-    church = forms.ChoiceField (
-        required=False,
-        widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
-    )
+    # creator = forms.ChoiceField (
+    #     required=False,
+    #     widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
+    # )
+    # church = forms.ChoiceField (
+    #     required=False,
+    #     widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
+    # )
 
     image = forms.CharField(label="",widget=MediaBaseWidget(label='海报',typ='images'),required=False)
-    church
 
     class Meta:
         model = WeeklyReport
@@ -39,9 +38,10 @@ class WRForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(WRForm, self).__init__(*args, **kwargs)
         if self.initial:
+            pass
             # when load init from model, when in add page from the admin
-            self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
-            self.fields['church'].choices=Church.objects.filter(id=self.initial['church']).values_list('id','name')
+            # self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
+            # self.fields['church'].choices=Church.objects.filter(id=self.initial['church']).values_list('id','name')
 
 
 # Register your models here.
