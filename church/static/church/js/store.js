@@ -11,9 +11,22 @@ async function getImages (context,par) {
     .then(function (res) {
         console.log(res)
         if (res.data.errCode == '0'){
-            context.commit('setImages', res.data.data)
-            // console.log(context.state.menues)
+          if(par.type == 'videos'){
+            for(i=0;i<res.data.data.medias.length;i++){
+              e = res.data.data.medias[i]
+              console.log(e)
+            }
+            // for(int i= 0; i < res.data.data.length; i++){
+            //   console.log(`${index}${currentValue}`)
+            //   if(currentValue.video_status != 3){
+            //     // ret = await dispatch('check_url',currentValue.video_tcinfo.sd) 
+            //     console.log('ret')
+            //   }
+            // }
+          }
+          context.commit('setImages',res.data.data)
         }
+
     })
     .catch(function (err) {
       console.log(err)
@@ -42,6 +55,30 @@ async function upload2oss (context,options) {
     options.uploader.onError()
   });
 }
+
+// async function check_url(context,options){
+//   return new Promise(function(resolve){
+//     axios.get(`https://api.bicf.org/mediabase/citychurch/default/052e4d2a-7b41-5078-3043-e63b85c6d4b0/sd.mp4`)
+//     .then(function (res) {
+//       resolve(true)
+//     })
+//     .catch(function (err) {
+//       resolve(false)
+//     });
+//   });
+// }
+
+// async function check_url(url){
+//   return new Promise(function(resolve){
+//       axios.get(`https://api.bicf.org/mediabase/citychurch/default/052e4d2a-7b41-5078-3043-e63b85c6d4b0/sd.mp4`)
+//           .then(function(){
+//               resolve(true);   
+//           })
+//           .catch(function(){
+//               resolve(false);
+//           });
+//   });
+// }
 
 function getOssToken (context,options) {
   return new Promise((resolve, reject) =>{        
@@ -126,6 +163,7 @@ const store = new Vuex.Store({
       upload2oss,
       getOssToken,
       getObjByKey,
+      // check_url,
       
     }
   })

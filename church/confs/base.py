@@ -437,6 +437,15 @@ ALIOSS_DESTINATIONS = {
         'x-oss-object-acl':'public-read',   #public-read、private、public-read-write
         'mimetype_prefix':'application/pdf'
     },
+    'tuwen':{
+        'endpoint':ALIOSS_DESTINATION_ENDPOINT,
+        'endpoint.acc':'oss-accelerate.aliyuncs.com',
+        'location':ALIOSS_DESTINATION_LOCATION,
+        'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
+        'redirecturl':'api.bicf.org/mediabase',
+        'x-oss-object-acl':'public-read',   #public-read、private、public-read-write
+        'mimetype_prefix':'application/tuwen'
+    },
     'source':{
         'endpoint':ALIOSS_SOURCE_ENDPOINT,
         'endpoint.acc':'oss-accelerate.aliyuncs.com',
@@ -562,10 +571,10 @@ CKEDITOR_BROWSE_SHOW_DIRS = True
 CKEDITOR_RESTRICT_BY_USER = True
 CKEDITOR_CONFIGS = {
     'default': {
-        'skin': 'moono-lisa',
+        'skin': 'moono',
         # 'skin': 'office2013',
         'language': 'zh-cn',
-        'uiColor': '#AADC6E',
+        'uiColor': '#000',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']
         ],

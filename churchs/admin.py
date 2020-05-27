@@ -48,13 +48,18 @@ class WRForm(forms.ModelForm):
 
 class WeeklyReportAdmin(admin.ModelAdmin):
     form=WRForm
-    list_display = ('title','creator','image', 'pub_time','status')   
+    list_display = ('title','creator','image', 'pub_time','status','promote')   
     search_fields = ('pub_time', 'title','status')
     #fields = ('title','creator','church','image', 'status','content','pub_time')
     readonly_fields = ['pub_time']
     formfield_overrides = {
         WeeklyReport.content: {'widget': CKEditorWidget()},
     }
+
+    def promote(self, obj):
+        button_html = """<a class="changelink" href="#" onclick='fontConfig.premote(%s,"%s")'>推广链接</a>""" % (obj.id,'tuwen')
+        return format_html(button_html)
+    promote.short_description = "操作"
     
     def get_changeform_initial_data(self, request):
         return {'creator': request.user.id,'church': request.user.church}
@@ -164,7 +169,7 @@ class SermonAdmin(admin.ModelAdmin):
 
     
     def promote(self, obj):
-        button_html = """<a class="changelink" href="#" onclick='fontConfig.premote(%s)'>推广链接</a>""" % obj.id
+        button_html = """<a class="changelink" href="#" onclick='fontConfig.premote(%s,%s)'>推广链接</a>""" % (obj.id,'sermon')
         return format_html(button_html)
     promote.short_description = "操作"
 

@@ -21,7 +21,7 @@ from django.core.files.storage import Storage
 from oss2.api import _normalize_endpoint
 import traceback, sys 
 from crequest.middleware import CrequestMiddleware
-from churchs.models import MediaFile
+from churchs.models import MediaFile,WeeklyReport
 from django.core.paginator import Paginator
 from churchs.models import Media
 
@@ -506,11 +506,14 @@ class AliyunMediaStorage(AliyunBaseStorage):
             raise e
 
 
-    def get_files_from_db(self,user=None,typ=None,series='',page=1,dkey='',skey=''):
+    def get_files_from_db(self,request=None,typ=None,series='',page=1,dkey='',skey=''):
         '''
         从数据库中，查找媒体记录
         '''
         try:
+            if request == None:
+                raise Exception(' no request is pass in.')
+            user = request.user
             self._set_bucket(dest=typ)  #根据不同的媒体 取不同的存储桶 不同的存储桶，有不同的访问url，跨国加速url和redirect url  同时会对self.destination进行赋值
             lg.info('mime_type:%s church_prefix%s series_prefix%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series))
 
@@ -539,10 +542,18 @@ class AliyunMediaStorage(AliyunBaseStorage):
 
             lg.info('mime_type:%s chuAliyunVideoStoragerch_prefix%s series_prefix%s dkey%s  skey%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series,dkey,skey))
             qrset = None
-            if skey != '':
-                qrset = MediaFile.objects.filter(church_prefix=user.church.code,origin_name__icontains=skey,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+            if typ == 'tuwen':
+                if skey != '':
+                    qrset = WeeklyReport.objects.filter(church=user.church,title__icontains=skey).order_by('-update_time')
+                else:
+                    qrset = WeeklyReport.objects.filter(church=user.church).order_by('-update_time')
             else:
-                qrset = MediaFile.objects.filter(series_prefix=series,church_prefix=user.church.code,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+                if skey != '':
+                    qrset = MediaFile.objects.filter(church_prefix=user.church.code,origin_name__icontains=skey,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+                else:
+                    qrset = MediaFile.objects.filter(series_prefix=series,church_prefix=user.church.code,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+
+                
 
             # qrset = MediaFile.objects.filter(mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],church_prefix=user.church.code,series_prefix=series).order_by('-update_time')
             # lg.info(qrset)
@@ -557,33 +568,42 @@ class AliyunMediaStorage(AliyunBaseStorage):
             files = []
             # dirs = set()
             for rc in results :
-                
-                filename = rc.name  #bucket key
-            
-                key = self._normalize_name(self._clean_name(filename))
-                key = key.encode('utf8')
-                # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
-                from oss2.compat import urlquote,urlparse
-                key = urlquote(key, safe='/?=')
-                p = urlparse(rc.endpoint)
-
-                media_url = self._media_url(typ,key)#'{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
-
-                visible_filename = rc.origin_name
-                if rc.mime_type.startswith( 'image/' ):
-                    thumb = '%s?%s' % (media_url,'x-oss-process=style/wh100_auto')#self.get_thumb_filename(media_url)
+                if typ == 'tuwen':
+                    files.append({
+                        'thumb': AliyunMediaStorage.get_media_url('images', rc.image),
+                        'src': "http://%s/blog/tuwen/%d" % (request.META['HTTP_HOST'],rc.id),
+                        'key':"/blog/tuwen/%d" % rc.id,
+                        'is_image': True,
+                        'typ':typ,
+                        'visible_filename': rc.title,
+                    })
                 else:
-                    from church.confs.base import get_icon_filename
-                    thumb = get_icon_filename(visible_filename)
+                    filename = rc.name  #bucket key
+                
+                    key = self._normalize_name(self._clean_name(filename))
+                    key = key.encode('utf8')
+                    # 做这个转化，是因为下面的_make_url会用urllib.quote转码，转码不支持unicode，会报错，在python2环境下。
+                    from oss2.compat import urlquote,urlparse
+                    key = urlquote(key, safe='/?=')
+                    p = urlparse(rc.endpoint)
 
-                files.append({
-                    'thumb': thumb,
-                    'src': media_url,
-                    'key':key,
-                    'is_image': is_valid_image_extension(filename),
-                    'typ':typ,
-                    'visible_filename': visible_filename,
-                })
+                    media_url = self._media_url(typ,key)#'{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[self.destination]['redirecturl'], key)
+
+                    visible_filename = rc.origin_name
+                    if rc.mime_type.startswith( 'image/' ):
+                        thumb = '%s?%s' % (media_url,'x-oss-process=style/wh100_auto')#self.get_thumb_filename(media_url)
+                    else:
+                        from church.confs.base import get_icon_filename
+                        thumb = get_icon_filename(visible_filename)
+
+                    files.append({
+                        'thumb': thumb,
+                        'src': media_url,
+                        'key':key,
+                        'is_image': is_valid_image_extension(filename),
+                        'typ':typ,
+                        'visible_filename': visible_filename,
+                    })
                 
             lg.info('-----get_files_from_db----files---')
             lg.info(files)
@@ -620,6 +640,15 @@ class AliyunMediaStorage(AliyunBaseStorage):
         except AccessDenied:
             # 当启用了RAM访问策略，是不允许list和create bucket的
             self.bucket = super()._get_bucket(self.auth)
+    @classmethod
+    def get_media_url(cls,dest,key):
+        if dest not in settings.ALIOSS_DESTINATIONS:
+            raise Exception('dest %s not in ALIOSS_DESTINATIONS' % dest)
+        
+        enp = settings.ALIOSS_DESTINATIONS[dest]['endpoint'] #
+        p = urlparse(enp)
+        media_url = '{0}://{1}/{2}'.format(p.scheme,settings.ALIOSS_DESTINATIONS[dest]['redirecturl'], key)
+        return media_url
 
     def _media_url(self,dest,key):
         if dest not in settings.ALIOSS_DESTINATIONS:
@@ -759,6 +788,7 @@ class AliyunVideoStorage(AliyunBaseStorage):
             
             files = []
             # dirs = set()
+            update_list = []
             for rc in results :
                 filename = rc.name  #bucket key
                 key = self._normalize_name(self._clean_name(filename))
@@ -785,6 +815,16 @@ class AliyunVideoStorage(AliyunBaseStorage):
                 tcinfo['ld'] = self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['ld']))
                 tcinfo['audio'] =self._media_url('%s.destination' % typ,'%s/%s' % (key,tcinfo['audio']))
 
+                if rc.video_file_status != 3 :
+                    try:
+                        with urllib.request.urlopen(tcinfo['sd']) as f:
+                            if f.status == 200:
+                                rc.video_file_status = 3
+                                update_list.append(rc.id)
+
+                    except Exception as e:
+                        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+
                    
                 #视频需求返回的数据有源桶的signed_url,只要存在就可以；2 要返回状态 3 返回redirecturl
                 #images只要返回thumb src 
@@ -801,6 +841,9 @@ class AliyunVideoStorage(AliyunBaseStorage):
                     'video_status':rc.video_file_status,
                     'video_tcinfo':tcinfo,
                 })
+
+            if len(update_list) > 0 :
+                MediaFile.objects.filter(id__in=update_list).update(video_file_status=3)
                 
             # lg.info('last (files dirs):')
             # lg.info((files,dirs))

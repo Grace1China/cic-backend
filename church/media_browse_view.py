@@ -97,6 +97,8 @@ def list_img(request,path=''):
             series = data.get('series','/') #默认的专栏，这样在专栏生成前应该有一个预置的默认专栏。就是用这个根目录。
             dkey = data.get('dkey','') #默认的专栏，这样在专栏生成前应该有一个预置的默认专栏。就是用这个根目录。
             skey = data.get('skey','')
+
+            lg.info('typ %s page %s series %s dkey %s skey %s ' % (typ,page,series,dkey,skey))
             
             # path = '%s%s' % (storage._get_user_path(request.user), '' if path=='' else '/'+path) #教会的目录是本函数负责加上
             if series != '':
@@ -106,7 +108,7 @@ def list_img(request,path=''):
                     stg = AliyunVideoStorage()
                     files,total = stg.get_files_from_db(user=request.user,typ=typ,series=series,page=page,dkey=dkey,skey=skey)
                 else:
-                    files,total = storage.get_files_from_db(user=request.user,typ=typ,series=series,page=page,dkey=dkey,skey=skey)
+                    files,total = storage.get_files_from_db(request=request,typ=typ,series=series,page=page,dkey=dkey,skey=skey)
                 ret = {'errCode': '0','msg':'success','data':{'medias':files,'total':total}}
             else:
                 raise Exception('series key must not null.')   

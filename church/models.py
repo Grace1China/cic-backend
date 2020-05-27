@@ -36,8 +36,8 @@ class Church(models.Model):
     manager = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,default=None,related_name='manageruser',verbose_name='管理者')
 
     class Meta:
-        verbose_name = "教会"
-        verbose_name_plural = "教会"
+        verbose_name = "教会基本信息"
+        verbose_name_plural = "教会基本信息"
 
     def __str__(self):
         return '%s' % (self.name)

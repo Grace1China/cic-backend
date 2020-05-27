@@ -1,0 +1,33 @@
+{% load i18n static  %}
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+
+<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+<style>
+.headline{
+    display:flex;
+    height: 2rem;
+    line-height: 1;
+    align-items: center;
+}
+.headline img{
+    height:100%;
+}
+
+</style>
+</head>
+<body class ="wechatpromt">
+{% if tuwen %}
+    <div class="headline">
+    <img src="{{ tuwen.image }}"><h3>{{ tuwen.title }}</h3>
+    
+    </div>
+    <div class="tuwen">
+    {{ tuwen.content|safe }}
+    </div>
+{% else %}
+    <p>No info found now.</p>
+{% endif %}
+</body>

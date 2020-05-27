@@ -179,6 +179,10 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 				}else if(typ == 'pdfs'){
 					html = html + `<p><iframe frameborder="0" scrolling="no" src="${e.getAttribute('data-src')}"></iframe></p>`
 				}
+				else if(typ == 'tuwen'){
+					html = html + `<p><a href="${e.getAttribute('data-src')}"><img style="width:100%;"src="${e.getAttribute('src')}"></a></p>`
+				}
+				console.log(html)
 			})
 			// var sel = editor.getSelection();
 			// var range = sel.getRanges()[0];

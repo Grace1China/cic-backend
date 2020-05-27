@@ -377,6 +377,56 @@
                             </div>
                         </el-checkbox-group>
                     </el-tab-pane>
+                    <el-tab-pane v-if="isShow('tuwen')" label="图文" name="tuwen">
+                        <el-checkbox-group  v-if="activeTab == 'tuwen'" v-model="checkedImages" >
+                            <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
+                                :style="{ display: 'flex'}"
+                            >
+                                <div  v-for="jj in 6" :key="jj"
+                                >
+                                    <el-card :body-style="{ padding: '0px' ,border: '0', position: 'relative', minWidth: '128px' }"
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        class='mediacard'
+                                    >
+                                        <el-checkbox 
+                                            border
+                                            :style="{ width: '100%'}"
+                                            :label=`${ii}-${jj}`
+                                        >
+                                            <!--上面这个label是el-checkbox-group的v-model的值。它也是唯一的。可以用来反查images里的object-->
+
+                                            <img 
+                                                :src=`${theImage(ii,jj).thumb}` 
+                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg mediadata"
+                                                typ='tuwen'
+                                                :style="{ width: '100%'}"
+                                            />
+                                            <hovercard>
+                                                <div class='extra-bar'>
+                                                    <span
+                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
+                                                    >
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span
+                                                        @click="removeKey(theImage(ii,jj).key)"
+                                                    >
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </div>
+                                            </hovercard>
+                                        </el-checkbox>
+                                            <span
+                                                :style="{ 'fontSize':'1rem' }" 
+                                                :title="[[ theImage(ii,jj).visible_filename  ]]"
+                                            >
+                                                [[ theImage(ii,jj).visible_filename | shortname ]]
+                                            </span>
+                                    </el-card>
+                                </div>
+                            </div>
+                        </el-checkbox-group>
+                    </el-tab-pane>
                     <el-tab-pane label="上传" name="upload">
                         <el-upload
                             class="upload"
@@ -404,11 +454,6 @@
                             
                         </el-upload> 
                         
-
-                        {% comment %} <el-dialog :visible.sync="dialogVisible" size="tiny">
-                            <img width="100%" :src="dialogImageUrl" alt="">
-                        </el-dialog> {% endcomment %}
-                        
                         <el-alert 
                             :title="errorMsg"
                             type="error"
@@ -426,8 +471,8 @@
                 </el-dialog>
                 
             </el-main>
-            <el-footer>
-                <el-button type="primary" onclick='window.close'>取消</el-button><el-button type="primary" @click=mediaReturn('ok')>确定返回结果</el-button>
+            <el-footer v-if="isFromCtrl()">
+                <el-button type="primary" @click.native='winClose'>取消</el-button><el-button type="primary" @click=mediaReturn('ok')>确定返回结果</el-button>
             </el-footer>
         </el-container>
 
@@ -542,6 +587,9 @@
                     }
                 },
                 methods:{
+                    hasTransCodeFile(file){
+                        
+                    },
                     checkij(value,ev){
                         console.log(`${value}-${ev}`)
                     },
@@ -553,6 +601,9 @@
                         from = this.getQueryVariable('from')
                         o = this.images[index]
                         window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
+                        window.close()
+                    },
+                    winClose(){
                         window.close()
                     },
                     getQueryVariable(variable){
@@ -571,8 +622,15 @@
                         }else{
                             return this.getQueryVariable('type') == typ
                         }
-
-                    },                    
+                    },   
+                    isFromCtrl:function(){
+                        console.log(this.getQueryVariable('from'))
+                        if (this.getQueryVariable('from').indexOf('admin')>=0 || this.getQueryVariable('from').indexOf('ckeditor')>=0){
+                            return false
+                        }else{
+                            return true
+                        }
+                    },                 
                     theImage(i,j){
                         return (store.state.images||[])[(i-1)*6 + j-1]||{}
                     },
@@ -782,8 +840,6 @@
                                     done()
                                 }
                             });
-
-                            
                         }
                         this.$nextTick(() => {
                             new QRCode(document.getElementById("qrcode"), file.url);  // 设置要生成二维码的链接

@@ -124,6 +124,8 @@
             themes: SimpleuiThemes,
             theme: "",
             themeName: "",
+            // church:'',
+            managedChurch:'',
             popup: {
                 left: 0,
                 top: 0,
@@ -268,6 +270,7 @@
             });
 
             this.menus = window.menus
+            this.managedChurch = window.managed_church
 
             this.theme = getCookie('theme');
             this.themeName = getCookie('theme_name');

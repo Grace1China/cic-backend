@@ -19,23 +19,28 @@ from users.models import CustomUser
 import logging
 loger = logging.getLogger('church.all')
 
+
+
+
+
 class ChurchForm(forms.ModelForm):
     promot_cover = forms.CharField(label="",widget=MediaBaseWidget(label='海报',typ='images'),required=False)
     giving_qrcode = forms.CharField(label="",widget=MediaBaseWidget(label='奉献二维码',typ='images'),required=False)
     promot_video = forms.CharField(label="",widget=MediaBaseWidget(label='海报视频',typ='videos'),required=False)
-    creator = forms.ChoiceField (
-        required=False,
-        widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
-    )
+    # creator = forms.ChoiceField (
+    #     required=False,
+    #     widget=forms.Select(attrs={'readonly': 'readonly','disabled':'disabled'})
+    # )
     class Meta:
         model = Church
-        fields = ('name', 'code','description', 'address', 'promot_cover', 'giving_qrcode', 'promot_video','status','venue','creator','manager')
+        fields = ('name', 'code','description', 'address', 'promot_cover', 'giving_qrcode', 'promot_video','status','venue')
 
     def __init__(self, *args, **kwargs):
         super(ChurchForm, self).__init__(*args, **kwargs)
         if self.initial:
+            pass
             # when load init from model, when in add page from the admin
-            self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
+            # self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
             # self.fields['manager'].choices=Church.objects.filter(id=self.initial['manager']).values_list('id','email')
            
 
@@ -68,11 +73,14 @@ class ChurchAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         try:
-            qs = super().get_queryset(request)
+            churchqs = super().get_queryset(request)
             if not request.user.is_superuser:
-                qs = qs.filter(Q(manager=request.user) or Q(creator=request.user))
-                # loger.info(qs)
-            return qs
+                #因为必须是管理者，才能登录，所以用户所属的教会，他登录了就默认成为了这个教会的管理者了
+                churchqs = churchqs.filter(Q(id=request.user.church.id))
+                if len(churchqs) != 1:
+                    raise Exception(' church is not valid, church id is%d' % request.user.church.id)
+                # # loger.info(qs)
+            return churchqs
         except Exception as e:
             import traceback
             loger.exception('There is and exceptin',exc_info=True,stack_info=True)
@@ -102,11 +110,10 @@ class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
         ret = {'church': request.user.church,'teacher':spk}
         print(ret)
         return ret
-
 admin.site.register(church_md.Church, ChurchAdmin)
 admin.site.register(models.Course, CourseAdmin)
 
-admin.AdminSite.site_header = '教会平台'
-admin.AdminSite.site_title = '教会平台'
+admin.site.site_header = '教会'
+admin.site.site_title = '教会'
 
 

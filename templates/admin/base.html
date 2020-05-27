@@ -103,8 +103,8 @@
                 }
             },
             methods: {
-                premote:function(id){
-                    this.$alert(`<a target="_blank" href="http://${document.location.host}/blog/sermon/${id}">${document.location.host}/blog/sermon/${id}</a>`, {
+                premote:function(id,path){
+                    this.$alert(`<a target="_blank" href="http://${document.location.host}/blog/${path?path:'sermon'}/${id}">${document.location.host}/blog/${path?path:'sermon'}/${id}</a>`, {
                             dangerouslyUseHTMLString: true,
                             customClass:"link-preview"
                         });

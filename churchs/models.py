@@ -55,8 +55,8 @@ class SermonSeries(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_CLOSE,verbose_name='状态')
 
     class Meta:
-        verbose_name = "专栏系列"
-        verbose_name_plural = "专栏系列"
+        verbose_name = "媒体分组"
+        verbose_name_plural = "媒体分组"
 
     def __str__(self):
         return '%s' % (self.title)
@@ -74,46 +74,38 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
             theLogger.info('----create_oss_dir-------')
             instance.res_path = 'series_%d' % (ct+1)
             #删除这一段的原因，是因为，一个原则，只在一处存储系列的集合关系。
-
-            # path = '%s/%s' % (instance.church.code,instance.res_path)
-            # auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            # d = settings.ALIOSS_DESTINATIONS
-            # theLogger.info('-----------create_oss_dir------------')
-            # theLogger.info(path)
             
-            # dictB = dict()
-            # for k,v in d.items():
-            #     if v['bucket'] not in dictB:
-            #         dictB[v['bucket']] = v['endpoint.acc']
-                
-
-            # for k in dictB:
-            #     # 每一个类型的文件都有一个系列存储位置
-            #     theLogger.info('dictB[%s]=%s' % (k,dictB[k]))
-            #     b = oss2.Bucket(auth, dictB[k], k)
-            #     theLogger.info(b)
-            #     r  = b.list_objects(path,max_keys=1)
-            #     theLogger.info(r)
-            #     l = len(r.object_list)
-            #     theLogger.info(l)
-            #     if l <= 0 :
-            #         # 不存在这个prefix，可以保存一个readme,来建立这个前缀
-            #         b.put_object('%s/readme.md' % path,'this is for series:%s' % instance.res_path)
-            #     else:
-            #         # 存在 检测一下 有没有readme, 以及是不是这个sereis的readme
-            #         if not b.object_exists('%s/readme.md' % path):
-            #             raise Exception('the resource path:%s is exists but no readme setting for sereis: %s' % (path, instance.res_path))   
-            #         r = b.get_object('%s/readme.md' % path) 
-            #         cnt = str(r.read(), encoding = "utf-8")
-            #         if cnt != 'this is for series:%s' % instance.res_path:
-            #             raise Exception('the resource path:%s is exists and it is not for series: %s' % (path, instance.res_path))                
     except Exception as e:
         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
         raise e
-    # finally:
-        # pass
-
 pre_save.connect(create_oss_dir, sender=SermonSeries)
+
+class ContentColumn(models.Model):
+    church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
+    title = models.CharField(max_length=250, default='',verbose_name='标题')
+    # res_path = models.CharField(max_length=250, default='',blank=True,verbose_name='资源路径')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
+    STATUS_OPEN = 1
+    STATUS_CLOSE = 2
+
+    STATUS_CHOICES = (
+        (STATUS_OPEN, '在线'),
+        (STATUS_CLOSE, '下线')
+    )
+    status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_CLOSE,verbose_name='状态')
+
+    class Meta:
+        verbose_name = "内容专栏"
+        verbose_name_plural = "内容专栏"
+
+    def __str__(self):
+        return '%s' % (self.title)
+
+
+
 
 class MediaFile(models.Model):
     '''
@@ -502,8 +494,8 @@ class WeeklyReport(models.Model):
     pub_time = models.DateTimeField(auto_now_add=True,null=True, blank=True,editable=True,verbose_name='发布时间')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
     class Meta:
-        verbose_name = "周报"
-        verbose_name_plural = "周报"
+        verbose_name = "周报图文"
+        verbose_name_plural = "周报图文"
 
     def __str__(self):
         return '%s' % (self.title)
