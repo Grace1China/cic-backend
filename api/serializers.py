@@ -89,7 +89,7 @@ class SermonSeriesSerializer4API(serializers.ModelSerializer):
 class MediaSerializer4ListAPI(serializers.ModelSerializer):
     # image_presigned_url = serializers.SerializerMethodField()
     # pdf_presigned_url = serializers.SerializerMethodField()
-    video = serializers.CharField(source='dist_video', max_length=400)
+    video = serializers.CharField(source='dist_list_video', max_length=400)
     video_status = serializers.IntegerField(source='dist_video_status')
     SHD_URL = serializers.CharField(source='dist_list_SHD_URL', max_length=400)
     HD_URL = serializers.CharField(source='dist_list_HD_URL', max_length=400)

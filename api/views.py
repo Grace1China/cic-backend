@@ -247,7 +247,10 @@ class SermonListViewSet(viewsets.ModelViewSet):
     '''
     主日信息列表。
     '''
-    queryset=Sermon.objects.all()
+    from django.db.models import Prefetch
+    from churchs.models import Media
+    queryset = Sermon.objects.prefetch_related(Prefetch('medias',queryset=Media.objects.order_by('kind')))
+    # queryset=Sermon.objects.all()
     serializer_class = SermonListSerializer4API
 
     permission_classes = [AllowAny]
@@ -293,10 +296,10 @@ class SermonListViewSet(viewsets.ModelViewSet):
             #         sermon.isLastWeek = True
                 
             slzSermons = self.get_serializer(theSermons, many=True)
-
+            theLogger.info('end1 GetLordsDayInfoList---------tmspan.getSpan:%d----' % tmspan.getSpan(end=dd.now()))
             slzdt = slzSermons.data
             
-            theLogger.info('end GetLordsDayInfoList---------tmspan.getSpan:%d----' % tmspan.getSpan(end=dd.now()))
+            theLogger.info('end2 GetLordsDayInfoList---------tmspan.getSpan:%d----' % tmspan.getSpan(end=dd.now()))
 
             return JsonResponse({'errCode': '0', 'data': slzdt, 
                                  'page': page,

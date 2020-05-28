@@ -97,7 +97,10 @@ class timeSpan():
     def getSpan(self,end = dd.now()):
         if self.begin == None:
             raise Exception('no begin')
-        return (end-self.begin).seconds
+        
+        ret = (end-self.begin).seconds
+        self.begin = end
+        return ret
 
 
 

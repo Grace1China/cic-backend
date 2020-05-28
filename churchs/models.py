@@ -240,6 +240,16 @@ class Media(models.Model):
         else:
             return ''
     @property
+    def dist_list_video(self):
+        if self.s3_video is not None and self.s3_video!='' :
+            return self.s3_video
+        elif self.alioss_video is not None and self.alioss_video != '':
+            # return self.alioss_video
+            retval = self.alioss_video
+            return retval
+        else:
+            return ''
+    @property
     def dist_video_status(self):
         if self.s3_video_status is not None:
             return self.s3_video_status
@@ -369,9 +379,9 @@ class Media(models.Model):
             return self.s3_SHD_URL
         elif self.alioss_video is not None and self.alioss_video != '':
             #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
-            theLogger.info('self.alioss_video:%s' % self.alioss_video)
+            # theLogger.info('self.alioss_video:%s' % self.alioss_video)
             retval = 'http://%s/%s/sd.mp4' % (get_ALIOSS_DESTINATIONS(typ = 'videos')['redirecturl'],self.alioss_video)
-            theLogger.info('retval:%s' % retval)
+            # theLogger.info('retval:%s' % retval)
 
             return retval #self.alioss_SHD_URL
         else:
@@ -399,7 +409,7 @@ class Media(models.Model):
         elif self.alioss_video is not None and self.alioss_video != '':
             #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
             retval = 'http://%s/%s/sd.mp4' % (get_ALIOSS_DESTINATIONS(typ = 'videos')['redirecturl'],self.alioss_video)
-            theLogger.info('retval:%s' % retval)
+            # theLogger.info('retval:%s' % retval)
 
             return retval #self.alioss_SHD_URL
         else:
@@ -425,7 +435,7 @@ class Media(models.Model):
         elif self.alioss_video is not None and self.alioss_video != '':
             #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
             retval = 'http://%s/%s/ld.mp4' % (get_ALIOSS_DESTINATIONS(typ = 'videos')['redirecturl'],self.alioss_video)
-            theLogger.info('retval:%s' % retval)
+            # theLogger.info('retval:%s' % retval)
             return retval #self.alioss_SHD_URLhttps://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/sd.mp4
         else:
             return ''
@@ -446,7 +456,7 @@ class Media(models.Model):
             return self.s3_audio
         elif self.alioss_audio is not None and self.alioss_audio != '':
             #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
-            retval = self.getMediaUrl(self.alioss_audio,dest='audios')
+            # retval = self.getMediaUrl(self.alioss_audio,dest='audios')
             retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'audios')['redirecturl'],self.alioss_audio)
       
             return retval 
