@@ -89,4 +89,15 @@ class CICUtill():
         else:
             return IsAuthenticated
 
+from datetime import datetime as dd  
+class timeSpan():
+    begin = None
+    def __init__(self,begin=dd.now()):
+        self.begin=begin
+    def getSpan(self,end = dd.now()):
+        if self.begin == None:
+            raise Exception('no begin')
+        return (end-self.begin).seconds
+
+
 

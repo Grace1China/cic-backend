@@ -15,6 +15,7 @@ import oss2
 import urllib
 import re
 from .widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField
+from church.confs.base import get_ALIOSS_DESTINATIONS
 
 import logging 
 theLogger = logging.getLogger('church.all')
@@ -333,9 +334,9 @@ class Media(models.Model):
     #----------------------------------------------------------------------------------------------------------------------------------------------
     @property
     def dist_SHD_URL_deprecate(self):
-        pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
-        pprint.PrettyPrinter(4).pprint(self.s3_SHD_URL)
-        pprint.PrettyPrinter(4).pprint(self.alioss_SHD_URL)
+        # pprint.PrettyPrinter(4).pprint('----------------dist_SHD_URL----------------------')
+        # pprint.PrettyPrinter(4).pprint(self.s3_SHD_URL)
+        # pprint.PrettyPrinter(4).pprint(self.alioss_SHD_URL)
         if self.s3_SHD_URL is not None and self.s3_SHD_URL != '':
             return self.s3_SHD_URL
         elif self.alioss_SHD_URL is not None and self.alioss_SHD_URL != '':
@@ -411,6 +412,17 @@ class Media(models.Model):
             return retval 
         else:
             return ''
+    @property
+    def dist_list_image(self):
+        if self.s3_image is not None and self.s3_image != '':
+            return self.s3_image
+        elif self.alioss_image is not None and self.alioss_image != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'images')['redirecturl'],self.alioss_image)
+            return retval 
+        else:
+            return ''
+
     @property
     def dist_pdf(self):
         if self.s3_pdf is not None and self.s3_pdf != '':

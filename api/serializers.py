@@ -86,7 +86,23 @@ class SermonSeriesSerializer4API(serializers.ModelSerializer):
         model = SermonSeries
         fields = '__all__'
 
+class MediaSerializer4ListAPI(serializers.ModelSerializer):
+    # image_presigned_url = serializers.SerializerMethodField()
+    # pdf_presigned_url = serializers.SerializerMethodField()
+    # video = serializers.CharField(source='dist_video', max_length=400)
+    video_status = serializers.IntegerField(source='dist_video_status')
+    # SHD_URL = serializers.CharField(source='dist_SHD_URL', max_length=400)
+    # HD_URL = serializers.CharField(source='dist_HD_URL', max_length=400)
+    # SD_URL = serializers.CharField(source='dist_SD_URL', max_length=400)
+    # audio = serializers.CharField(source='dist_audio', max_length=400)
+    image = serializers.CharField(source='dist_list_image', max_length=400)
+    # pdf = serializers.CharField(source='dist_pdf', max_length=400)
 
+
+    class Meta:
+        model = Media
+        fields = ['video_status','image']
+    
 
 class MediaSerializer4API(serializers.ModelSerializer):
     # image_presigned_url = serializers.SerializerMethodField()
@@ -120,10 +136,12 @@ class SermonSerializer4API(serializers.ModelSerializer):
 
 class SermonListSerializer4API(serializers.ModelSerializer):
     speaker = SpeakerSerializer4API(read_only=True)
-    medias = MediaSerializer4API(many=True, read_only=True)
+    medias = MediaSerializer4ListAPI(many=True, read_only=True)
+    # church = ChurchSerializer4Sermon(read_only=True)
+    # series = SermonSeriesSerializer4API(read_only=True)
     class Meta:
         model = Sermon
-        fields = ['id','user','title','cover','pub_time','status','speaker','scripture','medias','create_time','update_time']
+        fields = ['id','user','title','cover','pub_time','status','speaker','medias','scripture','create_time','update_time']
 
 
 class CourseSerializer4APIPOST(serializers.ModelSerializer):

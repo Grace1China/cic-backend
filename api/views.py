@@ -240,6 +240,8 @@ class ChurchViewSet(viewsets.ModelViewSet):
 #             permission_classes = [IsAuthenticated]
 #         return [permission() for permission in permission_classes]
 
+from .utill import timeSpan
+from datetime import datetime as dd
 
 class SermonListViewSet(viewsets.ModelViewSet):
     '''
@@ -252,12 +254,16 @@ class SermonListViewSet(viewsets.ModelViewSet):
     @action(detail=True,methods=['get'], format="json")
     def GetLordsDayInfoList(self,request,page=1,pagesize=30):
         try:
+            theLogger.info('start GetLordsDayInfoList-------------')
+            tmspan = timeSpan(dd.now())
+            
+
             page = getPage(request)
             pagesize = getPageSize(request)
             offset = int((page - 1) * pagesize)
             
             from django.conf import settings
-            theCh = Church.objects.all().get(code=settings.DEFAULT_CHURCH_CODE)
+            theCh = Church.objects.get(code=settings.DEFAULT_CHURCH_CODE)
             if not request.user.is_authenticated:
                 if theCh == None:
                     return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有平台教会信息', 'sysErrMsg': ''},
@@ -267,13 +273,13 @@ class SermonListViewSet(viewsets.ModelViewSet):
                 if theCh == None:
                     return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有教会信息', 'sysErrMsg': ''}, safe=False)
 
-            
-            now = datetime.datetime.now()
-            last_sunday = now - timedelta(days=now.weekday() + 1)
-            last_sunday = last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
-            this_saturday = now + timedelta(days=6 - now.weekday())
-            this_saturday = this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(
-                microsecond=999)
+            theLogger.info(settings.DEFAULT_CHURCH_CODE)
+            # now = datetime.datetime.now()
+            # last_sunday = now - timedelta(days=now.weekday() + 1)
+            # last_sunday = last_sunday.replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+            # this_saturday = now + timedelta(days=6 - now.weekday())
+            # this_saturday = this_saturday.replace(hour=23).replace(minute=59).replace(second=59).replace(
+            #     microsecond=999)
 
             count = self.get_queryset().filter(church=theCh,
                                                status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').count()
@@ -288,7 +294,11 @@ class SermonListViewSet(viewsets.ModelViewSet):
                 
             slzSermons = self.get_serializer(theSermons, many=True)
 
-            return JsonResponse({'errCode': '0', 'data': slzSermons.data, 
+            slzdt = slzSermons.data
+            
+            theLogger.info('end GetLordsDayInfoList---------tmspan.getSpan:%d----' % tmspan.getSpan(end=dd.now()))
+
+            return JsonResponse({'errCode': '0', 'data': slzdt, 
                                  'page': page,
                                  'totalPage': totalPage}, safe=False)
         except Exception as e:
