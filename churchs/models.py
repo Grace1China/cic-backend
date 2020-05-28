@@ -363,6 +363,20 @@ class Media(models.Model):
             return retval #self.alioss_SHD_URL
         else:
             return ''
+    @property
+    def dist_list_SHD_URL(self):
+        if self.s3_SHD_URL is not None and self.s3_SHD_URL != '':
+            return self.s3_SHD_URL
+        elif self.alioss_video is not None and self.alioss_video != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            theLogger.info('self.alioss_video:%s' % self.alioss_video)
+            retval = 'http://%s/%s/sd.mp4' % (get_ALIOSS_DESTINATIONS(typ = 'videos')['redirecturl'],self.alioss_video)
+            theLogger.info('retval:%s' % retval)
+
+            return retval #self.alioss_SHD_URL
+        else:
+            return ''
+
     #-----------------------------------------------------------------------------------------------------------------------------------------------
     def prop_dist_HD_URL(self):
         if self.s3_HD_URL is not None and self.s3_HD_URL != '':
@@ -377,11 +391,22 @@ class Media(models.Model):
             return ''
     prop_dist_HD_URL.short_description = "转码后视频(transcoded video)"
     dist_HD_URL = property(prop_dist_HD_URL)
+    
+    @property
+    def dist_list_HD_URL(self):
+        if self.s3_HD_URL is not None and self.s3_HD_URL != '':
+            return self.s3_HD_URL
+        elif self.alioss_video is not None and self.alioss_video != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = 'http://%s/%s/sd.mp4' % (get_ALIOSS_DESTINATIONS(typ = 'videos')['redirecturl'],self.alioss_video)
+            theLogger.info('retval:%s' % retval)
+
+            return retval #self.alioss_SHD_URL
+        else:
+            return ''
+
     @property
     def dist_SD_URL(self):
-        # pprint.PrettyPrinter(4).pprint('----------------dist_SD_URL----------------------')
-        # pprint.PrettyPrinter(4).pprint(self.s3_SD_URL)
-        # pprint.PrettyPrinter(4).pprint(self.alioss_SD_URL)
         if self.s3_SD_URL is not None and self.s3_SD_URL != '':
             return self.s3_SD_URL
         elif self.alioss_video is not None and self.alioss_video != '':
@@ -392,6 +417,19 @@ class Media(models.Model):
             return retval #self.alioss_SHD_URL
         else:
             return ''
+
+    @property
+    def dist_list_SD_URL(self):
+        if self.s3_SD_URL is not None and self.s3_SD_URL != '':
+            return self.s3_SD_URL
+        elif self.alioss_video is not None and self.alioss_video != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = 'http://%s/%s/ld.mp4' % (get_ALIOSS_DESTINATIONS(typ = 'videos')['redirecturl'],self.alioss_video)
+            theLogger.info('retval:%s' % retval)
+            return retval #self.alioss_SHD_URLhttps://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/sd.mp4
+        else:
+            return ''
+
     @property
     def dist_audio(self):
         if self.s3_audio is not None and self.s3_audio != '':
@@ -399,6 +437,18 @@ class Media(models.Model):
         elif self.alioss_audio is not None and self.alioss_audio != '':
             #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
             retval = self.getMediaUrl(self.alioss_audio,dest='audios')
+            return retval 
+        else:
+            return ''
+    @property
+    def dist_list_audio(self):
+        if self.s3_audio is not None and self.s3_audio != '':
+            return self.s3_audio
+        elif self.alioss_audio is not None and self.alioss_audio != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = self.getMediaUrl(self.alioss_audio,dest='audios')
+            retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'audios')['redirecturl'],self.alioss_audio)
+      
             return retval 
         else:
             return ''
@@ -430,6 +480,17 @@ class Media(models.Model):
         elif self.alioss_pdf is not None and self.alioss_pdf != '':
             #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
             retval = self.getMediaUrl(self.alioss_pdf,dest='pdfs')
+            return retval 
+        else:
+            return ''
+    
+    @property
+    def dist_list_pdf(self):
+        if self.s3_pdf is not None and self.s3_pdf != '':
+            return self.s3_pdf
+        elif self.alioss_pdf is not None and self.alioss_pdf != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'pdfs')['redirecturl'],self.alioss_pdf)
             return retval 
         else:
             return ''
