@@ -132,7 +132,7 @@ LOGGING = {
             'style': '{',
         },
         'simple': {
-            'format': '{levelname} {process:d} {thread:d}  {module} {lineno:d} {message}',
+            'format': '{levelname} {asctime} {process:d} {thread:d}  {module} {lineno:d} {message}',
             'style': '{',
         },
     },

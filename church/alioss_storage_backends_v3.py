@@ -24,6 +24,7 @@ from crequest.middleware import CrequestMiddleware
 from churchs.models import MediaFile,WeeklyReport
 from django.core.paginator import Paginator
 from churchs.models import Media
+import urllib.request
 
 import qrcode
 from io import BytesIO
@@ -518,13 +519,6 @@ class AliyunMediaStorage(AliyunBaseStorage):
             lg.info('mime_type:%s church_prefix%s series_prefix%s' % (settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],user.church.code,series))
 
             if (dkey != ''):
-                #删除上传桶
-                # self.bucket.delete_object(dkey)
-                #删除video的目标桶
-                # vdbk = Bucket(self.auth, settings.ALIOSS_DESTINATIONS['%s.destination']['endpoint.acc'], settings.ALIOSS_DESTINATIONS['%s.destination']['bucket'])
-                # vdbk.delete_object(dkey)
-                # 目前不删除文件
-
                 #删除数据库
                 from django.db.models import Q
                 MediaFile.objects.filter(name=dkey).delete()

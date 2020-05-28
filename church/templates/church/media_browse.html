@@ -420,7 +420,7 @@
                                                 :style="{ 'fontSize':'1rem' }" 
                                                 :title="[[ theImage(ii,jj).visible_filename  ]]"
                                             >
-                                                [[ theImage(ii,jj).visible_filename | shortname ]]
+                                                [[ theImage(ii,jj).visible_filename | shorttitle ]]
                                             </span>
                                     </el-card>
                                 </div>
@@ -584,6 +584,13 @@
                         fn_arr = value.split('.')   //["", "mp4"]
                         
                         return (fn_arr[0].length > 10) ? `${fn_arr[0].substring(0,10)}...${fn_arr[1]}` : value
+                    },
+                    shorttitle: function (value) {
+                        if (!value) return ''
+                        value = value.toString()
+                        //fn_arr = value.split('.')   //["", "mp4"]
+                        
+                        return (value.length > 12) ? `${value.substring(0,12)}...` : value
                     }
                 },
                 methods:{
@@ -832,7 +839,7 @@
                                 }
                             });
                         }else if(((file||{}).oname||'').match('(.pdf$)')){
-                            this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><div id="qrcode"></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
+                            this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;"><span>${file.oname}</span><a href="${file.url}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
                                 dangerouslyUseHTMLString: true,
                                 customClass:"image-preview",
                                 beforeClose:(action,instance,done)=>{
@@ -842,7 +849,11 @@
                             });
                         }
                         this.$nextTick(() => {
-                            new QRCode(document.getElementById("qrcode"), file.url);  // 设置要生成二维码的链接
+                            qrcode = document.getElementById("qrcode")
+                            if(qrcode){
+                                document.getElementById("qrcode").innerHTML = ''
+                                new QRCode(document.getElementById("qrcode"), file.url);  // 设置要生成二维码的链接
+                            }
                         })
 
                         return false
