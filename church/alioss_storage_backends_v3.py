@@ -547,12 +547,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
                 else:
                     qrset = MediaFile.objects.filter(series_prefix=series,church_prefix=user.church.code,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
 
-                
-
-            # qrset = MediaFile.objects.filter(mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix'],church_prefix=user.church.code,series_prefix=series).order_by('-update_time')
-            # lg.info(qrset)
             total = qrset.count()
-
             pg = Paginator(qrset, 18)
             results = pg.page(page)
 

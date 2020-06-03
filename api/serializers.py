@@ -124,7 +124,7 @@ class MediaSerializer4API(serializers.ModelSerializer):
 
 
 class SermonSerializer4API(serializers.ModelSerializer):
-    medias = MediaSerializer4API(many=True, read_only=True)
+    medias = MediaSerializer4ListAPI(many=True, read_only=True)
     church = ChurchSerializer4Sermon(read_only=True)
     speaker = SpeakerSerializer4API(read_only=True)
     series = SermonSeriesSerializer4API(read_only=True)

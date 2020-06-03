@@ -151,7 +151,10 @@ class Media(models.Model):
     MEDIA_SERMON = 3
     MEDIA_GIVING = 4
     MEDIA_COURSE = 5
-    MEDIA_OTHER = 6
+    MEDIA_VIDEOS = 6
+    MEDIA_AUDIOS = 7
+    MEDIA_PDFS = 8
+    MEDIA_OTHER = 9
 
 
     MEDIA_KIND = (
@@ -160,6 +163,9 @@ class Media(models.Model):
     (MEDIA_SERMON,'讲道'),
     (MEDIA_GIVING,'奉献'),
     (MEDIA_COURSE,'课程'),
+    (MEDIA_VIDEOS,'视频'),
+    (MEDIA_AUDIOS,'音频'),
+    (MEDIA_PDFS,'PDF'),
     (MEDIA_OTHER,'其它'),
     )
     STATUS_NONE = 1
@@ -191,7 +197,7 @@ class Media(models.Model):
     s3_pdf = S3DirectField(dest='pdfs', blank=True,verbose_name='AWS S3 讲义')
 
     # alioss_video = AliOssDirectField(dest='source',fieldname='alioss_video', blank=True,verbose_name='视频')
-    alioss_video = MediaBaseField(max_length=400,blank=True,verbose_name='视频')
+    alioss_video = models.CharField(max_length=400,blank=True,verbose_name='视频')
     
     # alioss_video = models.CharField(max_length=400, blank=True,verbose_name='视频')
     alioss_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='视频状态')
@@ -203,7 +209,7 @@ class Media(models.Model):
     # alioss_pdf = AliOssDirectField(dest='pdfs', fieldname='alioss_pdf',blank=True,verbose_name='讲义')
     alioss_audio = models.CharField(max_length=400,blank=True,verbose_name='音频')
     # alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
-    alioss_image = MediaBaseField(max_length=400,blank=True,verbose_name='封面')
+    alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
     alioss_pdf = models.CharField(max_length=400,blank=True,verbose_name='讲义')
     
     content = RichTextUploadingField(blank=True,verbose_name='摘要',external_plugin_resources=[('html5video',

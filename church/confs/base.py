@@ -571,10 +571,10 @@ CKEDITOR_BROWSE_SHOW_DIRS = True
 CKEDITOR_RESTRICT_BY_USER = True
 CKEDITOR_CONFIGS = {
     'default': {
-        'skin': 'moono',
+        'skin': 'moono-lisa',
         # 'skin': 'office2013',
         'language': 'zh-cn',
-        'uiColor': '#000',
+        'uiColor': '#CCEAEE',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']
         ],

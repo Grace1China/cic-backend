@@ -22,6 +22,8 @@
         <link rel="stylesheet" href="{% static 'admin/simpleui-x/css/base.css' %}?_=2.7">
         <link rel="stylesheet" href="{% static 'admin/simpleui-x/theme/simpleui.css' %}">
 
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'church/js/init.js' %}"></script>
 
     {% if "SIMPLEUI_STATIC_OFFLINE"|get_config %}
         <script type="text/javascript" src="{% static 'admin/simpleui-x/js/vue.min.js' %}"></script>
@@ -35,7 +37,7 @@
         <script type="text/javascript" src="{% static 'admin/simpleui-x/js/language.js' %}?_=2.1.2"></script>
         <script type="text/javascript" src="{% static 'admin/simpleui-x/locale/en-us.js' %}?_=2.1.2"></script>
         <script type="text/javascript" src="{% static 'admin/simpleui-x/locale/' %}{% get_language %}.js"></script>
-
+       
        
 
         {% if ""|get_language_code != 'zh-hans' %}
@@ -60,8 +62,8 @@
             {% endif %}
         {% endblock %}
         {% block blockbots %}
-            <meta name="robots" content="NONE,NOARCHIVE"/>{% endblock %}
-        <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+            <meta name="robots" content="NONE,NOARCHIVE"/>
+        {% endblock %}
     </head>
     {% load i18n %}
 

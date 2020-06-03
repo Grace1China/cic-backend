@@ -338,7 +338,7 @@ class SermonViewOneSet(viewsets.ModelViewSet):
             # sermonid = int(data.get('sermonid', -1))
             # if sermonid == -1:
             #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ""}, safe=False)
-            theSermon = self.get_queryset().filter(id=pk, 
+            theSermon = self.get_queryset().get(id=pk, 
                                                    status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').first()
             if theSermon is None:
                 return JsonResponse({'errCode': '1001', 'data': None, 'msg': "没有主日信息", 'sysErrMsg': ""}, safe=False)
