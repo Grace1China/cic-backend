@@ -338,7 +338,7 @@ class SermonViewOneSet(viewsets.ModelViewSet):
             # sermonid = int(data.get('sermonid', -1))
             # if sermonid == -1:
             #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ""}, safe=False)
-            theSermon = self.get_queryset().get(id=pk).order_by('-pub_time').first()
+            theSermon = self.get_queryset().get(id=pk)
             if theSermon is None or theSermon.status!=Sermon.STATUS_PUBLISHED:
                 raise Exception('no sermon for this id %d or sermon status is not published:%d' % (pk,Sermon.STATUS_PUBLISHED if Sermon else -1))
             # if theSermon is None:
