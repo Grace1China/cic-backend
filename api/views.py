@@ -338,10 +338,11 @@ class SermonViewOneSet(viewsets.ModelViewSet):
             # sermonid = int(data.get('sermonid', -1))
             # if sermonid == -1:
             #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "参数错误", 'sysErrMsg': ""}, safe=False)
-            theSermon = self.get_queryset().get(id=pk, 
-                                                   status=Sermon.STATUS_PUBLISHED).order_by('-pub_time').first()
-            if theSermon is None:
-                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "没有主日信息", 'sysErrMsg': ""}, safe=False)
+            theSermon = self.get_queryset().get(id=pk).order_by('-pub_time').first()
+            if theSermon is None or theSermon.status!=Sermon.STATUS_PUBLISHED:
+                raise Exception('no sermon for this id %d or sermon status is not published:%d' % (pk,Sermon.STATUS_PUBLISHED if Sermon else -1))
+            # if theSermon is None:
+            #     return JsonResponse({'errCode': '1001', 'data': None, 'msg': "没有主日信息", 'sysErrMsg': ""}, safe=False)
             slzSermon = self.get_serializer(theSermon)
             return JsonResponse({'errCode': '0', 'data': slzSermon.data}, safe=False)
         except Exception as e:
