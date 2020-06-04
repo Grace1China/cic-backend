@@ -19,7 +19,7 @@ DEBUG = True
 
 RUNTIME = 'sandbox'
 
-DEFAULT_CHURCH = 'L3'
+DEFAULT_CHURCH = 'ims'
 
 MAINSITE_API_V1 = 'http://47.95.199.234:8200/mainsite_api_v1/mst/MakeSermon'
 APP_SERVER_IP = "test.l3.bicf.org"  #singpore 54.169.143.92
