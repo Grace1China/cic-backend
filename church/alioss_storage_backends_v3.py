@@ -554,6 +554,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
             from  ckeditor_uploader import utils 
             from .utils import is_valid_image_extension
             lg.info(typ)
+            lg.info(results)
             files = []
             # dirs = set()
             for rc in results :

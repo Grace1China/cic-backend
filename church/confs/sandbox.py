@@ -67,7 +67,7 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # 数据库引擎
-        'NAME': 'cic_20200323',  # test_cic 数据库名，先前创建的
+        'NAME': 'cic_0528',  # test_cic 数据库名，先前创建的
         'USER': 'backend_user',     # 用户名，可以自己创建用户
         'PASSWORD': '11/28/2019',  # 密码
         'HOST': '13.231.255.163',  # mysql服务所在的主机ip 54.169.143.92
