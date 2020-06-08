@@ -147,6 +147,12 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			var imgs= document.getElementById('myiframe').contentDocument.querySelectorAll('.el-checkbox.is-checked .mediadata')
 			console.log(imgs)
 
+			if (window.XMLHttpRequest) { // Mozilla, Safari, IE7+ ...
+				httpRequest = new XMLHttpRequest();
+			} else if (window.ActiveXObject) { // IE 6 and older
+				httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
 			// //使用JS最基础的getElementById找到我们的iframe控件，然后再获取id为username的控件
 			// html = html + "<h2>" + your_name.value + ": </h2>";
 			// var selected_books = document.getElementById('myiframe').contentDocument.getElementsByName('yourbook');
@@ -163,10 +169,12 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			// console.log(img)
 			
 			html = ''
+			imgList = []
 			imgs.forEach(function(e){
 				typ = e.getAttribute('typ')
 				if(typ == 'images'){
 					html = html + `<p><img style="width:100%;" src="${e.getAttribute('src').replace('/wh100_auto','')}"></p>` 
+					imgList.push(e.getAttribute('src').replace('/wh100_auto',''))
 				}else if(typ == 'videos'){
 					html = html + `<div class="ckeditor-html5-video" style="text-align:center">
 						<video controls="controls" controlslist="nodownload"  src="${e.getAttribute('data-src')}" width="100%">&nbsp;</video>
@@ -184,6 +192,16 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 				}
 				console.log(html)
 			})
+			let xhr = new XMLHttpRequest();
+			// var subs = undefined
+			xhr.open("GET", "http://localhost:8000/blog/tuwen/8", false);
+			xhr.onload = function() {
+				s = xhr.response.indexOf('<body>')+6
+				e = xhr.response.indexOf('</body>')
+				subs = xhr.response.substrig(s,e)
+				html = html + subs
+			}
+			xhr.send();
 			// var sel = editor.getSelection();
 			// var range = sel.getRanges()[0];
 
@@ -193,11 +211,63 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			// range.selectNodeContents( editor.editable() );
 			// sel.selectRanges( [ range ] );
 			// }
+			if (imgList.length > 1 ){
+				html = makeCarousel(imgList)
+			}
 			editor.insertHtml(html);
 			this.commitContent();
 		},
 		onHide: function () {
 			document.getElementById('myiframe').contentDocument.location.reload();
 		},
+		
 	};
 });
+
+function makeCarousel(list){
+	// var list = $('picsList').getElementsByTagName('input');
+	var imgSrc =[],
+	num_width = '400',
+	num_height = '300',
+	delay_time = 1000;
+
+	for(var i = 3;i<list.length;i++){
+		if(list[i]){
+			imgSrc.push(list[i]);
+		}
+	}
+
+	var strHtml = "",
+			guid = createGuid(5),
+			scriptStr='<script>var length = document.querySelector(".'+guid+'").children.length,i=0;setInterval(function(){var El = document.querySelector(".'+guid+'"),marginLeft = El.style.marginLeft,moveNum = marginLeft.split("").reverse().join;if(++i<length){El.style.marginLeft = "-"+i*'+num_width+'+"px";}else{El.style.marginLeft = "-0px";i=0;}},'+delay_time+')</script>';
+			
+	for(var i =0;i<imgSrc.length;i++){
+		var imgStr = '<img style="height:100%;width:'+num_width+'px;transition:all .5s;-webkit-transition:all .5s;" src="'+imgSrc[i]+'">';
+		strHtml += imgStr;
+	}
+
+	strHtml = '<div style="width: '+num_width+'px;height: '+num_height+'px;overflow: hidden;position:relative;">'+
+						'<div class="'+guid+'" style="transition:all .5s;-webkit-transition:all .5s;width:10000px;height:100%;font-size: 0px;">'+
+						strHtml+
+						'</div>'+scriptStr+'</div>';
+
+	return strHtml ;
+}
+//生成一个自定义长度的表示guid，由0-9，a-z组成
+function createGuid(num){
+	var numberArr = [0,1,2,3,4,5,6,7,8,9],
+			wordsArr = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],
+			guidStr ='',
+			strSum = [];
+	strSum = wordsArr.concat(numberArr);
+	for(var i=0;i<num;i++){
+		var s = strSum[Math.floor((Math.random()*strSum.length))];
+		if (typeof s == "number" && i == 0) {
+			i--;
+		}else{
+			guidStr +=s ;
+		}
+	}
+
+	return guidStr;
+}

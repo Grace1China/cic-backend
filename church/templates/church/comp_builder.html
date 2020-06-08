@@ -1,0 +1,198 @@
+{% load static i18n %}
+{% load cust_filters %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Inline editing enabled by code</title>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
+    {% comment %} <script src="https://cdn.ckeditor.com/4.14.0/standard-all/ckeditor.js"></script> {% endcomment %}
+    <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
+    <script type="text/javascript" src="{% static "admin/simpleui-x/elementui/index.js" %}"></script>
+    <script type="text/javascript" src="{% static "church/js/es6-promise.auto.js" %}"></script>
+    <script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <style>
+        .complist{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .comp{
+            height: 180px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: #77686857;
+            margin: 10px;
+        }
+        .block{
+            position: relative;
+        }
+        .workplace{
+            display: flex;
+            justify-content: center;
+            
+        }
+        .col{
+            margin-left:20px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <script>
+    function allowDrop(ev){
+        ev.preventDefault();
+    }
+
+    function drag(ev){
+        ev.dataTransfer.setData("comp_id",ev.target.id);
+    }
+
+    function drop(ev){
+        ev.preventDefault();
+        var comp_id=ev.dataTransfer.getData("comp_id");   
+        ori = document.getElementById(comp_id)
+        dgee = ori.cloneNode();
+        //console.log('drop-----------')
+        //dgee.id = ori.id +'_draged'
+        theV.initComp(comp_id)
+    }
+    function carousel(){
+        return `<el-carousel height="150px">
+                    <el-carousel-item v-for="item in 4" :key="item">
+                        <h3>{{ item }}</h3>
+                    </el-carousel-item>
+                </el-carousel>`
+    }
+    
+    </script>
+
+    <div id="app">
+        <section class="el-container workplace">
+            <aside class="el-aside complist col" style="max-width: 300px;min-width:300px">
+                <div id='dg1'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/carousel.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>
+                Banner
+                    
+                </div>
+                <div id='dg2'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/slide.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>slide</div>
+                <div id='dg3'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/list.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>list</div>
+            </aside>
+            <main class="el-main col" style="max-width: 440px;" ondrop="drop(event)" ondragover="allowDrop(event)" ref="editcolumn" >
+                <div>再来</div>
+                <div id="introduction">
+                    <h1>Inline Editor <a class="documentation" href="https://ckeditor.com/docs/ckeditor4/latest/guide/dev_inline.html">Documentation</a></h1>
+
+                    <p>
+                    <strong>Inline Editing</strong> allows you to edit any element on the page in-place. Inline editor provides a real <abbr title="What You See is What You Get">WYSIWYG</abbr> experience &quot;out of the box&quot;, because unlike in <a href="./classic.html">classic editor</a>, there is no <code>&lt;iframe&gt;</code> element surrounding the editing area. The CSS styles used for editor content are exactly the same as on the target page where this content is rendered!
+                    </p>
+                </div>
+            </main>
+            <aside class="el-aside col" style="max-width: 300px;;min-width:300px" >Aside
+            </aside>
+        </section>
+        
+            <el-button @click="visible = true">按钮</el-button>
+            <el-dialog :visible.sync="visible" title="Hello world">
+                <p>欢迎使用 Element</p>
+            </el-dialog>
+    </div>
+
+
+</body>
+ 
+  <script>
+    theV = new Vue({
+        el: '#app',
+        data: function() {
+            return { 
+                visible: false,
+                data1: [{label: '一级 1',}, {label: '一级 2',}, {label: '二级 2-2',}, {label: '一级 3',}, {label: '二级 3-2',}],
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                }
+            }
+        },
+        methods: {
+            handleNodeClick(data) {
+                console.log(data);
+            },
+            addCarousel (comp_id) {
+                // 创建组件逻辑
+                let comp = Vue.extend({
+                    // 向界面渲染的dom方法。
+                    render (createElement) {
+                        return createElement(
+                            'el-carousel',
+                            {
+                                style: {
+                                    height: '150px',
+                                    width:'400px',
+                                },
+                                id:`${comp_id}_draged`
+                            },
+                            Array.apply(null, { length: 4 }).map(function (v,i) {
+                                return createElement('el-carousel-item', 
+                                    {key:'key'+i},
+                                    [createElement('img',
+                                        { 
+                                            attrs: {
+                                                src:'https://api.bicf.org/mediabase/citychurch/default/88b8a112-a24e-2a0d-a2a2-a1d1fdc288bf',
+                                            }
+                                        }，
+                                        'key'+i)
+                                    ]
+                                )
+                            })
+                        );
+                    },
+                    methods: {
+                        onCloseClick () {
+                            // 移除dom
+                            //this.$el.remove();
+                            // 然后将删除标签事件暴露除去
+                            //this.$emit("delete", this.text);
+                        }
+                    },
+                    data () {
+                        return {
+                            text: tagText, // 为这个tag标签使用的文字是传入的标签文字内容
+                        }
+                    }
+                });
+                return new comp();
+            },
+            initComp (comp_id) {
+                let comp = this.addCarousel(comp_id);
+                // 添加删除监听
+                //tag.$on("delete", this.onTagDelete);
+                // 挂载组件，即创建虚拟dom。
+                comp.$mount();
+                // 将组件添加到显示tag的div里面
+                this.$refs.editcolumn.appendChild(comp.$el);
+            }
+        },
+    })
+  </script>
+ 
+
+  <script>
+    // The inline editor should be enabled on an element with "contenteditable" attribute set to "true".
+    // Otherwise CKEditor will start in read-only mode.
+    var introduction = document.getElementById('introduction');
+    introduction.setAttribute('contenteditable', true);
+
+ 
+  </script>
+
+</body>
+
+</html>

@@ -320,8 +320,7 @@ class SermonViewOneSet(viewsets.ModelViewSet):
     from .serializers import SermonSerializer4API, MediaSerializer4API
     from churchs.models import Media
     from django.db.models import Prefetch
-    queryset = Sermon.objects.prefetch_related(Prefetch('medias',
-                                                        queryset=Media.objects.order_by('kind')))
+    queryset = Sermon.objects.prefetch_related(Prefetch('medias',queryset=Media.objects.order_by('kind')))
     serializer_class = SermonSerializer4API
     permission_classes = [AllowAny]
     @action(detail=True, methods=['GET'], format="json")
@@ -359,7 +358,7 @@ class SermonViewOneSet(viewsets.ModelViewSet):
         '''
         try:
             from django.conf import settings
-            theCh = Church.objects.all().get(code=settings.DEFAULT_CHURCH_CODE)
+            theCh = Church.objects.get(code=settings.DEFAULT_CHURCH_CODE)
             if theCh == None:
                 return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有平台教会信息', 'sysErrMsg': ''}, safe=False)
             now = datetime.datetime.now()
@@ -429,26 +428,24 @@ class  CourseViewSet(viewsets.ModelViewSet):
     permission_classes=[AllowAny]
 
     @action(detail=True,methods=['get','post'], format="json")
-    def GetCourseList(self,request,page=1,pagesize=30,keyword=None,orderby=None,bought=False):
+    def GetCourseList(self,request,page=1,pagesize=30,keyword=None,orderby=None,bought='false'):
         '''
         查找课程列表信息
         '''
         try:
-            logger = logging.getLogger('dev.error')
-            logger.error(request.META)
+            theLogger.info('start GetCourseList-------------')
+            tmspan = timeSpan(dd.now())
+            
 
             if(request.META['REQUEST_METHOD']  == 'GET'):
                 data = request.GET
-                #pprint.PrettyPrinter(6).pprint(data)
+                theLogger.info(data)
                 page = getPage(request)
                 pagesize = getPageSize(request)
                 offset = int((page - 1) * pagesize)
                 keyword = data.get('keyword', keyword)
                 orderby = data.get('orderby', orderby)
             else:         
-                # data = eval(request.body)
-                # pprint.PrettyPrinter(4).pprint(data)
-                logger.error(request.body)
                 sbody = str(request.body,'utf-8')
                 from ast import literal_eval
                 data = literal_eval(sbody)
@@ -464,45 +461,41 @@ class  CourseViewSet(viewsets.ModelViewSet):
             else:
                 orderby = '-update_time'
 
+            theLogger.info(data)
             #查询已经购买新逻辑
             if data.get('bought', bought).lower() == 'true':
-                queryBought = True
+
+                theLogger.info('data.get(bought, bought) = %s' % data.get('bought', bought))
+                if not request.user.is_authenticated:
+                    raise Exception('user need login to query bought list')
+                    
+                qr = self.get_queryset().filter(users=request.user)
+                courseList = qr.order_by(orderby)[offset:offset + pagesize]
+                for course in courseList:
+                    course.is_buy = True
+
+                slzCourseList = CourseSerializer4API(courseList, many=True)
+                # 前端需要用来取页面 
+                return JsonResponse({'errCode': '0', 'data': slzCourseList.data,
+                                        'page': page,
+                                        'totalPage': getTotalPage(pagesize,qr.count())}, safe=False)
+
+         
             else:
-                queryBought = False
-                
-            if queryBought:
-                from churchs.models import Media
-                from church.models import Course
-                from django.db.models import Prefetch
-                if request.user.is_authenticated:
-                    queryset = request.user.courses.all().prefetch_related(Prefetch('medias',
-                                                             queryset=Media.objects.order_by('kind')))
-                    count = queryset.order_by(orderby).count()
+                #未购买逻辑
+                count = 0
+                if keyword is not None:
+                    queryset = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword))
+                    count = queryset.count()
                     courseList = queryset.order_by(orderby)[offset:offset + pagesize]
-                    for course in courseList:
-                        course.is_buy = True
-    
-                    slzCourseList = CourseSerializer4API(courseList, many=True)
-                    # 前端需要用来取页面 
-                    return JsonResponse({'errCode': '0', 'data': slzCourseList.data,
-                                         'page': page,
-                                         'totalPage': getTotalPage(pagesize,count)}, safe=False)
                 else:
-                    return JsonResponse({'errCode': '1001', 'data': None, 'msg': '没有课程列表'},
-                                        safe=False)
+                    queryset = self.get_queryset()
+                    count = queryset.count()
+                    courseList = queryset.order_by(orderby)[offset:offset + pagesize]
+            for course in courseList:
+                    course.is_buy = len(course.users.filter(id=request.user.id))>0
             
-            #未购买逻辑
-            count = 0
-            if keyword is not None:
-                queryset = self.get_queryset().filter(Q(title__contains=keyword) | Q(content__contains=keyword) | Q(description__contains=keyword) | Q(church__name__contains=keyword) | Q(teacher__name__contains=keyword) | Q(medias__title__contains=keyword) | Q(medias__content__contains=keyword))
-                count = queryset.order_by(orderby).count()
-                courseList = queryset.order_by(orderby)[offset:offset + pagesize]
-            else:
-                queryset = self.get_queryset()
-                count = queryset.order_by(orderby).count()
-                courseList = queryset.order_by(orderby)[offset:offset + pagesize]
-            
-            addSalesInfosOnList(courseList, request.user)
+            # addSalesInfosOnList(courseList, request.user)
 
             slzCourseList = CourseSerializer4API(courseList, many=True)
             # 前端需要用来取页面 
@@ -510,9 +503,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
                                  'page':page, 
                                  'totalPage':getTotalPage(pagesize,count)}, safe=False)
         except Exception as e:
-            # pprint.PrettyPrinter(4).pprint(e.__traceback__)
             import traceback
-            import sys
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
             return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
@@ -540,8 +531,6 @@ def addSalesInfosOnList(courseList,user):
         for course in courseList:
             addSalesInfosOn(course,user)
     except Exception as e:
-        import traceback
-        import sys
         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
    
 def addSalesInfosOn(course,user):
@@ -553,8 +542,6 @@ def addSalesInfosOn(course,user):
         else:
             course.is_buy = False
     except Exception as e:
-        import traceback
-        import sys
         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
 

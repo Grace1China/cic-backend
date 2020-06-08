@@ -69,6 +69,24 @@ def browse(request):
         ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
         lg.exception('There is and exceptin',exc_info=True,stack_info=True)
         return render(request, 'exception.html', ret)
+
+
+
+def com_builder(request):
+    try:
+        context = {
+            # 'show_dirs': True,#这个可能没有什么用发，目前留着
+            'xx': 1,
+      
+        }
+        lg.info(context)
+        return render(request, 'church/comp_builder.html', context)
+    except Exception as e:
+        import traceback
+        import sys
+        ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
+        lg.exception('There is and exceptin',exc_info=True,stack_info=True)
+        return render(request, 'exception.html', ret)
     
     
 

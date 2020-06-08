@@ -1,4 +1,9 @@
 {% load static %}
+{% comment %} <link rel="stylesheet" href="/static/admin/simpleui-x/elementui/theme-chalk/index.css">
+<script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
+<script type="text/javascript" src="/static/church/js/init.js"></script>
+<script type="text/javascript" src="/static/admin/simpleui-x/js/vue.min.js"></script>
+<script type="text/javascript" src="/static/admin/simpleui-x/elementui/index.js"></script> {% endcomment %}
 <div class="django-ckeditor-widget" data-field-id="{{id}}" style="display: inline-block;">
     <textarea{{ final_attrs }} data-processed="0" data-config="{{ config }}" data-external-plugin-resources="{{ external_plugin_resources }}" data-id="{{id}}" data-type="ckeditortype">{{ value }}</textarea>
 </div>

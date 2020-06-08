@@ -612,6 +612,7 @@ CKEDITOR_CONFIGS = {
             # ['FilerImage']
 
         ],
+        'fullPage':True,
         
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
         # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
@@ -645,6 +646,9 @@ CKEDITOR_CONFIGS = {
             'clipboard',
             'widgetselection', 
             'abbr',
+            'stylesheetparser',
+            'docprops',
+
             # 'filerimage',
 
 #             'a11yhelp',
