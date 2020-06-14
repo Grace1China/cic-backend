@@ -152,13 +152,20 @@ class IapVerifyReceipt(APIView):
 
             decodedJson = json.loads(content)
             jsonString = json.dumps(decodedJson)
-
             order.iap_receipt = jsonString
 
             status = decodedJson.get('status')
             if status != 0:
+                # 21000 App Store无法读取你提供的JSON数据
+                # 21002 收据数据不符合格式
+                # 21003 收据无法被验证
+                # 21004 你提供的共享密钥和账户的共享密钥不一致
+                # 21005 收据服务器当前不可用
+                # 21006 收据是有效的，但订阅服务已经过期。当收到这个信息时，解码后的收据信息也包含在返回内容中
+                # 21007 收据信息是测试用（sandbox），但却被发送到产品环境中验证
+                # 21008 收据信息是产品环境中使用，但却被发送到测试环境中验证
                 SaveWithFailed(order)
-                return JsonResponse({'errCode': '0', 'data': None, 'msg': "验证失败"}, safe=False)
+                return JsonResponse({'errCode': '1001', 'data': None, 'msg': "验证失败:" + str(status)}, safe=False)
 
             course = Course.objects.get(pk=order.course.id)
             usercourse = Users_Courses(user=request.user, course=course)
