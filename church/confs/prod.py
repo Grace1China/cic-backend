@@ -20,8 +20,8 @@ DEBUG = False
 RUNTIME = 'product'
 
 
-IAP_IS_SANDBOX = False
-PAYPAL_IS_SANEBOX = False
+IAP_IS_SANDBOX = True
+PAYPAL_IS_SANEBOX = True
 DEFAULT_CHURCH_CODE = 'ims'
 
 

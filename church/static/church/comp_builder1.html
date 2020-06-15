@@ -1,22 +1,20 @@
-{% load static i18n %}
-{% load cust_filters %}
-<!doctype html>
-<html lang="en">
-
-<head>
+<html lang="en"><head>
     <meta charset="utf-8">
     <meta name="robots" content="noindex, nofollow">
     <title>Inline editing enabled by code</title>
     <meta charset="UTF-8">
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
-    {% comment %} <script src="https://cdn.ckeditor.com/4.14.0/standard-all/ckeditor.js"></script> {% endcomment %}
-    <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
-    <script type="text/javascript" src="{% static "admin/simpleui-x/elementui/index.js" %}"></script>
-    <script type="text/javascript" src="{% static "church/js/es6-promise.auto.js" %}"></script>
-    <script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <link rel="stylesheet" href="/static/admin/simpleui-x/elementui/theme-chalk/index.css" type="text/css">
+    
+    <script type="text/javascript" src="/static/church/js/vue.js"></script>
+    <script type="text/javascript" src="/static/admin/simpleui-x/elementui/index.js"></script>
+    <script type="text/javascript" src="/static/church/js/es6-promise.auto.js"></script>
+    <script type="text/javascript" src="/static/church/js/vuex.js"></script>
+    <script type="text/javascript" src="/static/ckeditor/ckeditor/ckeditor.js"></script><style>.cke{visibility:hidden;}</style>
     <style>
+        #app{
+            height: 100vh;
+        }
         .complist{
             display: flex;
             flex-direction: column;
@@ -37,7 +35,7 @@
         .workplace{
             display: flex;
             justify-content: center;
-            
+            height: 100vh;
         }
         .col{
             margin-left:20px;
@@ -47,6 +45,12 @@
             width: 400px;
             outline: solid yellow;
         }*/
+        .comp_wrap.active{
+            position:relative;
+            outline:solid yellow;
+            outline: solid red;
+            z-index: 9;
+        }
 
     </style>
 </head>
@@ -91,16 +95,13 @@
                 <div id='dg3'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/list.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>list</div>
             </aside>
             <main class="el-main col" style="max-width: 440px;" ondrop="drop(event)" ondragover="allowDrop(event)" ref="editcolumn" >
-                <div>再来</div>
                 <div id="introduction">
-                    <h1>Inline Editor <a class="documentation" href="https://ckeditor.com/docs/ckeditor4/latest/guide/dev_inline.html">Documentation</a></h1>
-
-                    <p>
-                    <strong>Inline Editing</strong> allows you to edit any element on the page in-place. Inline editor provides a real <abbr title="What You See is What You Get">WYSIWYG</abbr> experience &quot;out of the box&quot;, because unlike in <a href="./classic.html">classic editor</a>, there is no <code>&lt;iframe&gt;</code> element surrounding the editing area. The CSS styles used for editor content are exactly the same as on the target page where this content is rendered!
-                    </p>
+                    <p>xxx</p>
                 </div>
             </main>
-            <aside class="el-aside col" style="max-width: 300px;;min-width:300px" >Aside
+            <aside class="el-aside col" style="max-width: 300px;;min-width:300px" >
+                删除组件
+                数据源
             </aside>
         </section>
         
@@ -133,44 +134,61 @@
             handleCompClick(e){
                 console.log(e)
             },
-            addCarousel (comp_id) {
+            addCarousel(createElement){
+                return Array.apply(null, { length: 1 }).map(function (v,i) {
+                    return createElement(
+                        'el-carousel',
+                        {
+                            style: {
+                                width:'400px',
+                            },
+                            attrs:{
+                                height: '225px',
+                            },
+                        },
+                        Array.apply(null, { length: 4 }).map(function (v,i) {
+                            return createElement('el-carousel-item', 
+                                {key:'key'+i},
+                                [createElement('img',
+                                    { 
+                                        attrs: {
+                                            src:'https://api.bicf.org/mediabase/citychurch/default/88b8a112-a24e-2a0d-a2a2-a1d1fdc288bf',
+                                        },
+                                        style: {
+                                            height: '100%',
+                                            width:'100%',
+                                        },
+                                    },
+                                    'key'+i)
+                                ]
+                            )
+                        })
+                    ) 
+                })
+            },
+            addWrap (comp_id) {
                 vm = this
                 // 创建组件逻辑
                 let comp = Vue.extend({
                     // 向界面渲染的dom方法。
                     render (createElement) {
                         return createElement(
-                            'el-carousel',
+                            'div',
                             {
                                 style: {
                                     width:'400px',
                                 },
                                 attrs:{
                                     height: '225px',
+                                    id:`${comp_id}_draged`,
+                                    class:'comp_wrap'
                                 },
-                                id:`${comp_id}_draged`,
                                 on: {
-                                    'click':function(){console.log('-----------')}
+                                    'click':this.onWrapClick
                                 },
                             },
-                            Array.apply(null, { length: 4 }).map(function (v,i) {
-                                return createElement('el-carousel-item', 
-                                    {key:'key'+i},
-                                    [createElement('img',
-                                        { 
-                                            attrs: {
-                                                src:'https://api.bicf.org/mediabase/citychurch/default/88b8a112-a24e-2a0d-a2a2-a1d1fdc288bf',
-                                            },
-                                            style: {
-                                                height: '100%',
-                                                width:'100%',
-                                            },
-                                        },
-                                        'key'+i)
-                                    ]
-                                )
-                            })
-                        );
+                            vm.addCarousel(createElement)
+                        )
                     },
                     methods: {
                         onCloseClick () {
@@ -179,7 +197,26 @@
                             // 然后将删除标签事件暴露除去
                             //this.$emit("delete", this.text);
                         },
-                        onClick(e){
+                        onWrapClick(e){
+                            console.log('---------------------------')
+                            //当用点击时，outline高亮，并显示删除键
+                            comp_wraps = document.getElementsByClassName('comp_wrap')
+                            for(var i = 0; i < comp_wraps.length-1; i++){
+                                if(this.$el != comp_wraps[i]){
+                                    console.log(comp_wraps[i].classList)
+                                    comp_wraps[i].classList.remove('active')
+                                    comp_wraps[i].style.zIndex='0'
+                                    console.log(comp_wraps[i].classList)
+                                }
+                            }
+                            if (this.$el.classList.contains('active')){
+                                this.$el.classList.remove('active')
+                                this.$el.style.zIndex='0'
+                            }else{
+                                this.$el.classList.add('active')
+                                this.$el.style.zIndex='9'
+                            }
+                            console.log(this.$el)
                             console.log(e)
                         },
                     },
@@ -192,9 +229,8 @@
                 return new comp();
             },
             initComp (comp_id) {
-                let comp = this.addCarousel(comp_id);
+                let comp = this.addWrap(comp_id);
                 // 添加删除监听
-                //tag.$on("delete", this.onTagDelete);
                 // 挂载组件，即创建虚拟dom。
                 comp.$mount();
                 // 将组件添加到显示tag的div里面

@@ -255,3 +255,41 @@ class MediaBaseWidget(TextInput):
         theLogger.info(mark_safe(render_to_string( 'admin/media-select.tpl',ctx)))
         return mark_safe(render_to_string( 'admin/media-select.tpl',ctx))
 
+
+class MediaContentField(Field):
+    def __init__(self, *args, **kwargs):
+        self.widget = MediaContentField(label=kwargs.get('verbose_name', None))
+        super(MediaContentField, self).__init__(*args, **kwargs)
+
+    def get_internal_type(self):
+        return 'TextField'
+
+    def formfield(self, *args, **kwargs):
+        kwargs['widget'] = self.widget
+        return super(MediaContentField, self).formfield(*args, **kwargs)
+
+
+class MediaContentWidget(TextInput):
+    class Media:
+        pass
+
+    def __init__(self, *args, **kwargs):
+        self.label = kwargs.pop('label', None)
+        self.typ = kwargs.pop('typ', None)
+        self.cover = kwargs.pop('cover', None)
+
+
+        super(MediaContentWidget, self).__init__(*args, **kwargs)
+
+
+    def render(self, name, value, **kwargs):
+        ctx = {
+            'typ':self.typ,
+            'label':self.label,
+            'name':name,
+            'value':'' if value is None else value,
+            'cover':'' if self.cover is None else self.cover,
+        }
+        # theLogger.info(mark_safe(render_to_string( 'admin/content-select.tpl',ctx)))
+        return mark_safe(render_to_string( 'admin/content-select.tpl',ctx))
+

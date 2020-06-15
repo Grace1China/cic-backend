@@ -36,7 +36,7 @@ class MediaVideoForm_del(forms.ModelForm):
             # self.fields['creator'].choices=CustomUser.objects.filter(id=self.initial['creator']).values_list('id','email')
             # self.fields['church'].choices=Church.objects.filter(id=self.initial['church']).values_list('id','name')
 
-class MediaVideoForm(forms.ModelForm):
+class MediaVideoForm_del(forms.ModelForm):
   
     alioss_video = forms.CharField(label="",widget=MediaBaseWidget(label='视频',typ='videos'),required=False)
     alioss_image = forms.CharField(label="",widget=MediaBaseWidget(label='封面',typ='images'),required=False)

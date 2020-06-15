@@ -81,29 +81,9 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
         raise e
 pre_save.connect(create_oss_dir, sender=SermonSeries)
 
-class ContentColumn(models.Model):
-    church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
-    title = models.CharField(max_length=250, default='',verbose_name='标题')
-    # res_path = models.CharField(max_length=250, default='',blank=True,verbose_name='资源路径')
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
-    STATUS_OPEN = 1
-    STATUS_CLOSE = 2
 
-    STATUS_CHOICES = (
-        (STATUS_OPEN, '在线'),
-        (STATUS_CLOSE, '下线')
-    )
-    status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_CLOSE,verbose_name='状态')
 
-    class Meta:
-        verbose_name = "内容专栏"
-        verbose_name_plural = "内容专栏"
-
-    def __str__(self):
-        return '%s' % (self.title)
+    
 
 
 
@@ -153,8 +133,9 @@ class Media(models.Model):
     MEDIA_COURSE = 5
     MEDIA_VIDEOS = 6
     MEDIA_AUDIOS = 7
-    MEDIA_PDFS = 8
-    MEDIA_OTHER = 9
+    MEDIA_TUWEN = 8
+    MEDIA_PDFS = 9
+    MEDIA_OTHER = 10
 
 
     MEDIA_KIND = (
@@ -165,6 +146,7 @@ class Media(models.Model):
     (MEDIA_COURSE,'课程'),
     (MEDIA_VIDEOS,'视频'),
     (MEDIA_AUDIOS,'音频'),
+    (MEDIA_AUDIOS,'图文'),
     (MEDIA_PDFS,'PDF'),
     (MEDIA_OTHER,'其它'),
     )
@@ -182,10 +164,18 @@ class Media(models.Model):
     object_id = models.PositiveIntegerField(null=True, blank=True)
     content_object = GenericForeignKey("content_type", "object_id")
 
+    column = models.ManyToManyField('ContentColumn',through='ColumnMedias')
+
 
 
     kind = models.IntegerField(choices=MEDIA_KIND,default=MEDIA_SERMON,verbose_name='媒体种类')
     title = models.CharField(max_length=120, blank=True,verbose_name='标题')  
+
+    church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
 
     s3_video = S3DirectField(dest='videos', blank=True,verbose_name='视频')
     s3_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='S3媒体状态')
@@ -516,11 +506,61 @@ class Media(models.Model):
     
 
     class Meta:
-        verbose_name = "视听媒体"
-        verbose_name_plural = "视听媒体"
+        verbose_name = "内容"
+        verbose_name_plural = "内容"
 
     def __str__(self):
         return '%s' % (self.title)
+
+ 
+class ContentColumn(models.Model):
+    church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
+    title = models.CharField(max_length=250, default='',verbose_name='标题')
+    # res_path = models.CharField(max_length=250, default='',blank=True,verbose_name='资源路径')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
+    STATUS_OPEN = 1
+    STATUS_CLOSE = 2
+
+    STATUS_CHOICES = (
+        (STATUS_OPEN, '在线'),
+        (STATUS_CLOSE, '下线')
+    )
+    status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_CLOSE,verbose_name='状态')
+    # medias = GenericRelation(Media, related_query_name='ContentColumn',verbose_name='内容')
+    medias = models.ManyToManyField(Media,through='ColumnMedias')
+
+    class Meta:
+        verbose_name = "内容专栏"
+        verbose_name_plural = "内容专栏"
+
+    def __str__(self):
+        return '%s' % (self.title)
+
+from django.db.models.signals import pre_delete
+
+class ColumnMedias(models.Model):
+    ContentColumn = models.ForeignKey(ContentColumn,null=True, on_delete=models.CASCADE)
+    Media = models.ForeignKey(Media,null=True, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "专栏内容列表"
+        verbose_name_plural = "专栏内容列表"
+
+    def __str__(self):
+        return 'ContentColumn:%s -> Media:%s' % (self.ContentColumn,self.Media)
+
+# def ContentColumn_changed(sender, **kwargs):
+#     # Do something
+#     # pass
+#     theLogger.info('--------------ContentColumn_changed---------------')
+#     theLogger.info(sender)
+#     theLogger.info(kwargs)
+
+
+# pre_save.connect(ContentColumn_changed, sender=ContentColumn) 这种方式，可能不能实现防止级连删除的功能
 
 
 from church.alioss_storage_backends_v2 import AliyunMediaStorage,AliyunStaticStorage
