@@ -1,0 +1,97 @@
+{% load i18n static  %}
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+<link rel="stylesheet" href="{% static 'church/css/video-js.css' %}">
+<script type="text/javascript" src="{% static "church/js/videojs-ie8.min.js" %}"></script>
+
+
+{% comment %} <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}"> {% endcomment %}
+<style>
+    .cover{
+        z-index: 1;
+        background-position: 57%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .video-js{
+        object-fit: fill;
+    }
+
+    .contentblock p{
+        margin:0px;
+    }
+    .sticky{
+        position: fixed;
+        top: 0px;
+        left: 50%;
+        transform: translate(-50%, 0px);
+    }
+</style>
+</head>
+<body class ="wechatpromt">
+
+
+
+<div class="container" style="min-height: 937px;display: flex;justify-content: center;">
+    <div class="page-detail" style="width: 540px;">
+        <div class="topblock">
+        </div>
+        {% if media %}
+            <div class="headblock">
+                <div class="sticky">
+                    <video
+                        id="lx-video"
+                        class="video-js"
+                        controls
+                        width="540"
+                        height="303"
+                        poster="{{ media.cover }}"
+                        data-setup="{}"
+                    >
+                        <source src="{{ media.video }}" type="video/mp4" />
+                        <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a
+                        web browser that
+                        <a href="https://videojs.com/html5-video-support/" target="_blank"
+                            >supports HTML5 video</a
+                        >
+                        </p>
+                    </video>
+                </div>
+            </div>
+            <div class="contentblock">
+                {{ media.content|safe }}
+            </div>
+        {% else %}
+            <p>No info found now.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+<script>
+
+if(document.getElementsByTagName('wechatpromt').length>0){
+    if(document.getElementsByTagName('video').length>0){
+        document.getElementsByTagName('video')[0].classList.add('fixtop')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('webkit-playsinline','webkit-playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('x5-playsinline','x5-playsinline')
+    }
+}
+
+
+window.onresize = function(){
+    /*console.log('re')
+    vh = document.getElementsByTagName('video').length>0?document.getElementsByTagName('video')[0].offsetHeight:0
+    container_v = document.getElementsByClassName('ckeditor-html5-video').length>0 ? document.getElementsByClassName('ckeditor-html5-video')[0]:{}
+    container_v.style.height=vh*/
+}
+</script>
+</html>

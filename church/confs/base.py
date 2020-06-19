@@ -127,6 +127,8 @@ TEMPLATES = [
     },
 ]
 
+
+
 WSGI_APPLICATION = 'church.wsgi.application'
 
 SWAGGER_SETTINGS = {
@@ -612,7 +614,7 @@ CKEDITOR_CONFIGS = {
             # ['FilerImage']
 
         ],
-        'fullPage':True,
+        # 'fullPage':True,
         
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
         # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
@@ -647,7 +649,7 @@ CKEDITOR_CONFIGS = {
             'widgetselection', 
             'abbr',
             'stylesheetparser',
-            'docprops',
+            # 'docprops',
 
             # 'filerimage',
 

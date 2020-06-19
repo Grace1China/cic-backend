@@ -1,3 +1,6 @@
+document.write("<script type='text/javascript' src='/static/church/js/axios.min.js'></script>");
+document.write("<script type='text/javascript' src='/static/church/js/videojs-ie8.min.js'></script>");
+
 async function getImages (context,par) {
   /*
   取各种媒体对象  type 是种类，page是第几页面1-based page number，series是系列的路径
@@ -112,6 +115,22 @@ function getObjByKey(context,options) {
   });
 }
 
+function deleteContent(context,options){
+  return new Promise((resolve, reject) =>{        
+    console.log(`deleteContent=============`)
+    console.log(options)
+    host = store.getters.getHost()
+    axios.get(`http://${host}/rapi/delete_content`,{params: { 'columnid':options.columnid ,'contentid':options.contentid}}).then(function (res) {
+        console.log(res)
+        resolve(res)
+    })
+    .catch(function (err) {
+      console.log(err)
+      reject(err)
+    });
+  }); 
+}
+
 // async function getObjByKey (context,par) {
 //   host = document.location.host
 //   console.log(`getObjByKey=============`)
@@ -163,6 +182,7 @@ const store = new Vuex.Store({
       upload2oss,
       getOssToken,
       getObjByKey,
+      deleteContent,
       // check_url,
       
     }

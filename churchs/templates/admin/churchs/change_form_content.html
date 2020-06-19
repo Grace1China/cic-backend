@@ -373,7 +373,14 @@
 
             },
             methods:{
-                
+                deleteContent:function(columnid,contentid){
+                    vm = this
+                    this.$store.dispatch('deleteContent',{'columnid':columnid,'contentid':contentid}).then(function(rsp){
+                        console.log(rsp)
+                    }).catch(function(err){
+                        console.log(err)
+                    })
+                },
                 invokeMediaBrowse:function(e) {
                     console.log(e)
                     console.log(e.target)
@@ -509,7 +516,7 @@
                     window.location.href = url;
                 },
                 formSubmit: function (name, v, e) {
-                    console.log('-----------formSubmit--------')
+                    console.log(`-----------formSubmit----name:${name}-v:${v}-e:${e}--`)
                     $("#actionName").attr('name', name).val(v);
                     $("form").submit();
                 },

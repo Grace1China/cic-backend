@@ -147,11 +147,11 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			var imgs= document.getElementById('myiframe').contentDocument.querySelectorAll('.el-checkbox.is-checked .mediadata')
 			console.log(imgs)
 
-			if (window.XMLHttpRequest) { // Mozilla, Safari, IE7+ ...
-				httpRequest = new XMLHttpRequest();
-			} else if (window.ActiveXObject) { // IE 6 and older
-				httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
-			}
+			// if (window.XMLHttpRequest) { // Mozilla, Safari, IE7+ ...
+			// 	httpRequest = new XMLHttpRequest();
+			// } else if (window.ActiveXObject) { // IE 6 and older
+			// 	httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+			// }
 
 			// //使用JS最基础的getElementById找到我们的iframe控件，然后再获取id为username的控件
 			// html = html + "<h2>" + your_name.value + ": </h2>";
@@ -192,16 +192,16 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 				}
 				console.log(html)
 			})
-			let xhr = new XMLHttpRequest();
-			// var subs = undefined
-			xhr.open("GET", "http://localhost:8000/blog/tuwen/8", false);
-			xhr.onload = function() {
-				s = xhr.response.indexOf('<body>')+6
-				e = xhr.response.indexOf('</body>')
-				subs = xhr.response.substrig(s,e)
-				html = html + subs
-			}
-			xhr.send();
+			// let xhr = new XMLHttpRequest();
+			// // var subs = undefined
+			// xhr.open("GET", "http://localhost:8000/blog/tuwen/8", false);
+			// xhr.onload = function() {
+			// 	s = xhr.response.indexOf('<body>')+6
+			// 	e = xhr.response.indexOf('</body>')
+			// 	subs = xhr.response.substrig(s,e)
+			// 	html = html + subs
+			// }
+			// xhr.send();
 			// var sel = editor.getSelection();
 			// var range = sel.getRanges()[0];
 
@@ -211,9 +211,9 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			// range.selectNodeContents( editor.editable() );
 			// sel.selectRanges( [ range ] );
 			// }
-			if (imgList.length > 1 ){
-				html = makeCarousel(imgList)
-			}
+			// if (imgList.length > 1 ){
+			// 	html = makeCarousel(imgList)
+			// }
 			editor.insertHtml(html);
 			this.commitContent();
 		},

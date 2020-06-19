@@ -559,6 +559,63 @@ from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models.fields import CharField
 
+@api_view(['GET'])
+def delete_content(request,path=''):
+    '''
+    删除column下的某一个内容
+    '''
+    theLogger.info(path)
+    ret = {'errCode': '0'}
+    try:
+        if request.method == 'GET':
+            # data = request.data
+            # key = data.get('key', '')
+            if path != '':
+                # {"model":"Sermon","field":'id',"value":"1"}
+                theLogger.info(path)
+                import json
+                path = unquote(path)
+                theLogger.info(path)
+                path = eval(path)
+
+                path = json.loads(path)
+                theLogger.info(path)
+
+                import ast
+                model = eval(path['model'])
+                
+                qry = 'SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model'].lower()),path['filter'],('"%s"' % path['filter_v'] if  isinstance(model._meta.get_field(path['filter']),CharField) else path['filter_v']))
+                inst1 = model.objects.raw(qry)
+                 
+
+                theLogger.info(inst1)
+                theLogger.info(inst1[0].id)
+
+
+                from rest_framework import serializers
+
+                Meta = type('Meta', (object,), dict(model=model, fields='__all__'))
+                theSerializer = type('theSerializer', (serializers.ModelSerializer,), dict(Meta=Meta))
+                thesz = None
+                if len(inst1) == 1 :
+                    thesz = theSerializer(inst1[0])
+                else:
+                    thesz = theSerializer(inst1,many=True)
+
+                ret = {'errCode': '0','msg':'success','data':thesz.data}
+
+                # >>> inst1 = model.objects.raw('SELECT * FROM %s WHERE %s = %s' % ('%s_%s' % (model.__dict__['__module__'].split('.')[0],path['model']),path['field'],path['value']))
+
+            else:
+                raise Exception('key must not null.')   
+    except Exception as e:
+        import traceback
+        import sys
+        ret = {'errCode': '1001', 'msg': 'there is an exception check logs'}
+        theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+    finally:
+        return JsonResponse(ret, safe=False)
+
 # @api_view(['GET'])
 # @permission_classes([CICUtill.getPermissionClass()])
 # def getinfo(request,path=''):

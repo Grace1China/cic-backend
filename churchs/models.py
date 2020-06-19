@@ -20,6 +20,22 @@ from church.confs.base import get_ALIOSS_DESTINATIONS
 import logging 
 theLogger = logging.getLogger('church.all')
 
+
+class Speaker(models.Model):
+    # church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
+    churchs = models.ManyToManyField(to=Church,default=None,  blank=True,verbose_name='教会')
+    name = models.CharField(max_length=32)
+    title = models.CharField(max_length=32)
+    introduction = models.CharField(max_length=255)
+    profile = AliMediaField(max_length=255,null=True,verbose_name='照片')
+    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
+    class Meta:
+        verbose_name = "讲员"
+        verbose_name_plural = "讲员"
+    def __str__(self):
+        return '%s' % (self.name)
+
 class test1(models.Model):
     image = MediaBaseField(max_length=400,blank=True,verbose_name='封面')
 
@@ -80,12 +96,6 @@ def create_oss_dir(sender,instance,update_fields,**kwargs):
         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
         raise e
 pre_save.connect(create_oss_dir, sender=SermonSeries)
-
-
-
-    
-
-
 
 
 class MediaFile(models.Model):
@@ -172,10 +182,11 @@ class Media(models.Model):
     title = models.CharField(max_length=120, blank=True,verbose_name='标题')  
 
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='创建者')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    
+
+    speaker = models.ForeignKey(Speaker,on_delete=models.CASCADE,null=True,default=None,verbose_name='讲员')
 
     s3_video = S3DirectField(dest='videos', blank=True,verbose_name='视频')
     s3_video_status = models.IntegerField(choices=MEDIA_STATUS,default=STATUS_NONE,verbose_name='S3媒体状态')
@@ -201,6 +212,7 @@ class Media(models.Model):
     # alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
     alioss_image = models.CharField(max_length=400,blank=True,verbose_name='封面')
     alioss_pdf = models.CharField(max_length=400,blank=True,verbose_name='讲义')
+    
     
     content = RichTextUploadingField(blank=True,verbose_name='摘要',external_plugin_resources=[('html5video',
     '/static/ckeditor/ckeditor/plugins/html5video/',
@@ -673,20 +685,7 @@ class Donation(models.Model):
 
 
 
-class Speaker(models.Model):
-    # church = models.ForeignKey(Church, on_delete=models.CASCADE,blank=True,null=True,verbose_name='教会')
-    churchs = models.ManyToManyField(to=Church,default=None,  blank=True,verbose_name='教会')
-    name = models.CharField(max_length=32)
-    title = models.CharField(max_length=32)
-    introduction = models.CharField(max_length=255)
-    profile = AliMediaField(max_length=255,null=True,verbose_name='照片')
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
-    class Meta:
-        verbose_name = "讲员"
-        verbose_name_plural = "讲员"
-    def __str__(self):
-        return '%s' % (self.name)
+
 
 
 class Meeting(models.Model):
