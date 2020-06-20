@@ -506,7 +506,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             import traceback
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
 
-            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
+            return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
     @action(detail=True,methods=['POST'], format="json")
@@ -518,6 +518,7 @@ class  CourseViewSet(viewsets.ModelViewSet):
             course = self.get_queryset().filter(id=pk).order_by('-update_time')[0]
 
             addSalesInfosOn(course, request.user)
+            # course.is_buy = len(course.users.filter(id=request.user.id)) > 0
             slzCourse = CourseSerializer4API(course)
             return JsonResponse({'errCode': '0', 'data': slzCourse.data}, safe=False)
         except Exception as e:
@@ -532,7 +533,7 @@ def addSalesInfosOnList(courseList,user):
             addSalesInfosOn(course,user)
     except Exception as e:
         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-   
+
 def addSalesInfosOn(course,user):
     # course表自带sales_num，不再查询关联表了。用于orderby。
     # course.sales_num = course.users.all().count
