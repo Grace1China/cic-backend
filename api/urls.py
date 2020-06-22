@@ -63,6 +63,7 @@ lorddayinfolist = SermonListViewSet.as_view({'get':'GetLordsDayInfoList'})
 lorddayinfoByID = SermonViewOneSet.as_view({'get':'GetLordsDayInfoByID'})
 
 delete_content_of_column = Column_Content_ViewSet.as_view({'get':'delete_content_of_column'})
+ccolList=Column_Content_ViewSet.as_view({'get':'ccolList'})
 
 urlpatterns = [
     # path("user_getInfo/<str:email>",csrf_exempt(user_getInfo),name="user_getInfo"),
@@ -109,8 +110,8 @@ urlpatterns = [
     path('search_course',search_course,name='search_course'),
     path('oss_object_exists/<path:key>',alioss_directup_views.oss_object_exists,name='oss_object_exists'),
     path('get_media_by_key',never_cache(staff_member_required(get_media)),name='get_media_by_key'),
-    path('delete_content',never_cache(staff_member_required(delete_content_of_column)),name='delete_content'),
-
+    path('delete_content',never_cache(staff_member_required(delete_content_of_column)),name='delete_content'),#删除内容专栏的内容
+    path('ccolList',never_cache(staff_member_required(ccolList)),name='ccolList'),
     
  
 ]

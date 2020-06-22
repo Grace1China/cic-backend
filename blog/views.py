@@ -21,6 +21,7 @@ def index(request,pk=0):
     sm = queryset.get(id=pk)
     theLogger.info(sm)
     sz = SermonSerializer4API(sm)
+    theLogger.info(sz.data)
     sermoninfo = sz.data['medias'][0]['content']
     template = loader.get_template('blog/premote.html')
     context = {
@@ -76,6 +77,42 @@ def media(request,pk=0):
         template = loader.get_template('blog/media.html')
         context = {
             'media': mediaDict,
+        }
+        return HttpResponse(template.render(context, request))
+    except Exception as e:
+            theLogger.exception("there is an exception",exc_info=True,stack_info=True)
+            raise e
+
+
+from rest_framework import serializers
+from churchs.models import ContentColumn,Media
+from api.serializers import MediaSerializer4ListAPI
+class CColSerializer(serializers.ModelSerializer):
+    medias = MediaSerializer4ListAPI(many=True, read_only=True)
+    class Meta:
+        model = ContentColumn
+        fields = '__all__'
+
+class MediasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = '__all__'
+
+def column_content_medias(request,pk=0):
+    try:
+        # return HttpResponse("Hello, world. You're at the polls index.")
+        # from api.serializers import SermonSerializer4API, MediaSerializer4API
+        # from churchs.models import Media
+        # from django.db.models import Prefetch
+        # # queryset=Sermon.objects.all()
+        ccol = ContentColumn.objects.get(id=pk)
+        CColsz = CColSerializer(ccol)
+        # ccolDict = {
+        #    'data':CColsz.data
+        # }
+        template = loader.get_template('blog/ccol.html')
+        context = {
+            'ccol': CColsz.data,
         }
         return HttpResponse(template.render(context, request))
     except Exception as e:

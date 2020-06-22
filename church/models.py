@@ -11,6 +11,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 # from filer.fields.image import FilerImageField
 # from filer.fields.file import FilerFileField
 from church.alioss_storage_backends_v2 import AliyunMediaStorage,AliyunStaticStorage
+from church.confs.base import get_ALIOSS_DESTINATIONS
 
 class Church(models.Model):
     STATUS_INITED = 1
@@ -43,6 +44,21 @@ class Church(models.Model):
     def __str__(self):
         return '%s' % (self.name)
 
+
+    @property
+    def fullpath_giving_qrcode(self):
+        retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'images')['redirecturl'],self.giving_qrcode)
+        return retval 
+
+    @property
+    def fullpath_promot_cover(self):
+        retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'images')['redirecturl'],self.promot_cover)
+        return retval 
+    
+    @property
+    def fullpath_promot_video(self):
+        retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'videos')['redirecturl'],self.promot_video)
+        return retval 
 
         
 class Course(models.Model):

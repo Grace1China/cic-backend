@@ -131,18 +131,21 @@ function deleteContent(context,options){
   }); 
 }
 
-// async function getObjByKey (context,par) {
-//   host = document.location.host
-//   console.log(`getObjByKey=============`)
-//   console.log(options)
-//   host = store.getters.getHost()
-//   axios.get(`http://${host}/rapi/get_media_by_key`,{params: { 'typ':options.typ ,'key':options.key}}).then(function (res) {
-//       console.log(res)
-//   })
-//   .catch(function (err) {
-//     console.log(err)
-//   });
-// }
+function ccolList(context,options){
+  return new Promise((resolve, reject) =>{        
+    console.log(`ccolList=============`)
+    console.log(options)
+    host = store.getters.getHost()
+    axios.get(`http://${host}/rapi/ccolList`,{params: { }}).then(function (res) {
+        console.log(res)
+        resolve(res)
+    })
+    .catch(function (err) {
+      console.log(err)
+      reject(err)
+    });
+  }); 
+}
 
 const store = new Vuex.Store({
     state: {
@@ -183,7 +186,7 @@ const store = new Vuex.Store({
       getOssToken,
       getObjByKey,
       deleteContent,
-      // check_url,
+      ccolList,
       
     }
   })

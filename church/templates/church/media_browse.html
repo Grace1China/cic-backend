@@ -133,11 +133,13 @@
             .el-upload .el-upload--picture-card{
             
             }
+
+            
             
         </style>
     </head>
     <body>
-        <el-container id="page">
+        <el-container id="page" style="visibility:hidden" ref="vuepage">
             <el-header>
                 <div class="toolbar">
                     <el-select 
@@ -485,428 +487,434 @@
         <script type="text/javascript" src="{% static "church/js/qrcode.min.js" %}"></script>
 
         <script>
-            Vue.config.delimiters = ["[[", "]]"];
-            Vue.component('hovercard', {
-                //props: ['value'],
-               
-                data: function () {
-                    return {
-                        hover: false,
-                    }
-                },
-                template: `
-                    <div
-                        @mouseover="hover = true"
-                        @mouseleave="hover = false"
-                        :class="{hover:hover}"
-                        :style="{width: '100%', minWidth: '124px'}"
-                    >
-                        <slot/>
-                    </div>
-                `
-            })
+            window.onload=function setupVue(){
+                Vue.config.delimiters = ["[[", "]]"];
+                Vue.component('hovercard', {
+                    //props: ['value'],
+                
+                    data: function () {
+                        return {
+                            hover: false,
+                        }
+                    },
+                    template: `
+                        <div
+                            @mouseover="hover = true"
+                            @mouseleave="hover = false"
+                            :class="{hover:hover}"
+                            :style="{width: '100%', minWidth: '124px'}"
+                        >
+                            <slot/>
+                        </div>
+                    `
+                })
 
-            Vue.component('hoveralter', {
-                //props: ['value'],
-               
-                data: function () {
-                    return {
-                        hover1: false,
-                    }
-                },
-                template: `
-                    <div
-                        @mouseover="hover1 = true"
-                        @mouseleave="hover1 = false"
-                        :style="{width: '100%', minWidth: '124px'}"
-                    >
-                        <div v-show="hover1" style="">
-                            <slot name="full"></slot>
+                Vue.component('hoveralter', {
+                    //props: ['value'],
+                
+                    data: function () {
+                        return {
+                            hover1: false,
+                        }
+                    },
+                    template: `
+                        <div
+                            @mouseover="hover1 = true"
+                            @mouseleave="hover1 = false"
+                            :style="{width: '100%', minWidth: '124px'}"
+                        >
+                            <div v-show="hover1" style="">
+                                <slot name="full"></slot>
+                            </div>
+                            <div v-show="!hover1">
+                                <slot></slot>
+                            </div>
                         </div>
-                        <div v-show="!hover1">
-                            <slot></slot>
-                        </div>
-                    </div>
-                `
-            })
-            var app = new Vue({
-                el: '#page',
-                data () {
-                    return {
-                        church:'{{ churchcode }}',
-                        curdir: 'default',
-                        activeTab: '{{ type }}',
-                        dialogImageUrl: '',
-                        dialogVisible: false,
-                        errorDisplay:'none',
-                        errorMsg:'',
-                        filePrepared:false,
-                        progressPercent:0,
-                        fileArr:[],
-                        page:{
-                            'images':1,
-                            'videos':1,
-                            'audios':1,
-                            'pdfs':1
+                    `
+                })
+                var app = new Vue({
+                    el: '#page',
+                    data () {
+                        return {
+                            church:'{{ churchcode }}',
+                            curdir: 'default',
+                            activeTab: '{{ type }}',
+                            dialogImageUrl: '',
+                            dialogVisible: false,
+                            errorDisplay:'none',
+                            errorMsg:'',
+                            filePrepared:false,
+                            progressPercent:0,
+                            fileArr:[],
+                            page:{
+                                'images':1,
+                                'videos':1,
+                                'audios':1,
+                                'pdfs':1
+                            },
+                            loading:false,
+                            ALIOSS_DESTINATIONS:JSON.parse(`{{ ALIOSS_DESTINATIONS|safe }}`),
+                            checkedImages:[],
+                            checkedImages1:[],
+                            searchkey:''
+
+                        }
+                    },
+                    computed: {
+                        count() {
+                            return store.state.count
                         },
-                        loading:false,
-                        ALIOSS_DESTINATIONS:JSON.parse(`{{ ALIOSS_DESTINATIONS|safe }}`),
-                        checkedImages:[],
-                        checkedImages1:[],
-                        searchkey:''
-
-                    }
-                },
-                computed: {
-                    count() {
-                        return store.state.count
+                        images(){
+                            return store.state.images||[]
+                        },
+                        totalmedia(){
+                            return store.state.totalmedia||0
+                        },
                     },
-                    images(){
-                        return store.state.images||[]
+                    store,
+                    created:function(){
+                        typ = this.getQueryVariable('type')
+                        this.showFiles(typ,this.curdir,1)
                     },
-                    totalmedia(){
-                        return store.state.totalmedia||0
-                    },
-                },
-                store,
-                created:function(){
-                    typ = this.getQueryVariable('type')
-                    this.showFiles(typ,this.curdir,1)
-                },
-                mounted: function (){
-                    //this.showImages(this.curdir)
-                    
-                },
-                filters: {
-                    shortname: function (value) {
-                        if (!value) return ''
-                        value = value.toString()
-                        fn_arr = value.split('.')   //["", "mp4"]
-                        
-                        return (fn_arr[0].length > 10) ? `${fn_arr[0].substring(0,10)}...${fn_arr[1]}` : value
-                    },
-                    shorttitle: function (value) {
-                        if (!value) return ''
-                        value = value.toString()
-                        //fn_arr = value.split('.')   //["", "mp4"]
-                        
-                        return (value.length > 12) ? `${value.substring(0,12)}...` : value
-                    }
-                },
-                methods:{
-                    hasTransCodeFile(file){
+                    mounted: function (){
+                        //this.showImages(this.curdir)
+                        this.$refs.vuepage.$el.style.visibility = 'visible'
+                        console.log(this.$refs.vuepage.$el.style.visibility)
                         
                     },
-                    checkij(value,ev){
-                        console.log(`${value}-${ev}`)
-                    },
-                    mediaReturn(o){
-                        console.log('-----mediaReturn-----------')
-                        console.log(this.images)
-                        arr = this.checkedImages[0].split('-')
-                        index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
-                        from = this.getQueryVariable('from')
-                        o = this.images[index]
-                        window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
-                        window.close()
-                    },
-                    winClose(){
-                        window.close()
-                    },
-                    getQueryVariable(variable){
-                        var query = window.location.search.substring(1);
-                        var vars = query.split("&");
-                        for (var i=0;i<vars.length;i++) {
-                                var pair = vars[i].split("=");
-                                if(pair[0] == variable){return pair[1];}
-                        }
-                        return(false);
-                    },
-                   
-                    isShow:function(typ='images'){
-                        if (this.getQueryVariable('from')=='ckeditor' || this.getQueryVariable('from')=='admin' ){
-                            return true
-                        }else{
-                            return this.getQueryVariable('type') == typ
-                        }
-                    },   
-                    isFromCtrl:function(){
-                        console.log(this.getQueryVariable('from'))
-                        if (this.getQueryVariable('from').indexOf('admin')>=0 || this.getQueryVariable('from').indexOf('ckeditor')>=0){
-                            return false
-                        }else{
-                            return true
-                        }
-                    },                 
-                    theImage(i,j){
-                        return (store.state.images||[])[(i-1)*6 + j-1]||{}
-                    },
-                    pageChange:function(page){
-                        console.log(`--------pageChange(${page})----------------`)
-                        this.showFiles(this.activeTab,this.curdir,page,{'search':this.searchkey})
-                    },
-                    next:function(){
-                        //当没有18个图片的时候，说明就结束了
-                        console.log('------next------')
-                        this.page[this.activeTab] = (++this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
-                        this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
-                    },
-                    prev:function(){
-                        this.page[this.activeTab] = (--this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
-                        this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
-                    },
-                    goTab(page){
-                        this.activeTab = page
-                    },
-                    onSeriesChange:function(sereis){
-                        if (sereis == 'upload') {return}
-                        this.showFiles(this.activeTab,sereis,this.page[this.activeTab])
-                    },
-                    showFiles:function(type,series,page,extra){
-                        /*
-                        page 是从1开始的。有delfilekey，删除的文件key,在删除后，从新查找的逻辑
-                        */
-                        //delfilekey=undefined,searchkey=undefined
-                        extra = extra||{}
-                        vm = this
-                        vm.loading = true
-                        store.dispatch('getImages',{'type':type,'series':series,'page':page,'delfilekey':extra.delete,'searchkey':extra.search}).then(function(){
-                            vm.$forceUpdate()
-                            vm.loading = false
-                        })
-                    },
-                    handleClick(tab, event) {
-                        console.log(tab, event)
-                        console.log(`-----------this.activeTab -------${this.activeTab}----`)
-                   
-                        this.loading = true
-                        this.activeTab = tab.name
-                        this.showFiles(tab.name,this.curdir,this.page.image)
-                        this.checkedImages = []
-                    },
-                    onbeforeUpload(file){
-                        console.log('--------onbeforeUpload----------')
-                        console.log(file)
-                    },
-                    onprogress(e, rawFile,fileList){
-              
-                        this.fileArr = fileList
-                        this.fileArr.forEach(item=>{
-                            if (item.percentage == 100) {
-
-                            } else {
-                                item.progressFlag = true
-                                item.progressPercent = Math.abs(item.percentage.toFixed(0));
-                            }
-                        })
-                    },
-                    getTyp(filetype){
-                        if(filetype.match('image/')){
-                            return 'images'
+                    filters: {
+                        shortname: function (value) {
+                            if (!value) return ''
+                            value = value.toString()
+                            fn_arr = value.split('.')   //["", "mp4"]
                             
+                            return (fn_arr[0].length > 10) ? `${fn_arr[0].substring(0,10)}...${fn_arr[1]}` : value
+                        },
+                        shorttitle: function (value) {
+                            if (!value) return ''
+                            value = value.toString()
+                            //fn_arr = value.split('.')   //["", "mp4"]
+                            
+                            return (value.length > 12) ? `${value.substring(0,12)}...` : value
                         }
-                        if(filetype.match('video/')){
-                            return 'videos'
-                        }
-                        if(filetype.match('audio/')){
-                            return 'audios'
-                        }
-                        if(filetype.match('pdf/')){
-                            return 'pdfs'
-                        }
-                        return 'destination'
                     },
-                    onchange(e,fileList){
-                        console.log('-------onchange---------')
-                        console.log(e)
-                        console.log(fileList)
-
-                        this.errorDisplay = 'none'
-                        this.errorMsg=''
-
-                        if(!e.raw.type.match('image/')){
-                            if(e.raw.type.match('video/')){
-                                e.url="/static/church/img/vidoe.jpg"
-                            } else if(e.raw.type.match('audio/')){
-                                e.url="/static/church/img/audio.jpg"
-                            } else{
-                                e.url="/static/church/img/document.jpg"   
+                    methods:{
+                        hasTransCodeFile(file){
+                            
+                        },
+                        checkij(value,ev){
+                            console.log(`${value}-${ev}`)
+                        },
+                        mediaReturn(o){
+                            console.log('-----mediaReturn-----------')
+                            console.log(this.images)
+                            arr = this.checkedImages[0].split('-')
+                            index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
+                            from = this.getQueryVariable('from')
+                            o = this.images[index]
+                            window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
+                            window.close()
+                        },
+                        winClose(){
+                            window.close()
+                        },
+                        getQueryVariable(variable){
+                            var query = window.location.search.substring(1);
+                            var vars = query.split("&");
+                            for (var i=0;i<vars.length;i++) {
+                                    var pair = vars[i].split("=");
+                                    if(pair[0] == variable){return pair[1];}
                             }
-                        }
-                        this.filePrepared = false
-                        
-                        fileList.forEach((item,index)=>{
-                            allOk = true
-                            if(item.status != 'ready'){
-                                allOk = false
-                            }
-                            this.filePrepared = allOk
-                        })
-                        if (fileList.length <= 0){
-                            this.filePrepared = false
-                        }
-                        //"success" "ready" "uploading" "fail"
-                    },
-                    onerror(e,f){
-                        console.log('-------onerror---------')
-                        console.log(e)
-                        console.log(f)
-                    },
-                    onsuccess(e,f,fileList){
-                        console.log('-------onsuccess---------')
-                        console.log(e)
-                        console.log(f)
-                        this.fileArr = fileList
-                        this.fileArr.forEach((item,index)=>{
-                            item.progressFlag = false
-                            if(item.status == 'success'){
-                                item.successFlag = true
+                            return(false);
+                        },
+                    
+                        isShow:function(typ='images'){
+                            if (this.getQueryVariable('from')=='ckeditor' || this.getQueryVariable('from')=='admin' ){
+                                return true
                             }else{
-                                item.successFlag = false
+                                return this.getQueryVariable('type') == typ
                             }
-                        })
-                    },
-                    onremove(e,f){
-                        console.log('-------onremove---------')
-                        console.log(e)
-                        console.log(f)
-                        
-                        if (f.length <= 0){
-                            this.filePrepared = false
-                        }
-                        //this.fileArr.splice(f,1)
-                    },
-                    removeFile(item,index){
-                        this.fileArr.splice(f,index)
-                    },
-                    onpreview(e,f){
-                        console.log('-------onpreview---------')
-                        console.log(e)
-                        console.log(f)
-                    },
-                    onexceed(e,f){
-                        console.log('-------onexceed---------')
-                        console.log(e)
-                        console.log(f)
-                        if((e||[]).length >10){
-                            this.errorDisplay = 'block'
-                            this.errorMsg = `最多只能一次加入10个文件，现在有${e.length}请重新选择。`
-                        }else{
+                        },   
+                        isFromCtrl:function(){
+                            console.log(this.getQueryVariable('from'))
+                            if (this.getQueryVariable('from').indexOf('admin')>=0 || this.getQueryVariable('from').indexOf('ckeditor')>=0){
+                                return false
+                            }else{
+                                return true
+                            }
+                        },                 
+                        theImage(i,j){
+                            return (store.state.images||[])[(i-1)*6 + j-1]||{}
+                        },
+                        pageChange:function(page){
+                            console.log(`--------pageChange(${page})----------------`)
+                            this.showFiles(this.activeTab,this.curdir,page,{'search':this.searchkey})
+                        },
+                        next:function(){
+                            //当没有18个图片的时候，说明就结束了
+                            console.log('------next------')
+                            this.page[this.activeTab] = (++this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
+                            this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
+                        },
+                        prev:function(){
+                            this.page[this.activeTab] = (--this.page[this.activeTab] >=1 ? this.page[this.activeTab] : 1)
+                            this.showFiles(this.activeTab,this.curdir,this.page[this.activeTab])
+                        },
+                        goTab(page){
+                            this.activeTab = page
+                        },
+                        onSeriesChange:function(sereis){
+                            if (sereis == 'upload') {return}
+                            this.showFiles(this.activeTab,sereis,this.page[this.activeTab])
+                        },
+                        showFiles:function(type,series,page,extra){
+                            /*
+                            page 是从1开始的。有delfilekey，删除的文件key,在删除后，从新查找的逻辑
+                            */
+                            //delfilekey=undefined,searchkey=undefined
+                            extra = extra||{}
+                            vm = this
+                            vm.loading = true
+                            store.dispatch('getImages',{'type':type,'series':series,'page':page,'delfilekey':extra.delete,'searchkey':extra.search}).then(function(){
+                                vm.$forceUpdate()
+                                vm.loading = false
+                            })
+                        },
+                        handleClick(tab, event) {
+                            console.log(tab, event)
+                            console.log(`-----------this.activeTab -------${this.activeTab}----`)
+                    
+                            this.loading = true
+                            this.activeTab = tab.name
+                            this.showFiles(tab.name,this.curdir,this.page.image)
+                            this.checkedImages = []
+                        },
+                        onbeforeUpload(file){
+                            console.log('--------onbeforeUpload----------')
+                            console.log(file)
+                        },
+                        onprogress(e, rawFile,fileList){
+                
+                            this.fileArr = fileList
+                            this.fileArr.forEach(item=>{
+                                if (item.percentage == 100) {
+
+                                } else {
+                                    item.progressFlag = true
+                                    item.progressPercent = Math.abs(item.percentage.toFixed(0));
+                                }
+                            })
+                        },
+                        getTyp(filetype){
+                            if(filetype.match('image/')){
+                                return 'images'
+                                
+                            }
+                            if(filetype.match('video/')){
+                                return 'videos'
+                            }
+                            if(filetype.match('audio/')){
+                                return 'audios'
+                            }
+                            if(filetype.match('pdf/')){
+                                return 'pdfs'
+                            }
+                            return 'destination'
+                        },
+                        onchange(e,fileList){
+                            console.log('-------onchange---------')
+                            console.log(e)
+                            console.log(fileList)
+
                             this.errorDisplay = 'none'
                             this.errorMsg=''
-                        }
-                    },
-                    submitUpload() {
-                        //console.log(file)
-                        
-                        //return true
-                        console.log('--------submitUpload---------------')
-                        this.$refs.upload.submit();
-                    },
-                    removeKey(key){
-                        console.log(`-----need to delete the bucket file and db record---of--${key}--`)
-                        this.showFiles(this.activeTab,this.curdir,1,{'delete':key})
-                    },
-                    handlePictureCardPreview(file) {
-                        console.log('------------handlePictureCardPreview---------------')
-                        console.log(file)
-                        
-                        if (((file||{}).oname||'').match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')){
-                            this.$alert(`<span>${file.oname}</span><img style="width:100%;height:auto;" src="${file.url}">`, {
-                                dangerouslyUseHTMLString: true,
-                                customClass:"image-preview"
-                            });
-                            return
-                        } else if (((file||{}).oname||'').match('(.mp4$)')){
-                            this.$alert(`<span>${file.oname}</span><video id="media-preview" style="width:100%;height:auto;" controls src="${file.url}">`, {
-                                dangerouslyUseHTMLString: true,
-                                customClass:"image-preview",
-                                beforeClose:(action,instance,done)=>{
-                                    //console.log(instance)
-                                    (instance.$el.querySelector('video#media-preview')||this.document.createElement('video')).pause()
-                                    done()
+
+                            if(!e.raw.type.match('image/')){
+                                if(e.raw.type.match('video/')){
+                                    e.url="/static/church/img/vidoe.jpg"
+                                } else if(e.raw.type.match('audio/')){
+                                    e.url="/static/church/img/audio.jpg"
+                                } else{
+                                    e.url="/static/church/img/document.jpg"   
                                 }
-                            });
-                            return
-                        }else if(((file||{}).oname||'').match('(.mp3$)|(.wav$)')){
-                            this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><video controls="" autoplay="" id="media-preview" name="media"><source src="${file.url}" type="audio/mpeg"></video></div>`, {
-                                dangerouslyUseHTMLString: true,
-                                customClass:"image-preview",
-                                beforeClose:(action,instance,done)=>{
-                                    //console.log(instance)
-                                    (instance.$el.querySelector('video#media-preview')||this.document.createElement('audio')).pause()
-                                    done()
-                                }
-                            });
-                        }else if(((file||{}).oname||'').match('(.pdf$)')){
-                            this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;"><span>${file.oname}</span><a href="${file.url}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
-                                dangerouslyUseHTMLString: true,
-                                customClass:"image-preview",
-                                beforeClose:(action,instance,done)=>{
-                                    //console.log(instance)
-                                    done()
-                                }
-                            });
-                        }
-                        this.$nextTick(() => {
-                            qrcode = document.getElementById("qrcode")
-                            if(qrcode){
-                                document.getElementById("qrcode").innerHTML = ''
-                                new QRCode(document.getElementById("qrcode"), file.url);  // 设置要生成二维码的链接
                             }
-                        })
-
-                        return false
-                    },
-                    parsePercentage(val) {
-                        return parseInt(val, 10);
-                    },
-                    S4() {
-                        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-                    },
-                    guid() {
-                        return (this.S4()+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+this.S4()+this.S4());
-                    },
-                    diyUpload(params) {
-                        const thefile = params.file,
-                            fileType = thefile.type,
-                            isImage = fileType.indexOf("image") != -1,
-                            isLt2M = thefile.size / 1024 / 1024 < 2;
-                        console.log('-----------diyUpload------------')
-                        console.log(fileType)
-                        thedest = this.getTyp(fileType)
-                        thehost = `https://${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['bucket']}.${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['endpoint.acc']}`
-
-                        console.log(`dest:${thedest};host:${thehost}`)
-                        
-                        tokenParams ={'type':thedest,'object_prefix':`${this.church}${(this.curdir||''=='')?'':'/'+this.curdir+'/'}`}
-                        thisV = this
-                        store.dispatch('getOssToken',tokenParams).then((res)=>{
-                            console.log('---------getOssToken----------')
-                            console.log(res)
-
-                            let fd = new FormData()
-                            fd.append('OSSAccessKeyId', res.data.token['accessid'])
-                            fd.append('policy', res.data.token['policy'])
-                            fd.append('Signature', res.data.token['signature'])
-                            fd.append('callback', res.data.token['callback'])
-                            fd.append('key', `${thisV.church}/${thisV.curdir}/${thisV.guid()}`)//这个是oss中的key,随机 不用这个前缀方式了L3${(this.curdir||'').length>1?'/'+this.curdir:''}/
-                            fd.append('x:originname', thefile.name)//文件原有名称 x是自定义oss回调变量
-                            fd.append('x:dest', `${thedest}`)//所属的文件目标桶类型
-                            fd.append('x:seriesrespath', `${ thisV.curdir }`)
-                            fd.append('x:church', `${ thisV.church }`)
-                            fd.append('file', thefile)
-                            option = {
-                                'host':thehost,
-                                'form':fd,
-                                'uploader':params
+                            this.filePrepared = false
+                            
+                            fileList.forEach((item,index)=>{
+                                allOk = true
+                                if(item.status != 'ready'){
+                                    allOk = false
+                                }
+                                this.filePrepared = allOk
+                            })
+                            if (fileList.length <= 0){
+                                this.filePrepared = false
                             }
-                            thisV.$store.dispatch('upload2oss',option)
-                        })
-                    } 
-                },
-                delimiters: ["[[","]]"]
-            });
+                            //"success" "ready" "uploading" "fail"
+                        },
+                        onerror(e,f){
+                            console.log('-------onerror---------')
+                            console.log(e)
+                            console.log(f)
+                        },
+                        onsuccess(e,f,fileList){
+                            console.log('-------onsuccess---------')
+                            console.log(e)
+                            console.log(f)
+                            this.fileArr = fileList
+                            this.fileArr.forEach((item,index)=>{
+                                item.progressFlag = false
+                                if(item.status == 'success'){
+                                    item.successFlag = true
+                                }else{
+                                    item.successFlag = false
+                                }
+                            })
+                        },
+                        onremove(e,f){
+                            console.log('-------onremove---------')
+                            console.log(e)
+                            console.log(f)
+                            
+                            if (f.length <= 0){
+                                this.filePrepared = false
+                            }
+                            //this.fileArr.splice(f,1)
+                        },
+                        removeFile(item,index){
+                            this.fileArr.splice(f,index)
+                        },
+                        onpreview(e,f){
+                            console.log('-------onpreview---------')
+                            console.log(e)
+                            console.log(f)
+                        },
+                        onexceed(e,f){
+                            console.log('-------onexceed---------')
+                            console.log(e)
+                            console.log(f)
+                            if((e||[]).length >10){
+                                this.errorDisplay = 'block'
+                                this.errorMsg = `最多只能一次加入10个文件，现在有${e.length}请重新选择。`
+                            }else{
+                                this.errorDisplay = 'none'
+                                this.errorMsg=''
+                            }
+                        },
+                        submitUpload() {
+                            //console.log(file)
+                            
+                            //return true
+                            console.log('--------submitUpload---------------')
+                            this.$refs.upload.submit();
+                        },
+                        removeKey(key){
+                            console.log(`-----need to delete the bucket file and db record---of--${key}--`)
+                            this.showFiles(this.activeTab,this.curdir,1,{'delete':key})
+                        },
+                        handlePictureCardPreview(file) {
+                            console.log('------------handlePictureCardPreview---------------')
+                            console.log(file)
+                            
+                            if (((file||{}).oname||'').match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')){
+                                this.$alert(`<span>${file.oname}</span><img style="width:100%;height:auto;" src="${file.url}">`, {
+                                    dangerouslyUseHTMLString: true,
+                                    customClass:"image-preview"
+                                });
+                                return
+                            } else if (((file||{}).oname||'').match('(.mp4$)')){
+                                this.$alert(`<span>${file.oname}</span><video id="media-preview" style="width:100%;height:auto;" controls src="${file.url}">`, {
+                                    dangerouslyUseHTMLString: true,
+                                    customClass:"image-preview",
+                                    beforeClose:(action,instance,done)=>{
+                                        //console.log(instance)
+                                        (instance.$el.querySelector('video#media-preview')||this.document.createElement('video')).pause()
+                                        done()
+                                    }
+                                });
+                                return
+                            }else if(((file||{}).oname||'').match('(.mp3$)|(.wav$)')){
+                                this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><video controls="" autoplay="" id="media-preview" name="media"><source src="${file.url}" type="audio/mpeg"></video></div>`, {
+                                    dangerouslyUseHTMLString: true,
+                                    customClass:"image-preview",
+                                    beforeClose:(action,instance,done)=>{
+                                        //console.log(instance)
+                                        (instance.$el.querySelector('video#media-preview')||this.document.createElement('audio')).pause()
+                                        done()
+                                    }
+                                });
+                            }else if(((file||{}).oname||'').match('(.pdf$)')){
+                                this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;"><span>${file.oname}</span><a href="${file.url}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
+                                    dangerouslyUseHTMLString: true,
+                                    customClass:"image-preview",
+                                    beforeClose:(action,instance,done)=>{
+                                        //console.log(instance)
+                                        done()
+                                    }
+                                });
+                            }
+                            this.$nextTick(() => {
+                                qrcode = document.getElementById("qrcode")
+                                if(qrcode){
+                                    document.getElementById("qrcode").innerHTML = ''
+                                    new QRCode(document.getElementById("qrcode"), file.url);  // 设置要生成二维码的链接
+                                }
+                            })
+
+                            return false
+                        },
+                        parsePercentage(val) {
+                            return parseInt(val, 10);
+                        },
+                        S4() {
+                            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+                        },
+                        guid() {
+                            return (this.S4()+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+"-"+this.S4()+this.S4()+this.S4());
+                        },
+                        diyUpload(params) {
+                            const thefile = params.file,
+                                fileType = thefile.type,
+                                isImage = fileType.indexOf("image") != -1,
+                                isLt2M = thefile.size / 1024 / 1024 < 2;
+                            console.log('-----------diyUpload------------')
+                            console.log(fileType)
+                            thedest = this.getTyp(fileType)
+                            thehost = `https://${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['bucket']}.${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['endpoint.acc']}`
+
+                            console.log(`dest:${thedest};host:${thehost}`)
+                            
+                            tokenParams ={'type':thedest,'object_prefix':`${this.church}${(this.curdir||''=='')?'':'/'+this.curdir+'/'}`}
+                            thisV = this
+                            store.dispatch('getOssToken',tokenParams).then((res)=>{
+                                console.log('---------getOssToken----------')
+                                console.log(res)
+
+                                let fd = new FormData()
+                                fd.append('OSSAccessKeyId', res.data.token['accessid'])
+                                fd.append('policy', res.data.token['policy'])
+                                fd.append('Signature', res.data.token['signature'])
+                                fd.append('callback', res.data.token['callback'])
+                                fd.append('key', `${thisV.church}/${thisV.curdir}/${thisV.guid()}`)//这个是oss中的key,随机 不用这个前缀方式了L3${(this.curdir||'').length>1?'/'+this.curdir:''}/
+                                fd.append('x:originname', thefile.name)//文件原有名称 x是自定义oss回调变量
+                                fd.append('x:dest', `${thedest}`)//所属的文件目标桶类型
+                                fd.append('x:seriesrespath', `${ thisV.curdir }`)
+                                fd.append('x:church', `${ thisV.church }`)
+                                fd.append('file', thefile)
+                                option = {
+                                    'host':thehost,
+                                    'form':fd,
+                                    'uploader':params
+                                }
+                                thisV.$store.dispatch('upload2oss',option)
+                            })
+                        } 
+                    },
+                    delimiters: ["[[","]]"],
+                    template:``
+                });
+                window.app = app
+            }
         </script>
  
     </body>

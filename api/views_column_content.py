@@ -76,6 +76,41 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
             return JsonResponse({'errCode': '1001', 'msg':'delete content err','sysErrMsg':traceback.format_exc()}, safe=False)
 
 
+    @action(detail=True,methods=['get','post'], format="json")
+    def ccolList(self,request):
+        '''
+        查找
+        '''
+        try:
+            # theLogger.info('start GetCourseList-------------')
+            tmspan = timeSpan(dd.now())
+
+            if(request.META['REQUEST_METHOD']  == 'GET'):
+                data = request.GET
+                theLogger.info(data)
+                columnid = int(data.get('columnid',-1))
+                contentid = int(data.get('contentid',-1))  
+                theLogger.info('columnid:%dcontentid:%d' % (columnid,contentid))
+                if columnid < 0 or contentid < 0:
+                    raise Exception('column id or content id is wrong.')  
+
+                qr = self.get_queryset()
+                col = qr.get(id=columnid)
+                if col is None:
+                    raise Exception('column is not find')
+
+                media = Media.objects.get(id=contentid)
+                if media is None:
+                    raise Exception('content media is not find')
+
+                col.medias.remove(media)
+
+                return JsonResponse({'errCode': '0', 'msg':'delete content(%d) from column(%d)' % (columnid,contentid)}, safe=False)
+           
+        except Exception as e:
+            import traceback
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            return JsonResponse({'errCode': '1001', 'msg':'delete content err','sysErrMsg':traceback.format_exc()}, safe=False)
     # @action(detail=True,methods=['POST'], format="json")
     # def GetCoursebyID(self,request,pk):
     #     '''

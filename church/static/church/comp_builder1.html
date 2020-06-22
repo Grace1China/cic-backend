@@ -5,12 +5,16 @@
     <meta charset="UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="/static/admin/simpleui-x/elementui/theme-chalk/index.css" type="text/css">
-    
+    <link rel="stylesheet" href="/static/church/css/mintui.css" type="text/css">
     <script type="text/javascript" src="/static/church/js/vue.js"></script>
-    <script type="text/javascript" src="/static/admin/simpleui-x/elementui/index.js"></script>
-    <script type="text/javascript" src="/static/church/js/es6-promise.auto.js"></script>
     <script type="text/javascript" src="/static/church/js/vuex.js"></script>
+    <script type="text/javascript" src="/static/admin/simpleui-x/elementui/index.js"></script>
+    <script type="text/javascript" src="/static/church/js/mintui_index.js"></script>
+    <script type="text/javascript" src="/static/church/js/es6-promise.auto.js"></script>
     <script type="text/javascript" src="/static/ckeditor/ckeditor/ckeditor.js"></script><style>.cke{visibility:hidden;}</style>
+    <script type="text/javascript" src="/static/church/js/store.js"></script>
+    <script type="text/javascript" src="/static/church/js/comp.js"></script>
+
     <style>
         #app{
             height: 100vh;
@@ -28,13 +32,16 @@
             justify-content: center;
             background-color: #77686857;
             margin: 10px;
+            color:red;
+            font-size:50px;
+            font-weight:700px;
         }
         .block{
             position: relative;
         }
         .workplace{
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             height: 100vh;
         }
         .col{
@@ -50,6 +57,12 @@
             outline:solid yellow;
             outline: solid red;
             z-index: 9;
+        }
+        .part_template{
+
+        }
+        .setting_col div{
+            margin-top:40px;
         }
 
     </style>
@@ -83,25 +96,49 @@
     }
     
     </script>
+    <!--
+        Banner 应该是希望自由的加图和链接
+        横滑 应该也是加图和链接
+        列表应该是自选的知识内容
+
+        实现步骤：
+        1 组件的呈现和删除
+        2 数据源添加
+        3 保存发布
+        
+    -->
 
     <div id="app">
+        <section style="background: rgba(128, 128, 128, 0.39);text-align: right;padding: 10px 15;" >
+            <el-button type="primary" @click="deleteCurComp">删除当前组件</el-button>
+            <el-button type="primary" @click="deleteCurComp">保存</el-button>
+            <el-button type="primary" @click="deleteCurComp">预览</el-button>
+        </section>
         <section class="el-container workplace">
             <aside class="el-aside complist col" style="max-width: 300px;min-width:300px">
-                <div id='dg1'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/carousel.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>
+                <div id='dg_carousel'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/carousel.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>
                 Banner
                     
                 </div>
-                <div id='dg2'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/slide.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>slide</div>
-                <div id='dg3'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/list.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>list</div>
+                <div id='dg_slide'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/slide.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>slide</div>
+                <div id='dg_list'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/list.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>list</div>
+                <div id='dg_text'  class='comp' draggable=true ondragstart="drag(event)" style='background-image: url("/static/church/img/list.png");background-size: contain;background-repeat: no-repeat;    background-position: center;'>Text</div>
             </aside>
             <main class="el-main col" style="max-width: 440px;" ondrop="drop(event)" ondragover="allowDrop(event)" ref="editcolumn" >
-                <div id="introduction">
-                    <p>xxx</p>
-                </div>
+                
             </main>
-            <aside class="el-aside col" style="max-width: 300px;;min-width:300px" >
-                删除组件
-                数据源
+            <aside class="el-aside setting_col" style="max-width: 300px;;min-width:300px" >
+                <div class='part_template'>
+                    <el-radio-group v-model="rb_template">
+                        <el-radio-button label="carousel"></el-radio-button>
+                        <el-radio-button label="slide"></el-radio-button>
+                        <el-radio-button label="list"></el-radio-button>
+                    </el-radio-group>
+                </div>
+                <div class="part_source">
+                    <media-select ref="mediaSelect1">xxx</media-select>
+                </div>
+                <div class="part_attribute"></div>                
             </aside>
         </section>
         
@@ -115,8 +152,14 @@
 </body>
  
   <script>
+
+
+
     theV = new Vue({
         el: '#app',
+        components:{
+            'media-select':mediaSele,
+        },
         data: function() {
             return { 
                 visible: false,
@@ -124,10 +167,16 @@
                 defaultProps: {
                     children: 'children',
                     label: 'label'
-                }
+                },
+                rb_template:'',
             }
         },
+        store,
         methods: {
+            deleteCurComp(){
+                dd = document.getElementsByClassName('comp_wrap active')
+                dd[0].parentElement.removeChild(dd[0])
+            },
             handleNodeClick(data) {
                 console.log(data);
             },
@@ -146,20 +195,30 @@
                                 height: '225px',
                             },
                         },
-                        Array.apply(null, { length: 4 }).map(function (v,i) {
+                        Array.apply(null, { length: 3 }).map(function (v,i) {
                             return createElement('el-carousel-item', 
-                                {key:'key'+i},
-                                [createElement('img',
-                                    { 
-                                        attrs: {
-                                            src:'https://api.bicf.org/mediabase/citychurch/default/88b8a112-a24e-2a0d-a2a2-a1d1fdc288bf',
+                                {
+                                    key:'key' + i,
+                                    attrs:{
+                                    }
+                                    
+                                },
+                                [
+                                    createElement('div',
+                                        { 
+                                            attrs: {
+                                            },
+                                            style: {
+                                                height: '100%',
+                                                width:'100%',
+                                                'background-image': "url('https://api.bicf.org/mediabase/citychurch/default/88b8a112-a24e-2a0d-a2a2-a1d1fdc288bf')",
+                                                backgroundSize: 'contain',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                            },
                                         },
-                                        style: {
-                                            height: '100%',
-                                            width:'100%',
-                                        },
-                                    },
-                                    'key'+i)
+                                        [createElement('h3',{},'xxx')]
+                                    ),
                                 ]
                             )
                         })
@@ -167,6 +226,7 @@
                 })
             },
             addWrap (comp_id) {
+                console.log(`------------addWrap---------${comp_id}----`)
                 vm = this
                 // 创建组件逻辑
                 let comp = Vue.extend({
@@ -235,17 +295,25 @@
                 comp.$mount();
                 // 将组件添加到显示tag的div里面
                 this.$refs.editcolumn.appendChild(comp.$el);
+            },
+            updateCompSource(){
+
+            },
+            setRo(o){
+                console.log(o)
             }
         },
     })
+
+    var formVue = theV
   </script>
  
 
   <script>
     // The inline editor should be enabled on an element with "contenteditable" attribute set to "true".
     // Otherwise CKEditor will start in read-only mode.
-    var introduction = document.getElementById('introduction');
-    introduction.setAttribute('contenteditable', true);
+    //var introduction = document.getElementById('introduction');
+    //introduction.setAttribute('contenteditable', true); 
 
  
   </script>

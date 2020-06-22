@@ -1,0 +1,103 @@
+{% load i18n static %}
+{% load cust_filters %}
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+<link rel="stylesheet" href="{% static 'church/css/video-js.css' %}">
+<link rel="stylesheet" href="{% static 'church/css/ele_index.css' %}">
+
+<script type="text/javascript" src="{% static "church/js/videojs-ie8.min.js" %}"></script>
+<script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
+<script type="text/javascript" src="{% static "church/js/ele_index.js" %}"></script>
+
+
+
+
+{% comment %} <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}"> {% endcomment %}
+<style>
+    .cover{
+        z-index: 1;
+        background-position: 57%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .video-js{
+        object-fit: fill;
+    }
+    .headblock{
+        width: 100%;
+        height: 200px;
+        background: gray;
+        text-align: center;
+    }
+
+    .contentblock p{
+        margin:0px;
+    }
+    .sticky{
+        position: fixed;
+        top: 0px;
+        left: 50%;
+        transform: translate(-50%, 0px);
+    }
+</style>
+</head>
+<body class ="wechatpromt">
+
+
+
+<div class="container" style="min-height: 937px;display: flex;justify-content: center;">
+    <div class="page-detail" style="width: 540px;">
+        <div class="topblock">
+        </div>
+        {% if ccol %}
+            <div class="headblock">
+                <div class="">
+                    <div>{{ ccol.title  }}</div>
+                    <div>{{ ccol.pub_time| datetime_to_date }}</div>
+                    {% comment %} {'id': 1, 'medias': [OrderedDict([('video', 'L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21'), ('video_status', 1), ('SHD_URL', 'http://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/sd.mp4'), ('HD_URL', 'http://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/sd.mp4'), ('SD_URL', 'http://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/ld.mp4'), ('audio', ''), ('image', 'http://api.bicf.org/mediabase/L3/default/14a4297d-5a08-2290-a933-e004a33e452f'), ('pdf', '')])], 'title': '测试内容专栏', 'create_time': '2020-06-19T14:37:36.139139+08:00', 'update_time': '2020-06-19T14:40:06.421838+08:00', 'pub_time': '2020-06-19T14:37:00+08:00', 'status': 1, 'church': 22, 'user': 19} {% endcomment %}
+                </div>
+            </div>
+            <div class="contentblock">
+                <ul>
+                    {% for media in ccol.medias %}
+                        <li style="display:flex;margin-bottom:20px;">
+                            <a href="/blog/media/{{ media.id }}" style="display:contents;"><img style="width:30%;height:84px;" src="{{ media.image }}"></a> <a style="text-decoration: none;" href="/blog/media/{{ media.id }}"><span style="margin-left:20px;">{{ media.title }}</span></a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <p>No info found now.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+<script>
+
+
+
+if(document.getElementsByTagName('wechatpromt').length>0){
+    if(document.getElementsByTagName('video').length>0){
+        document.getElementsByTagName('video')[0].classList.add('fixtop')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('webkit-playsinline','webkit-playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('x5-playsinline','x5-playsinline')
+    }
+}
+
+
+window.onresize = function(){
+    /*console.log('re')
+    vh = document.getElementsByTagName('video').length>0?document.getElementsByTagName('video')[0].offsetHeight:0
+    container_v = document.getElementsByClassName('ckeditor-html5-video').length>0 ? document.getElementsByClassName('ckeditor-html5-video')[0]:{}
+    container_v.style.height=vh*/
+}
+</script>
+</html>

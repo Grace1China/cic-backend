@@ -157,7 +157,7 @@ class ContentColumnAdmin(admin.ModelAdmin):
     
     change_form_template ="admin/churchs/change_form_content.html"
 
-    list_display = ('title','user','pub_time','status')  
+    list_display = ('title','user','pub_time','status','promote')  
     fieldsets = (
         (None, {
             'fields': ('title','pub_time','status','add_content')
@@ -228,8 +228,8 @@ class ContentColumnAdmin(admin.ModelAdmin):
         instance.user = request.user
         instance.church = request.user.church
         return instance
-        
 
-        # def get_form(self, request, obj=None, **kwargs):
-        #     kwargs['form'] = MediaVideoForm
-        #     return super().get_form(request, obj, **kwargs)
+    def promote(self, obj):
+        button_html = """<a class="changelink" href="#" onclick='fontConfig.premote(%s,"%s")'>推广链接</a>""" % (obj.id,'ccol')
+        return format_html(button_html)
+    promote.short_description = "操作"

@@ -266,3 +266,14 @@ register.filter('jsondumps', jsondumps)
 
 
 
+@register.filter
+def datetime_to_date(dt):
+    rt1 = dt.split('T')
+    rt2 = dt.split(' ')
+    if (len(rt1) != 2) and (len(rt2) != 2):
+        raise Exception('datetime should be have T or space in it')
+    return rt1[0] if len(rt1)==2 else rt2[0]
+
+
+
+

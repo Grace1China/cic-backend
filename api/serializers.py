@@ -59,6 +59,11 @@ class venueSerializer4API(serializers.ModelSerializer):
 
 
 
+
+
+
+
+
 class ChurchSerializer4Sermon(serializers.ModelSerializer):
     venue = venueSerializer4API(required=False,many=True)
 
@@ -69,10 +74,13 @@ class ChurchSerializer4Sermon(serializers.ModelSerializer):
 
 class ChurchSerializer4API(serializers.ModelSerializer):
     venue = venueSerializer4API(required=False,many=True)
-
+    promot_cover = serializers.CharField(source='fullpath_promot_cover', max_length=400)
+    giving_qrcode = serializers.CharField(source='fullpath_giving_qrcode', max_length=400)
+    promot_video = serializers.CharField(source='fullpath_promot_video', max_length=400)
     class Meta:
         model = Church
-        fields =  '__all__'
+        fields =  ['id','venue','name','code','description','address','promot_cover','giving_qrcode','promot_video','status']
+
 
 class SpeakerSerializer4API(serializers.ModelSerializer):
 
@@ -98,10 +106,9 @@ class MediaSerializer4ListAPI(serializers.ModelSerializer):
     image = serializers.CharField(source='dist_list_image', max_length=400)
     pdf = serializers.CharField(source='dist_list_pdf', max_length=400)
 
-
     class Meta:
         model = Media
-        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf']
+        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','content']
     
 
 class MediaSerializer4API(serializers.ModelSerializer):
