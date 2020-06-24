@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
 <link rel="stylesheet" href="{% static 'church/css/video-js.css' %}">
-<link rel="stylesheet" href="{% static 'church/css/ele_index.css' %}">
+{% comment %} <link rel="stylesheet" href="{% static 'church/css/ele_index.css' %}" type="text/css"> {% endcomment %}
 <link rel="stylesheet" href="{% static 'church/css/mintui.css' %}">
 
 
 <script type="text/javascript" src="{% static "church/js/videojs-ie8.min.js" %}"></script>
 <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
-<script type="text/javascript" src="{% static "church/js/ele_index.js" %}"></script>
+{% comment %} <script type="text/javascript" src="{% static "church/js/ele_index.js" %}"></script> {% endcomment %}
 <script type="text/javascript" src="{% static "church/js/mintui_index.js" %}"></script>
 
 
+<link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
 
 
+<script type="text/javascript" src="{% static "admin/simpleui-x/elementui/index.js" %}"></script>
 
-{% comment %} <link rel="stylesheet" href="{% static 'blog/css/blog.css' %}"> {% endcomment %}
 <style>
     body{
         margin:0px;
@@ -59,16 +60,22 @@
         background: #000000a1;
         color: #fff;
         text-align: left;
-        position: relative;
-        top: 124px;
+        /*position: relative;
+        top: 124px;*/
         padding: 5px 13px;
         font-size: 13px;
     }
-    .banner_item{
-        justify-content: flex-end;
+    {% comment %} .banner_item{
         display: flex;
-        align-items: flex-end;
-       
+        flex-direction:column;
+        justify-content: flex-end;
+    } {% endcomment %}
+    .banner_item div{
+        width:100%;
+        height:100%;
+        display: flex;
+        flex-direction:column;
+        justify-content: flex-end;
     }
     .mint-swipe-indicator.is-active{
         background:#1dec8c !important;
@@ -96,6 +103,9 @@
     .info{
         padding:5px 15px;
     }
+    .mint-navbar .mint-tab-item{
+        padding:0px;
+    }
 </style>
 </head>
 <body class ="wechatpromt">
@@ -113,7 +123,9 @@
                 {% for ba in banners %}
                     <mt-swipe-item class="banner_item" style="background-image: url('{{ ba.image }}');background-size: cover;background-position-y: 22%;">
                         {% comment %} <img style="width:100%;height:auto;" src="{{ ba.image }}"> {% endcomment %}
-                        <h3 class="cap-image-ad__title">{{ ba.title }}</h3>
+                        <div>
+                            <h3 class="cap-image-ad__title">{{ ba.title }}</h3>
+                        </div>
                     </mt-swipe-item>
                 {% endfor %}
             </mt-swipe>
@@ -134,8 +146,8 @@
                     show-icon>
                 </el-alert>
                 <mt-navbar v-model="selected">
-                    <mt-tab-item id="1"><h3 class="col_title" >最新内容</h3></mt-tab-item>
-                    <mt-tab-item id="2"><h3 class="col_title" >全部</h3></mt-tab-item>
+                    <mt-tab-item id="1"><h3 class="col_title" >最新主日内容</h3></mt-tab-item>
+                    <mt-tab-item id="2"><h3 class="col_title" >往期讲道</h3></mt-tab-item>
                 </mt-navbar>
 
                 <!-- tab-container -->

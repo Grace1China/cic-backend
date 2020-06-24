@@ -10,6 +10,7 @@ theLogger = logging.getLogger('church.all')
 from rest_framework import serializers
 from churchs.models import ContentColumn,Media
 from api.serializers import MediaSerializer4ListAPI
+from church.models import Church
 
 class CColSerializer(serializers.ModelSerializer):
     medias = MediaSerializer4ListAPI(many=True, read_only=True)
@@ -30,17 +31,18 @@ def column_content_Lord_Day(request,pk=0):
         # from django.db.models import Prefetch
         # # queryset=Sermon.objects.all()
 
-        theLogger.info('user:%s' % request.user)
-        theLogger.info('church:%s' % request.user.church)
-        theLogger.info('Lord Day:%s' % request.user.church.Lord_Day_column)
+        chs = Church.objects.filter(code='ims')
 
+        # theLogger.info('user:%s' % request.user)
+        theLogger.info('church:%s' % chs[0])
+        # theLogger.info('Lord Day:%s' % request.user.church.Lord_Day_column)
         
         # ccol = ContentColumn.objects.get(id=pk)
-        CColsz = CColSerializer(request.user.church.Lord_Day_column)
+        CColsz = CColSerializer(chs[0].Lord_Day_column)
         # ccolDict = {
         #    'data':CColsz.data
         # }
-        banners = request.user.church.Lord_Day_swipe.all()
+        banners = chs[0].Lord_Day_swipe.all()
         theLogger.info('----------banners:')
         theLogger.info(banners)
         if banners:
