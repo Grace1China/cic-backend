@@ -5,19 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
 <link rel="stylesheet" href="{% static 'church/css/video-js.css' %}">
-{% comment %} <link rel="stylesheet" href="{% static 'church/css/ele_index.css' %}" type="text/css"> {% endcomment %}
-<link rel="stylesheet" href="{% static 'church/css/mintui.css' %}">
 
+{% comment %} <link rel="stylesheet" href="{% static 'church/css/mintui.css' %}">
+<script type="text/javascript" src="{% static "church/js/mintui_index.js" %}"></script> {% endcomment %}
+
+<link rel="stylesheet" href="{% static 'church/css/swiper.min.css' %}">
+<script type="text/javascript" src="{% static "church/js/swiper.min.js" %}"></script>
 
 <script type="text/javascript" src="{% static "church/js/videojs-ie8.min.js" %}"></script>
 <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
-{% comment %} <script type="text/javascript" src="{% static "church/js/ele_index.js" %}"></script> {% endcomment %}
-<script type="text/javascript" src="{% static "church/js/mintui_index.js" %}"></script>
-
 
 <link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
-
-
 <script type="text/javascript" src="{% static "admin/simpleui-x/elementui/index.js" %}"></script>
 
 <style>
@@ -70,7 +68,7 @@
         flex-direction:column;
         justify-content: flex-end;
     } {% endcomment %}
-    .banner_item div{
+    .banner-item div{
         width:100%;
         height:100%;
         display: flex;
@@ -81,11 +79,10 @@
         background:#1dec8c !important;
     }
     .col_title{
-        font-size:16px;
+        font-size:1rem;
     }
     .row_title{
-        font-size:14px;
-
+        font-size:1rem;
     }
     .row_rpart{
         display: flex;
@@ -98,7 +95,7 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        font-size:12px;
+        font-size:0.75rem;
     }
     .info{
         padding:5px 15px;
@@ -119,18 +116,28 @@
         {% if ccol %}
             <div class="headblock">
             <!-- {{ banners }} -->
-            <mt-swipe :auto="400000">
-                {% for ba in banners %}
-                    <mt-swipe-item class="banner_item" style="background-image: url('{{ ba.image }}');background-size: cover;background-position-y: 22%;">
-                        {% comment %} <img style="width:100%;height:auto;" src="{{ ba.image }}"> {% endcomment %}
-                        <div>
-                            <h3 class="cap-image-ad__title">{{ ba.title }}</h3>
-                        </div>
-                    </mt-swipe-item>
-                {% endfor %}
-            </mt-swipe>
-
-           
+                
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        {% for ba in banners %}
+                            <div class="swiper-slide banner-item"  style="background-image: url('{{ ba.image }}');background-size: cover;background-position-y: 22%;">
+                                <div>
+                                    <h3 class="cap-image-ad__title">{{ ba.title }}</h3>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <!-- 如果需要分页器 -->
+                    <div class="swiper-pagination"></div>
+                    
+                    <!-- 如果需要导航按钮 -->
+                    {% comment %} <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div> {% endcomment %}
+                    
+                    <!-- 如果需要滚动条 -->
+                    <div class="swiper-scrollbar"></div>
+                </div>
+                
                 {% comment %} <div class="">
                     <div>{{ ccol.title  }}</div>
                     {{ ccol }}
@@ -145,20 +152,48 @@
                     description=""
                     show-icon>
                 </el-alert>
-                <mt-navbar v-model="selected">
-                    <mt-tab-item id="1"><h3 class="col_title" >最新主日内容</h3></mt-tab-item>
-                    <mt-tab-item id="2"><h3 class="col_title" >往期讲道</h3></mt-tab-item>
-                </mt-navbar>
+                {% comment %} <mt-navbar v-model="selected">
+                    <mt-tab-item id="1"><h3 class="col_title" ></h3></mt-tab-item>
+                    <mt-tab-item id="2"><h3 class="col_title" ></h3></mt-tab-item>
+                </mt-navbar>  {% endcomment %}
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <el-tab-pane label="最新主日内容" name="curlorday">
+                        <ul style="padding:0;">
+                            {% for media in ccol.medias %}
+                                <li style="display:flex;padding:15px;height:17vw;">
+                                    <div>
+                                        <a href="/blog/media/{{ media.id }}" style="display:contents;">
+                                            <img style="width:30vw;height:17vw;border-radius:5%;" src="{{ media.image }}">
+                                        </a> 
+                                    </div>
+                                    <div class="row_rpart">
+                                        <a style="text-decoration: none;" href="/blog/media/{{ media.id }}">
+                                            <span class='row_title' >{{ media.title }}</span>
+                                        </a>
+                                        <div class="row_rb_part">
+                                            <span class='row_desc' >{{ media.pub_time | datetime_to_date }}</span>
+                                            <span class='row_desc' >{{ media.hits }} 次观看</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul> 
+                    
+                    </el-tab-pane>
+                    <el-tab-pane label="往期讲道" name="history">
+                        <span v-for="n in 4" :title="'content ' + n" />
+                    </el-tab-pane>
+                </el-tabs>
 
                 <!-- tab-container -->
-                <mt-tab-container v-model="selected">
+                {% comment %} <mt-tab-container v-model="selected">
                     <mt-tab-container-item id="1">
                         <ul style="padding:0;">
                             {% for media in ccol.medias %}
-                                <li style="display:flex;padding:15px;height:64px;">
+                                <li style="display:flex;padding:15px;height:17vw;">
                                     <div>
                                         <a href="/blog/media/{{ media.id }}" style="display:contents;">
-                                            <img style="width:110px;height:64px;border-radius:7%;" src="{{ media.image }}">
+                                            <img style="width:30vw;height:17vw;border-radius:5%;" src="{{ media.image }}">
                                         </a> 
                                     </div>
                                     <div class="row_rpart">
@@ -177,7 +212,7 @@
                     <mt-tab-container-item id="2">
                         <mt-cell v-for="n in 4" :title="'content ' + n" />
                     </mt-tab-container-item>
-                </mt-tab-container>
+                </mt-tab-container> {% endcomment %}
                 
             </div>
         {% else %}
@@ -189,8 +224,6 @@
 </body>
 <script>
 
-
-
 if(document.getElementsByTagName('wechatpromt').length>0){
     if(document.getElementsByTagName('video').length>0){
         document.getElementsByTagName('video')[0].classList.add('fixtop')
@@ -200,7 +233,6 @@ if(document.getElementsByTagName('wechatpromt').length>0){
         document.getElementsByTagName('video')[0].setAttribute('x5-playsinline','x5-playsinline')
     }
 }
-
 
 window.onresize = function(){
     /*console.log('re')
@@ -215,10 +247,37 @@ new Vue({
     data: {
         theme: '',
         selected:'1',
+        activeName:'curlorday'
     },
     created: function () {
+    },
+    methods:{
+        handleClick:function(){
+            console.log(1)
+        }
     }
 })
+
+var mySwiper = new Swiper ('.swiper-container', {
+    direction: 'horizontal', // 垂直切换选项vertical
+    loop: true, // 循环模式选项
+    
+    // 如果需要分页器
+    pagination: {
+      el: '.swiper-pagination',
+    },
+    
+    // 如果需要前进后退按钮
+    /*navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },*/
+    
+    // 如果需要滚动条
+    scrollbar: {
+      el: '.swiper-scrollbar',
+    },
+  })
 
 </script>
 </html>
