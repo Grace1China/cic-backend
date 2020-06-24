@@ -84,22 +84,36 @@ class ColumnMediasInline(admin.TabularInline):
         ) 
     # short_description functions like a model field's verbose_name
     # Media_cover.short_description = ""
+    def get_kind_title(self,kind):
+        if kind == 'video' or kind == '6' :
+            kind = '视频'
+        elif kind == 'audio' or kind == '7':
+            kind = '音频'
+        elif kind == 'tuwen' or kind == '8':
+            kind = '图文'
+        else:
+            raise Exception('no support %s' % kind)
+        return kind
+
 
     def Media_one(self, instance):
         # assuming get_full_address() returns a list of strings
         return format_html(
             '''<div style="width:100%;display:flex;align-items: center;">
             <img data-name="cover" style="height: 100px;width: 177.59px;flex-grow: 0;text-align: left;margin-left: 20px;" src="{}" @click="popupCenter('/admin/churchs/media/?mediaid={}','媒体库',900,600)">
+            <span  style="flex-grow: 1;text-align: left;margin-left: 20px;">{}</span>
             <a data-name="title" style="flex-grow: 1;text-align: left;margin-left: 20px;" target="_blank" type="text" href="/blog/media/{}" >{}</a>
-            <a data-name="edit" style='flex-grow: 0;margin-left: 20px;' href="/admin/churchs/media/{}/change/" target="_blank">{}</a>
+            <a data-name="edit" style='flex-grow: 0;margin-left: 20px;' href="/admin/churchs/media/{}/change/?kind={}" target="_blank">{}</a>
             <el-button data-name="delete" style='flex-grow: 0;margin-left: 20px;' type="text" @click="deleteContent({},{})">{}</el-button>
             </div>
             ''',
             'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='images')['redirecturl'], instance.Media.alioss_image),
             instance.Media,
+            self.get_kind_title(str(instance.Media.kind)),
             instance.Media.id,
             instance.Media.title,
             instance.Media.id,
+            instance.Media.kind,
             "编辑",
             instance.ContentColumn.id,
             instance.Media.id,
@@ -157,7 +171,7 @@ class ContentColumnAdmin(admin.ModelAdmin):
     
     change_form_template ="admin/churchs/change_form_content.html"
 
-    list_display = ('title','user','pub_time','status','promote')  
+    list_display = ('title_with_link','user','pub_time','status','promote')  
     fieldsets = (
         (None, {
             'fields': ('title','pub_time','status','add_content')
@@ -168,6 +182,14 @@ class ContentColumnAdmin(admin.ModelAdmin):
         # },),
     ) 
     readonly_fields = ('add_content',)
+
+    def title_with_link(self,obj):
+        return format_html(
+            '<a target="_blank" href="/blog/ccol/{}">{}</a>',
+            obj.id,
+            obj.title,
+        )
+    title_with_link.short_description = '标题'
 
     def add_content(self, instance):
         # assuming get_full_address() returns a list of strings
@@ -230,6 +252,9 @@ class ContentColumnAdmin(admin.ModelAdmin):
         return instance
 
     def promote(self, obj):
-        button_html = """<a class="changelink" href="#" onclick='fontConfig.premote(%s,"%s")'>推广链接</a>""" % (obj.id,'ccol')
+        
+        button_html = """<a class="changelink" href="/admin/churchs/contentcolumn/%d/change/">编辑</a>""" % (obj.id)
         return format_html(button_html)
     promote.short_description = "操作"
+
+    # 

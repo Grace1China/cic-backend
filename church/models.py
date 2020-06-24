@@ -30,6 +30,12 @@ class Church(models.Model):
     giving_qrcode =  models.CharField(max_length=400,null=True, blank=True,verbose_name='奉献二维码')
     #FilerImageField(on_delete=models.CASCADE,null=True, blank=True,verbose_name='海报封面',related_name="logo_company")#models.ImageField(storage=PrivateMediaStorage(), null=True, blank=True,verbose_name='海报封面')
     promot_video =  models.CharField(max_length=400,null=True, blank=True,verbose_name='海报短片')
+
+    Lord_Day_column = models.ForeignKey('churchs.ContentColumn', on_delete=models.SET_NULL,null=True,default=None,related_name='Lord_Day_column',verbose_name='教会主日专栏')
+    
+    Lord_Day_swipe = models.ManyToManyField('churchs.Media', null=True,default=None,related_name='Lord_Day_swipe',verbose_name='教会主日Banner')
+
+
     venue = models.ManyToManyField(to="churchs.Venue",default=None,  blank=True,verbose_name='场地')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_INITED,verbose_name='状态')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')

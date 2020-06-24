@@ -329,6 +329,12 @@
                 });
 
             },
+            add_content:function(command){
+                console.log(command)
+                //window.location.href = url;
+                //console.log(window.location.href)
+                return;
+            },
             iframeLoad: function (tab, e) {
                 url = e.target.contentWindow.location.href
                 console.log('--------iframeLoad-------')

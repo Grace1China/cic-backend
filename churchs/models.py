@@ -156,7 +156,7 @@ class Media(models.Model):
     (MEDIA_COURSE,'课程'),
     (MEDIA_VIDEOS,'视频'),
     (MEDIA_AUDIOS,'音频'),
-    (MEDIA_AUDIOS,'图文'),
+    (MEDIA_TUWEN,'图文'),
     (MEDIA_PDFS,'PDF'),
     (MEDIA_OTHER,'其它'),
     )
@@ -185,6 +185,8 @@ class Media(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='创建者')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
+    hits = models.IntegerField(default=0,verbose_name='点播次数')
 
     speaker = models.ForeignKey(Speaker,on_delete=models.CASCADE,null=True,default=None,verbose_name='讲员')
 

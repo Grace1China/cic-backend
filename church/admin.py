@@ -33,7 +33,7 @@ class ChurchForm(forms.ModelForm):
     # )
     class Meta:
         model = Church
-        fields = ('name', 'code','description', 'address', 'promot_cover', 'giving_qrcode', 'promot_video','status','venue')
+        fields = ('name', 'code','description', 'address', 'promot_cover', 'giving_qrcode', 'promot_video','Lord_Day_column','Lord_Day_swipe','status','venue')
 
     def __init__(self, *args, **kwargs):
         super(ChurchForm, self).__init__(*args, **kwargs)

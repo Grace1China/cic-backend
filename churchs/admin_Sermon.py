@@ -22,15 +22,30 @@ from church.confs.prod import get_ALIOSS_DESTINATIONS
 import logging
 loger = logging.getLogger('church.all')
 
+from datetime import datetime
+
 class MediaInline1(GenericStackedInline):
     form = MeidaForm2
     model = Media
     readonly_fields = ('dist_video','dist_video_status','dist_audio','dist_image','dist_pdf')
     fields = (('alioss_video_f','alioss_audio_f','alioss_image_f','alioss_pdf_f'),'alioss_video_status','content') #('alioss_video_f','dist_SHD_URL','dist_HD_URL','dist_SD_URL'),
    
-    extra = 0
+    extra = 1
     max_num = 4
     min_num = 1
+
+    def save_form(self, request, form,change):
+        """
+        Given a ModelForm return an unsaved instance. ``change`` is True if
+        the object is being changed, and False if it's being added.
+        """
+        loger.info('---------save_form-------')
+        instance = form.save(commit=False)
+        loger.info(instance)
+        instance.church = request.user.church
+        return instance
+    def get_changeform_initial_data(self, request):
+        return {'church': request.user.church}
 
 class SermonAdmin(admin.ModelAdmin):
     inlines = [

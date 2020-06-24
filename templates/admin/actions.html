@@ -30,18 +30,29 @@
                                 :value="item.value">
                         </el-option>
                     </el-select>
-                    <el-button icon="fas fa-download" data-name="{{ field.0 }}">{{ field.1 }}</el-button>
+                    <el-button icon="fas fa-download" data-name="{{ field.0 }}"  >{{ field.1 }}</el-button>
+                {% elif field.0 == 'add_content' %}   
+                    <el-dropdown  @command="add_content">
+                        <el-button type="primary" data-name="{{ field.0 }}">
+                            添加内容<i class="el-icon-arrow-down el-icon--right"></i>
+                        </el-button>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="video">视频</el-dropdown-item>
+                            <el-dropdown-item command="audio">音频</el-dropdown-item>
+                            <el-dropdown-item command="tuwen">图文</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>  
                 {% else %}
                     <el-button :eid="customButton.{{ field.0 }}.eid"
                                :icon="customButton.{{ field.0 }}.icon" :style="customButton.{{ field.0 }}.style"
-                               :type="customButton.{{ field.0 }}.type" data-name="{{ field.0 }}">{{ field.1 }}
+                               :type="customButton.{{ field.0 }}.type" data-name="{{ field.0 }}" >{{ field.1 }} 
                     </el-button>
                 {% endif %}
             {% endif %}
         {% endif %}
     {% endfor %}
 
-    {% if cl.formset and cl.result_count %}
+    {% if cl.formset and cl.result_count %} 
         <input type="hidden" name="_save" value="{% trans 'Save' %}"/>
         <el-button icon="el-icon-circle-check" type="success"
                    @click="formSubmit()">{% trans 'Save' %}</el-button>
@@ -116,6 +127,19 @@
                 value: 7,
                 label: 'html'
             }],
+
+            addcontents:[{
+                    value: 0,
+                    label: '视频'
+                }, {
+                    value: 1,
+                    label: '音频'
+                }, {
+                    value: 2,
+                    label: '图文'
+                },
+            ],
+
             customButton:{% autoescape off %}{% custom_button %}{% endautoescape %},
             exts: []
         },
@@ -219,6 +243,13 @@
                     }).catch(_ => {
 
                 });
+            },
+            add_content:function(command){
+                console.log(command)
+                url = `/admin/churchs/media/add/?kind=${command}`
+                window.location.href = url;
+                //console.log(window.location.href)
+                return;
             }
         }
     });
@@ -233,7 +264,8 @@
 
 
     $(function () {
-        $(".actions button[data-name!='delete_selected']").click(function () {
+        $(".actions button[data-name!='delete_selected'][data-name!='add_content']").click(function () {
+            console.log('-----------------actions button-----------------')
             var url = $(this).attr("url");
             var eid = $(this).attr('eid');
             if (eid) {
@@ -252,7 +284,7 @@
                                 });
                                 return;
                             }
-
+                            console.log(temp)
                             switch (temp.action_type) {
                                 case 0:
                                     window.location.href = temp.action_url;
@@ -276,8 +308,10 @@
                 }
             }
             console.log('执行了')
+            console.log(url)
             if (url) {
                 window.location.href = url;
+                console.log(window.location.href)
                 return;
             } else if ($(this).attr('data-name')) {
                 var name = $(this).attr("data-name");
