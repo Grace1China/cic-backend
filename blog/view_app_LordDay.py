@@ -12,6 +12,10 @@ from churchs.models import ContentColumn,Media
 from api.serializers import MediaSerializer4ListAPI
 from church.models import Church
 
+from rest_framework_simplejwt.state import token_backend
+from users.models import CustomUser
+
+
 class CColSerializer(serializers.ModelSerializer):
     medias = MediaSerializer4ListAPI(many=True, read_only=True)
     class Meta:
@@ -25,24 +29,26 @@ class MediasSerializer(serializers.ModelSerializer):
 
 def column_content_Lord_Day(request,pk=0):
     try:
-        # return HttpResponse("Hello, world. You're at the polls index.")
-        # from api.serializers import SermonSerializer4API, MediaSerializer4API
-        # from churchs.models import Media
-        # from django.db.models import Prefetch
-        # # queryset=Sermon.objects.all()
-
-        chs = Church.objects.filter(code='ims')
-
-        # theLogger.info('user:%s' % request.user)
-        theLogger.info('church:%s' % chs[0])
-        # theLogger.info('Lord Day:%s' % request.user.church.Lord_Day_column)
+        data = request.GET
+        token = data.get('token','')
+        token1 = token_backend.decode(token, verify=True)
+       
+        if token1 == None:
+            raise Exception('Token invalid!')
         
-        # ccol = ContentColumn.objects.get(id=pk)
-        CColsz = CColSerializer(chs[0].Lord_Day_column)
-        # ccolDict = {
-        #    'data':CColsz.data
-        # }
-        banners = chs[0].Lord_Day_swipe.all()
+        theLogger.info(token1)
+        user = CustomUser.objects.get(id = token1['user_id'])
+        if user == None:
+            raise Exception('No such user invalid!')
+        theLogger.info(user)
+
+        chs = user.church
+        
+        if chs == None:
+            raise Exception('User has no church')
+        theLogger.info('church:%s' % chs)
+        CColsz = CColSerializer(chs.Lord_Day_column)
+        banners = chs.Lord_Day_swipe.all()
         theLogger.info('----------banners:')
         theLogger.info(banners)
         if banners:

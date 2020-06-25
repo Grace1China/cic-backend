@@ -1,0 +1,273 @@
+{% load i18n static %}
+{% load cust_filters %}
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+<link rel="stylesheet" href="{% static 'church/css/video-js.css' %}">
+
+<link rel="stylesheet" href="{% static 'church/css/swiper.min.css' %}">
+<script type="text/javascript" src="{% static "church/js/swiper.min.js" %}"></script>
+
+<script type="text/javascript" src="{% static "church/js/videojs-ie8.min.js" %}"></script>
+<script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
+
+<link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
+<script type="text/javascript" src="{% static "admin/simpleui-x/elementui/index.js" %}"></script>
+
+<style>
+    body{
+        margin:0px;
+    }
+    .cover{
+        z-index: 1;
+        background-position: 57%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .video-js{
+        object-fit: fill;
+    }
+    .page-detail{
+        width: 100%;
+    }
+    .headblock{
+        width: 100vw;
+        height: 37vw;
+        background: gray;
+        text-align: center;
+    }
+
+    .contentblock p{
+        margin:0px;
+    }
+    .sticky{
+        position: fixed;
+        top: 0px;
+        left: 50%;
+        transform: translate(-50%, 0px);
+    }
+    .cap-image-ad__title{
+        margin: 0;
+        background: #000000a1;
+        color: #fff;
+        text-align: left;
+        /*position: relative;
+        top: 124px;*/
+        padding: 5px 13px;
+        font-size: 13px;
+    }
+    .banner-item div{
+        width:100%;
+        height:100%;
+        display: flex;
+        flex-direction:column;
+        justify-content: flex-end;
+    }
+    .mint-swipe-indicator.is-active{
+        background:#1dec8c !important;
+    }
+    .col_title{
+        font-size:1rem;
+    }
+    .row_title{
+        font-size:1rem;
+    }
+    .row_rpart{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding:0 0 0 10px;
+        flex-grow: 1;
+    }
+    .row_rb_part{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size:0.75rem;
+    }
+    .info{
+        padding:5px 15px;
+    }
+    .mint-navbar .mint-tab-item{
+        padding:0px;
+    }
+</style>
+</head>
+<body class ="wechatpromt">
+
+<div id="LordDay" class="container" style="min-height: 937px;display: flex;justify-content: center;">
+    <div class="page-detail" >
+        <div class="topblock">
+        </div>
+        {% if ccol %}
+            <div class="headblock">
+            <!-- {{ banners }} -->
+                
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        {% for ba in banners %}
+                            <div class="swiper-slide banner-item"  style="background-image: url('{{ ba.image }}');background-size: cover;background-position-y: 22%;">
+                                <div>
+                                    <h3 class="cap-image-ad__title">{{ ba.title }}</h3>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <!-- 如果需要分页器 -->
+                    <div class="swiper-pagination"></div>
+                    
+                    <!-- 如果需要导航按钮 -->
+                    {% comment %} <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div> {% endcomment %}
+                    
+                    <!-- 如果需要滚动条 -->
+                    <div class="swiper-scrollbar"></div>
+                </div>
+                
+                {% comment %} <div class="">
+                    <div>{{ ccol.title  }}</div>
+                    {{ ccol }}
+                    <div>{{ ccol.pub_time | datetime_to_date }}</div>
+                    {'id': 1, 'medias': [OrderedDict([('video', 'L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21'), ('video_status', 1), ('SHD_URL', 'http://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/sd.mp4'), ('HD_URL', 'http://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/sd.mp4'), ('SD_URL', 'http://api.bicf.org/mediabase/L3/default/fbec25f9-8261-05d0-370a-9dbeaaaeee21/ld.mp4'), ('audio', ''), ('image', 'http://api.bicf.org/mediabase/L3/default/14a4297d-5a08-2290-a933-e004a33e452f'), ('pdf', '')])], 'title': '测试内容专栏', 'create_time': '2020-06-19T14:37:36.139139+08:00', 'update_time': '2020-06-19T14:40:06.421838+08:00', 'pub_time': '2020-06-19T14:37:00+08:00', 'status': 1, 'church': 22, 'user': 19}
+                </div> {% endcomment %}
+            </div>
+            <div class="contentblock">
+                <el-alert
+                    title="线上主日崇拜于周日上午8：30更新上线"
+                    type="warning"
+                    description=""
+                    show-icon>
+                </el-alert>
+                {% comment %} <mt-navbar v-model="selected">
+                    <mt-tab-item id="1"><h3 class="col_title" ></h3></mt-tab-item>
+                    <mt-tab-item id="2"><h3 class="col_title" ></h3></mt-tab-item>
+                </mt-navbar>  {% endcomment %}
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <el-tab-pane label="最新主日内容" name="curlorday">
+                        <ul style="padding:0;">
+                            {% for media in ccol.medias %}
+                                <li style="display:flex;padding:15px;height:17vw;">
+                                    <div>
+                                        <a href="/blog/media/{{ media.id }}" style="display:contents;">
+                                            <img style="width:30vw;height:17vw;border-radius:5%;" src="{{ media.image }}">
+                                        </a> 
+                                    </div>
+                                    <div class="row_rpart">
+                                        <a style="text-decoration: none;" href="/blog/media/{{ media.id }}">
+                                            <span class='row_title' >{{ media.title }}</span>
+                                        </a>
+                                        <div class="row_rb_part">
+                                            <span class='row_desc' >{{ media.pub_time | datetime_to_date }}</span>
+                                            <span class='row_desc' >{{ media.hits }} 次观看</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul> 
+                    
+                    </el-tab-pane>
+                    <el-tab-pane label="往期讲道" name="history">
+                        <span v-for="n in 4" :title="'content ' + n" />
+                    </el-tab-pane>
+                </el-tabs>
+
+                <!-- tab-container -->
+                {% comment %} <mt-tab-container v-model="selected">
+                    <mt-tab-container-item id="1">
+                        <ul style="padding:0;">
+                            {% for media in ccol.medias %}
+                                <li style="display:flex;padding:15px;height:17vw;">
+                                    <div>
+                                        <a href="/blog/media/{{ media.id }}" style="display:contents;">
+                                            <img style="width:30vw;height:17vw;border-radius:5%;" src="{{ media.image }}">
+                                        </a> 
+                                    </div>
+                                    <div class="row_rpart">
+                                        <a style="text-decoration: none;" href="/blog/media/{{ media.id }}">
+                                            <span class='row_title' >{{ media.title }}</span>
+                                        </a>
+                                        <div class="row_rb_part">
+                                            <span class='row_desc' >{{ media.pub_time | datetime_to_date }}</span>
+                                            <span class='row_desc' >{{ media.hits }} 次观看</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul> 
+                    </mt-tab-container-item>
+                    <mt-tab-container-item id="2">
+                        <mt-cell v-for="n in 4" :title="'content ' + n" />
+                    </mt-tab-container-item>
+                </mt-tab-container> {% endcomment %}
+                
+            </div>
+        {% else %}
+            <p>No info found now.</p>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+<script>
+
+if(document.getElementsByTagName('wechatpromt').length>0){
+    if(document.getElementsByTagName('video').length>0){
+        document.getElementsByTagName('video')[0].classList.add('fixtop')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('webkit-playsinline','webkit-playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('x5-playsinline','x5-playsinline')
+    }
+}
+
+window.onresize = function(){
+    /*console.log('re')
+    vh = document.getElementsByTagName('video').length>0?document.getElementsByTagName('video')[0].offsetHeight:0
+    container_v = document.getElementsByClassName('ckeditor-html5-video').length>0 ? document.getElementsByClassName('ckeditor-html5-video')[0]:{}
+    container_v.style.height=vh*/
+}
+
+
+new Vue({
+    el: '#LordDay',
+    data: {
+        theme: '',
+        selected:'1',
+        activeName:'curlorday'
+    },
+    created: function () {
+    },
+    methods:{
+        handleClick:function(){
+            console.log(1)
+        }
+    }
+})
+
+var mySwiper = new Swiper ('.swiper-container', {
+    direction: 'horizontal', // 垂直切换选项vertical
+    loop: true, // 循环模式选项
+    
+    // 如果需要分页器
+    pagination: {
+      el: '.swiper-pagination',
+    },
+    
+    // 如果需要前进后退按钮
+    /*navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },*/
+    
+    // 如果需要滚动条
+    scrollbar: {
+      el: '.swiper-scrollbar',
+    },
+  })
+
+</script>
+</html>

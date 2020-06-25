@@ -59,12 +59,12 @@ def media(request,pk=0):
     try:
         # return HttpResponse("Hello, world. You're at the polls index.")
         from churchs.models import Media
-        # from api.serializers import SermonSerializer4API, MediaSerializer4API
-        # from churchs.models import Media
-        # from django.db.models import Prefetch
-        # # queryset=Sermon.objects.all()
+        
         media = Media.objects.get(id=pk)
 
+        media.hits = media.hits+1
+        media.save()
+        
         mediaDict = {
             'image':media.alioss_image,
             'title':media.title,
@@ -118,4 +118,6 @@ def column_content_medias(request,pk=0):
     except Exception as e:
             theLogger.exception("there is an exception",exc_info=True,stack_info=True)
             raise e
+
+
       

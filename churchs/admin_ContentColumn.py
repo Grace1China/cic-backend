@@ -45,16 +45,7 @@ class ColumnMediasForm(forms.ModelForm):
     Ver 4 
     保留图片 链接 和跳转本页方式的修改
     '''
-    # Media_cover = forms.CharField(label="",widget=MediaContentWidget(label='封面',typ='images'),required=False)
-    # Media_title = forms.CharField(label="",required=False)
-    Media = forms.CharField(label="",widget=HiddenInput,required=False)
-    # class Meta:
-    #     model = churchs_models.Media
-    #     fields = ('title','alioss_video','alioss_image','alioss_video_status','content',)
-    #     formfield_overrides = {
-    #         Media.content: {'widget': CKEditorWidget()},
-    #     }
-    
+    Media = forms.ModelChoiceField(label="",queryset=Media.objects.all(),widget=HiddenInput,required=False)
 
     class Meta:
         model = ColumnMedias
@@ -161,8 +152,6 @@ class ColumnMediasInline(admin.TabularInline):
             "删除"
         )
     Media_delete.short_description = ""
-    
-    
 
 class ContentColumnAdmin(admin.ModelAdmin):
     # form=MediaVideoForm
