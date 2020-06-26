@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import WeeklyReport, Sermon, Media,SermonSeries,Speaker
-from . import models as churchs_models
+from churchs.models import WeeklyReport, Sermon, Media,SermonSeries,Speaker
+from churchs import models as churchs_models
 from django.db import models as sysmodels
 from ckeditor.widgets import CKEditorWidget
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
-from .widget import AliVideoWidgetExt
+from churchs.widget import AliVideoWidgetExt
 from django.forms import ModelForm,Form
-from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
-from .forms import MeidaForm2
+from churchs.widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
+from churchs.forms import MeidaForm2
 from users.models import CustomUser
 from church.models import Church
 

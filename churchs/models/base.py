@@ -14,7 +14,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 import oss2
 import urllib
 import re
-from .widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField
+from churchs.widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField
 from church.confs.base import get_ALIOSS_DESTINATIONS
 
 import logging 
@@ -31,6 +31,7 @@ class Speaker(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
     class Meta:
+        app_label = 'churchs'
         verbose_name = "讲员"
         verbose_name_plural = "讲员"
     def __str__(self):
@@ -48,6 +49,7 @@ class Venue(models.Model):
     addressUrl =  models.CharField(max_length=255)
     createdby = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='创建者')
     class Meta:
+        app_label = 'churchs'
         verbose_name = "场地"
         verbose_name_plural = "场地"
 
@@ -72,6 +74,7 @@ class SermonSeries(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_CLOSE,verbose_name='状态')
 
     class Meta:
+        app_label = 'churchs'
         verbose_name = "媒体分组"
         verbose_name_plural = "媒体分组"
 
@@ -130,6 +133,11 @@ class MediaFile(models.Model):
     video_file_tcinfo = models.CharField(max_length=1000,null=True,verbose_name='视频转码文件')
     # pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
     # status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
+
+    class Meta:
+        app_label = 'churchs'
+        verbose_name = "媒体文件"
+        verbose_name_plural = "媒体文件"
 
 
 class Media(models.Model):
@@ -346,10 +354,6 @@ class Media(models.Model):
         
 
         return retval
-            
-        
-
-
 
     #----------------------------------------------------------------------------------------------------------------------------------------------
     @property
@@ -514,19 +518,12 @@ class Media(models.Model):
             return retval 
         else:
             return ''
-
-
-   
-    
-
     class Meta:
         verbose_name = "内容"
         verbose_name_plural = "内容"
 
     def __str__(self):
         return '%s' % (self.title)
-
- 
 class ContentColumn(models.Model):
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
@@ -547,6 +544,7 @@ class ContentColumn(models.Model):
     medias = models.ManyToManyField(Media,through='ColumnMedias')
 
     class Meta:
+        app_label = 'churchs'
         verbose_name = "内容专栏"
         verbose_name_plural = "内容专栏"
 
@@ -560,6 +558,7 @@ class ColumnMedias(models.Model):
     Media = models.ForeignKey(Media,null=True, on_delete=models.CASCADE)
 
     class Meta:
+        app_label = 'churchs'
         verbose_name = "专栏内容列表"
         verbose_name_plural = "专栏内容列表"
 
@@ -573,9 +572,7 @@ class ColumnMedias(models.Model):
 #     theLogger.info(sender)
 #     theLogger.info(kwargs)
 
-
 # pre_save.connect(ContentColumn_changed, sender=ContentColumn) 这种方式，可能不能实现防止级连删除的功能
-
 
 from church.alioss_storage_backends_v2 import AliyunMediaStorage,AliyunStaticStorage
 
@@ -601,18 +598,13 @@ class Sermon(models.Model):
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
-
-
-
     class Meta:
+        app_label = 'churchs'
         verbose_name = "主日信息"
         verbose_name_plural = "主日信息"
 
     def __str__(self):
         return '%s' % (self.title)
-                
-    
-
 
 class WeeklyReport(models.Model):
     STATUS_DRAFT = 1
@@ -637,6 +629,7 @@ class WeeklyReport(models.Model):
     pub_time = models.DateTimeField(auto_now_add=True,null=True, blank=True,editable=True,verbose_name='发布时间')
     status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
     class Meta:
+        app_label = 'churchs'
         verbose_name = "周报图文"
         verbose_name_plural = "周报图文"
 
@@ -663,7 +656,9 @@ class Team(models.Model):
     )
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
     class Meta:
+        app_label = 'churchs'
         verbose_name = "小组"
         verbose_name_plural = "小组"
     def __str__(self):
@@ -678,7 +673,9 @@ class Donation(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
     pay_time = models.DateTimeField(null=True,verbose_name='支付时间')
+    
     class Meta:
+        app_label = 'churchs'
         verbose_name = "奉献"
         verbose_name_plural = "奉献"
     def __str__(self):
@@ -699,7 +696,9 @@ class Meeting(models.Model):
     # content = models.TextField()
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
     class Meta:
+        app_label = 'churchs'
         verbose_name = "聚会"
         verbose_name_plural = "聚会"
     def __str__(self):
@@ -713,7 +712,9 @@ class BibleStudy(models.Model):
     # content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
     class Meta:
+        app_label = 'churchs'
         verbose_name = "灵修"
         verbose_name_plural = "灵修"
     def __str__(self):
@@ -727,7 +728,9 @@ class BibleStudyComment(models.Model):
     content = models.TextField(null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+    
     class Meta:
+        app_label = 'churchs'
         verbose_name = "灵修评论"
         verbose_name_plural = "灵修评论"
     def __str__(self):

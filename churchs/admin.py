@@ -283,18 +283,20 @@ admin.site.register(churchs_models.SermonSeries,SermonSeriesAdmin)
 # admin.site.register(churchs_models.BibleStudyComment)
 # admin.site.register(churchs_models.Media)
 
-
-
-
-from churchs.admin_Content import MediaVideoAdmin    
+from churchs.admins.admin_Content import MediaVideoAdmin    
 admin.site.register(churchs_models.Media, MediaVideoAdmin)
 
 
-from churchs.admin_ContentColumn import ContentColumnAdmin
+from churchs.admins.admin_ContentColumn import ContentColumnAdmin
 admin.site.register(churchs_models.ContentColumn,ContentColumnAdmin)
 
-from churchs.admin_Sermon import SermonAdmin
+from churchs.admins.admin_Sermon import SermonAdmin
 admin.site.register(churchs_models.Sermon, SermonAdmin)
+
+from churchs.admins.admin_Vpage import VpageAdmin
+admin.site.register(churchs_models.vpage,VpageAdmin)
+admin.site.register(churchs_models.vpage_position)
+
 
 
 

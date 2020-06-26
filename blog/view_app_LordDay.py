@@ -15,6 +15,8 @@ from church.models import Church
 from rest_framework_simplejwt.state import token_backend
 from users.models import CustomUser
 
+from django.conf import settings
+
 
 class CColSerializer(serializers.ModelSerializer):
     medias = MediaSerializer4ListAPI(many=True, read_only=True)
@@ -31,22 +33,26 @@ def column_content_Lord_Day(request,pk=0):
     try:
         data = request.GET
         token = data.get('token','')
-        token1 = token_backend.decode(token, verify=True)
-       
-        if token1 == None:
-            raise Exception('Token invalid!')
+        chs = None
+        if token == '':
+            chs = Church.objects.get(code=settings.DEFAULT_CHURCH_CODE)
+        else:
+            token1 = token_backend.decode(token, verify=True)
         
-        theLogger.info(token1)
-        user = CustomUser.objects.get(id = token1['user_id'])
-        if user == None:
-            raise Exception('No such user invalid!')
-        theLogger.info(user)
+            if token1 == None:
+                raise Exception('Token invalid!')
+            
+            theLogger.info(token1)
+            user = CustomUser.objects.get(id = token1['user_id'])
+            if user == None:
+                raise Exception('No such user invalid!')
+            theLogger.info(user)
 
-        chs = user.church
-        
-        if chs == None:
-            raise Exception('User has no church')
-        theLogger.info('church:%s' % chs)
+            chs = user.church
+            
+            if chs == None:
+                raise Exception('User has no church')
+            theLogger.info('church:%s' % chs)
         CColsz = CColSerializer(chs.Lord_Day_column)
         banners = chs.Lord_Day_swipe.all()
         theLogger.info('----------banners:')
