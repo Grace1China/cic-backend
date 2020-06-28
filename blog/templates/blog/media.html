@@ -48,6 +48,7 @@
 
     .contentblock p{
         margin:0px;
+        width:100%;
     }
     .sticky{
         position: fixed;
@@ -105,21 +106,24 @@
     .mint-navbar .mint-tab-item{
         padding:0px;
     }
+    .bottom_tool{
+        position: fixed;
+        z-index: 99999;
+        bottom: 0px;
+        font-size: 2rem;
+        display: flex;
+        justify-content: space-around;
+        background: #33333394;
+        width: 100%;
+        height: fit-content;
+        padding: 5px 0 10px;
+    }
 
-    .el-icon-refresh{
-        right: 20px;
-        position: fixed;
-        z-index: 99999;
-        bottom: 200px;
-        font-size: 2rem;
+    .bottom_tool i{
+        color:#fff;
     }
-    .el-icon-d-arrow-left{
-        right: 20px;
-        position: fixed;
-        z-index: 99999;
-        bottom: 250px;
-        font-size: 2rem;
-    }
+
+    
 </style>
 </head>
 <body class ="wechatpromt">
@@ -170,14 +174,16 @@
             <p>No info found now.</p>
         {% endif %}
     </div>
-    <a href="javascript:void(0);" onclick="document.location.reload()"><i class="el-icon-refresh"></i></a>
-    <a href="javascript:void(0);" onclick="document.location.href='/blog/LordDay'"><i class="el-icon-d-arrow-left"></i></a>
+    <div class="bottom_tool">
+        <a href="javascript:void(0);" onclick="document.location.href='/blog/LordDay'"><i class="el-icon-d-arrow-left"></i></a>
+        <a href="javascript:void(0);" onclick="document.location.reload()"><i class="el-icon-refresh"></i></a>
+    </div>
 </div>
 
 </body>
 <script>
 
-if(document.getElementsByTagName('wechatpromt').length>0){
+if(document.getElementsByClassName('wechatpromt').length>0){
     if(document.getElementsByTagName('video').length>0){
         document.getElementsByTagName('video')[0].classList.add('fixtop')
         document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')

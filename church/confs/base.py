@@ -711,7 +711,7 @@ CKEDITOR_CONFIGS = {
 # 'xml'
             
         ]),
-        'extraAllowedContent': 'video [*]{*}(*); p [*]{*}(*); script [*]{*}(*); img [*]{*}(*); audio [*]{*}(*); source [*]{*}(*) ',
+        'extraAllowedContent': 'video [*]{*}(*); p [*]{*}(*); script [*]{*}(*); img [*]{*}(*); audio [*]{*}(*); source [*]{*}(*)  ',
     }
 }
 
