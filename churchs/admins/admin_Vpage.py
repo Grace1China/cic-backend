@@ -17,7 +17,7 @@ from django.db.models import Q
 from django.forms import widgets as Fwidgets
 from django.forms import fields
 from django.forms.widgets import HiddenInput
-from django.utils.functional import curry
+# from django.utils.functional import curry
 
 from django.utils.html import format_html
 from church.confs.prod import get_ALIOSS_DESTINATIONS
@@ -231,6 +231,15 @@ class VpageAdmin(admin.ModelAdmin):
         vpos_Inline,
     ]
 
+
+
+class VComponents(admin.ModelAdmin):
+    list_display = ('title','name', 'pub_time','promote_at','status','promote')  
+    # list_filter = (MediaKindListFilter, 'alioss_video_status')
+    fields = ('title','name', 'pub_time','promote_at','status')
+    formfield_overrides = {
+        churchs_models.Media.content: {'widget': CKEditorWidget()},
+    }
 
 
 
