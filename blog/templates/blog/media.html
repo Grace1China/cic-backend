@@ -1,7 +1,7 @@
 {% load i18n static  %}
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
 <link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
 <link rel="stylesheet" href="{% static 'church/css/video-js.css' %}">
 <script type="text/javascript" src="{% static "church/js/videojs-ie8.min.js" %}"></script>
@@ -29,7 +29,7 @@
         top: 0px;
         left: 50%;
         transform: translate(-50%, 0px);
-        width:100%;
+        width: 100vw;
     }
     body{
         margin:0px;
@@ -44,22 +44,14 @@
         text-align: center;
     }
     .contentblock{
-        width:100%;
+        width: 100vw;
     }
 
     .contentblock p{
         margin:0px;
-        100%;
     }
-    .contentblock p img{
-        100%;
-    }
-    .sticky{
-        position: fixed;
-        top: 0px;
-        left: 50%;
-        transform: translate(-50%, 0px);
-    }
+   
+    
     .cap-image-ad__title{
         margin: 0;
         background: #000000a1;
