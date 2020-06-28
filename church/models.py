@@ -82,8 +82,8 @@ class Course(models.Model):
     users = models.ManyToManyField("users.CustomUser", through='payment.Users_Courses', related_name="courses", blank=True)
     sales_num = models.IntegerField(default=0)
     
-    import churchs.models as churchs_models
-    medias = GenericRelation(churchs_models.Media, related_query_name='Course',verbose_name='视听媒体')
+    # from  churchs.models.base import Media
+    medias = GenericRelation('churchs.Media', related_query_name='Course',verbose_name='视听媒体')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True,verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True,verbose_name='更新时间')
     class Meta:

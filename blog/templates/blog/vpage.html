@@ -1,15 +1,27 @@
-{% load i18n static  %}
+{% load i18n static %}
+{% load cust_filters %}
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
 <link rel="stylesheet" href="{% static 'church/css/video-js.css' %}">
+
+{% comment %} <link rel="stylesheet" href="{% static 'church/css/mintui.css' %}">
+<script type="text/javascript" src="{% static "church/js/mintui_index.js" %}"></script> {% endcomment %}
+
+<link rel="stylesheet" href="{% static 'church/css/swiper.min.css' %}">
+<script type="text/javascript" src="{% static "church/js/swiper.min.js" %}"></script>
+
 <script type="text/javascript" src="{% static "church/js/videojs-ie8.min.js" %}"></script>
+<script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
 
 <link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
 <script type="text/javascript" src="{% static "admin/simpleui-x/elementui/index.js" %}"></script>
 
 <style>
+    body{
+        margin:0px;
+    }
     .cover{
         z-index: 1;
         background-position: 57%;
@@ -21,20 +33,6 @@
     }
     .video-js{
         object-fit: fill;
-    }
-
-    .contentblock p{
-        margin:0px;
-    }
-    .sticky{
-        position: fixed;
-        top: 0px;
-        left: 50%;
-        transform: translate(-50%, 0px);
-        width:100%;
-    }
-    body{
-        margin:0px;
     }
     .page-detail{
         width: 100%;
@@ -105,73 +103,38 @@
     .mint-navbar .mint-tab-item{
         padding:0px;
     }
-
-    .el-icon-refresh{
-        right: 20px;
-        position: fixed;
-        z-index: 99999;
-        bottom: 200px;
-        font-size: 2rem;
-    }
-    .el-icon-d-arrow-left{
-        right: 20px;
-        position: fixed;
-        z-index: 99999;
-        bottom: 250px;
-        font-size: 2rem;
-    }
 </style>
 </head>
 <body class ="wechatpromt">
 
 
 
-<div class="container" style="min-height: 937px;display: flex;justify-content: center;">
+<div id="LordDay" class="container" style="min-height: 937px;display: flex;justify-content: center;">
     <div class="page-detail" >
         <div class="topblock">
         </div>
-        {% if media %}
-            <div class="headblock">
-                <div class="sticky">
-                    <video
-                        id="lx-video"
-                        class="video-js"
-                        controls
-                        width="100%"
-                        height="auto"
-                        poster="{{ media.cover }}"
-                        data-setup="{}"
-                    >
-                        <!--
-                            MEDIA_VIDEOS = 6
-                            MEDIA_AUDIOS = 7
-                            MEDIA_TUWEN = 8
-                        -->  
-                        {% if media.kind == 6 %}
-                            <source src="{{ media.video }}" type="video/mp4" />
-                        {% endif %}
-                        {% if media.kind == 7 %}
-                            <source src="{{ media.audio }}" type="audio/mp3" />
-                        {% endif %}
-                        <p class="vjs-no-js">
-                        To view this video please enable JavaScript, and consider upgrading to a
-                        web browser that
-                        <a href="https://videojs.com/html5-video-support/" target="_blank"
-                            >supports HTML5 video</a
-                        >
-                        </p>
-                    </video>
-                </div>
-            </div>
-            <div class="contentblock">
-                {{ media.content|safe }}
-            </div>
+        {% if vpage %}
+            {% for vpo in vpos %}
+                {% if vpo.control == 1 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+                {% endif %}
+                {% if vpo.control == 2 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+                {% endif %}
+                {% if vpo.control == 3 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+                {% endif %}
+                {% if vpo.control == 4 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+                {% endif %}
+            {% endfor%}
         {% else %}
-            <p>No info found now.</p>
+            <div>
+                no page data
+            </div>
         {% endif %}
+        <p>{{  vpage }}</p>
+        <!--
+            
+        -->
+        <p>{{ vpos }}</p>
     </div>
-    <a href="javascript:void(0);" onclick="document.location.reload()"><i class="el-icon-refresh"></i></a>
-    <a href="javascript:void(0);" onclick="document.location.href='/blog/LordDay'"><i class="el-icon-d-arrow-left"></i></a>
 </div>
 
 </body>
@@ -187,12 +150,50 @@ if(document.getElementsByTagName('wechatpromt').length>0){
     }
 }
 
-
 window.onresize = function(){
     /*console.log('re')
     vh = document.getElementsByTagName('video').length>0?document.getElementsByTagName('video')[0].offsetHeight:0
     container_v = document.getElementsByClassName('ckeditor-html5-video').length>0 ? document.getElementsByClassName('ckeditor-html5-video')[0]:{}
     container_v.style.height=vh*/
 }
+
+
+new Vue({
+    el: '#LordDay',
+    data: {
+        theme: '',
+        selected:'1',
+        activeName:'curlorday'
+    },
+    created: function () {
+    },
+    methods:{
+        handleClick:function(){
+            console.log(1)
+        }
+    }
+})
+
+var mySwiper = new Swiper ('.swiper-container', {
+    direction: 'horizontal', // 垂直切换选项vertical
+    loop: true, // 循环模式选项
+    
+    // 如果需要分页器
+    pagination: {
+      el: '.swiper-pagination',
+    },
+    
+    // 如果需要前进后退按钮
+    /*navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },*/
+    
+    // 如果需要滚动条
+    scrollbar: {
+      el: '.swiper-scrollbar',
+    },
+  })
+
 </script>
 </html>

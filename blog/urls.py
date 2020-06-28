@@ -5,6 +5,7 @@ from django.views.decorators.cache import never_cache
 from . import views
 from .view_app_LordDay import column_content_Lord_Day
 from .view_app_home import theApp_home
+from .vpage import vpage
 
 
 urlpatterns = [
@@ -14,4 +15,6 @@ urlpatterns = [
     path('ccol/<int:pk>', views.column_content_medias, name='ccol'),
     path(r'LordDay', never_cache(column_content_Lord_Day), name='LordDay'),
     path(r'AppHome', never_cache(theApp_home), name='AppHome'),
+    path(r'vpage', never_cache(vpage), name='vpage'),
+
 ]

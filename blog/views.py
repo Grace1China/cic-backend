@@ -72,7 +72,7 @@ def media(request,pk=0):
             'kind':media.kind,
             'cover':'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='images')['redirecturl'],media.alioss_image),
             'video':'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='videos')['redirecturl'],media.alioss_video),
-            'audio':media.alioss_audio,
+            'audio':'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='audios')['redirecturl'],media.alioss_audio),
         }
         template = loader.get_template('blog/media.html')
         context = {

@@ -252,7 +252,7 @@ class MediaBaseWidget(TextInput):
             'name':name,
             'value':'' if value is None else value
         }
-        theLogger.info(mark_safe(render_to_string( 'admin/media-select.tpl',ctx)))
+        # theLogger.info(mark_safe(render_to_string( 'admin/media-select.tpl',ctx)))
         return mark_safe(render_to_string( 'admin/media-select.tpl',ctx))
 
 
@@ -292,4 +292,35 @@ class MediaContentWidget(TextInput):
         }
         # theLogger.info(mark_safe(render_to_string( 'admin/content-select.tpl',ctx)))
         return mark_safe(render_to_string( 'admin/content-select.tpl',ctx))
+
+class InlineContentField(Field):
+    def __init__(self, *args, **kwargs):
+        self.widget = InlineContentWidget(label=kwargs.get('verbose_name', None))
+        super(InlineContentField, self).__init__(*args, **kwargs)
+
+    def get_internal_type(self):
+        return 'TextField'
+
+    def formfield(self, *args, **kwargs):
+        kwargs['widget'] = self.widget
+        return super(InlineContentField, self).formfield(*args, **kwargs)
+
+class InlineContentWidget(TextInput):
+    class Media:
+        pass
+
+    def __init__(self, *args, **kwargs):
+        self.label = kwargs.pop('label', None)
+
+        super(InlineContentWidget, self).__init__(*args, **kwargs)
+
+    def render(self, name, value, **kwargs):
+        ctx = {
+            'label':self.label,
+            'name':name,
+            'value':'' if value is None else value,
+        }
+        # theLogger.info(mark_safe(render_to_string( 'admin/content-select.tpl',ctx)))
+        return mark_safe(render_to_string( 'admin/inline-content.tpl',ctx))
+
 

@@ -14,9 +14,10 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 import oss2
 import urllib
 import re
-from churchs.widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField
+from churchs.widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField,InlineContentField
 from church.confs.base import get_ALIOSS_DESTINATIONS
-from churchs.models.base import ContentColumn,Media
+from churchs.models.columnContent import ContentColumn
+from churchs.models.base import Media
 
 import logging 
 theLogger = logging.getLogger('church.all')
@@ -30,18 +31,19 @@ theLogger = logging.getLogger('church.all')
 位置1 控件carousel 数据(col1)
 '''
 
-class baseChurchModel(models.Model):
-    church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
-    create_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
+# class baseChurchModel(models.Model):
+#     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
+#     create_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
+#     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+#     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     
-    class Meta:
-        app_label = 'churchs'
-        verbose_name = "教会基础组件"
-        verbose_name_plural = "教会基础组件"
+#     class Meta:
+#         app_label = 'churchs'
+#         verbose_name = "教会基础组件"
+#         verbose_name_plural = "教会基础组件"
 
-class vpage(models.Model):
+class VPage(models.Model):
+    id = models.AutoField(primary_key=True)
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     create_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -70,7 +72,8 @@ class vpage(models.Model):
         verbose_name = "微页面"
         verbose_name_plural = "微页面"
 
-class vpage_position(models.Model):
+class VComponents(models.Model):
+    id = models.AutoField(primary_key=True)
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     create_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -89,17 +92,17 @@ class vpage_position(models.Model):
     control = models.IntegerField(choices=CONTROL_CHOICES,default=CAROUSEL,verbose_name='控件')
     ContentColumn = models.ForeignKey(ContentColumn,null=True,blank=True, on_delete=models.CASCADE)#position 多 <-->1  ContentColumn
     Media = models.ForeignKey(Media,null=True,blank=True, on_delete=models.CASCADE)
-    content = RichTextUploadingField(null=True,blank=True,verbose_name='内容',external_plugin_resources=[('html5video',
-    '/static/ckeditor/ckeditor/plugins/html5video/',
-    'plugin.js'
-    ),
-    ])
-    vpage = models.ForeignKey(vpage,null=True, on_delete=models.CASCADE)#position 多 <-->1  ContentColumn
-
+    content = InlineContentField(null=True,blank=True,verbose_name='内容',)
+    # vpage = models.ForeignKey(vpage,null=True, on_delete=models.CASCADE)#position 多 <-->1  ContentColumn
     class Meta:
         app_label = 'churchs'
         verbose_name = "微组件"
         verbose_name_plural = "微组件"
+
+class VPageComponents(models.Model):
+    page = models.ForeignKey(VPage,null=True, on_delete=models.CASCADE)
+    components = models.ForeignKey(VComponents,null=True, on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField(null=False,default=0)
 
 
 

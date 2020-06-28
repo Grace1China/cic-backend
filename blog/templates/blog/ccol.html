@@ -103,12 +103,23 @@
     .mint-navbar .mint-tab-item{
         padding:0px;
     }
+    .el-icon-refresh{
+        right: 20px;
+        position: fixed;
+        z-index: 99999;
+        bottom: 200px;
+        font-size: 2rem;
+    }
+    .el-icon-d-arrow-left{
+        right: 20px;
+        position: fixed;
+        z-index: 99999;
+        bottom: 250px;
+        font-size: 2rem;
+    }
 </style>
 </head>
 <body class ="wechatpromt">
-
-
-
 <div id="LordDay" class="container" style="min-height: 937px;display: flex;justify-content: center;">
     <div class="page-detail" >
         <div class="topblock">
@@ -219,6 +230,9 @@
             <p>No info found now.</p>
         {% endif %}
     </div>
+    <a href="javascript:void(0);" onclick="document.location.reload()"><i class="el-icon-refresh"></i></a>
+    <a href="javascript:void(0);" onclick="document.location.href='/blog/LordDay'"><i class="el-icon-d-arrow-left"></i></a>
+    
 </div>
 
 </body>

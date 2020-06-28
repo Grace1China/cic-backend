@@ -294,8 +294,8 @@ from churchs.admins.admin_Sermon import SermonAdmin
 admin.site.register(churchs_models.Sermon, SermonAdmin)
 
 from churchs.admins.admin_Vpage import VpageAdmin
-admin.site.register(churchs_models.vpage,VpageAdmin)
-admin.site.register(churchs_models.vpage_position)
+admin.site.register(churchs_models.VPage,VpageAdmin)
+admin.site.register(churchs_models.VComponents)
 
 
 
