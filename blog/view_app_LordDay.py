@@ -62,7 +62,7 @@ def column_content_Lord_Day(request,pk=0):
         theLogger.info(banners)
         if banners:
             banners = MediaSerializer4ListAPI(banners,many=True)
-        template = loader.get_template('blog/ccol.html')
+        template = loader.get_template('blog/LordDay.html')
         context = {
             'ccol': CColsz.data,
             'ccol_medias':ccol_medias.data,
