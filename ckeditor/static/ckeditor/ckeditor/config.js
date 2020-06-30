@@ -7,5 +7,10 @@ CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here. For example:
 	// config.language = 'fr';
 	// config.uiColor = '#AADC6E';
-	config.filebrowserImageBrowseUrl = ' /ckeditor/browse/?type=images';
+	config.filebrowserImageBrowseUrl = '/media_browse/?type=images&from=ckeditor_browse';
+	config.allowedContent = true;
+	config.pasteFilter = null
 };
+CKEDITOR.editorConfig.allowedContent = true;
+CKEDITOR.editorConfig.pasteFilter = null
+

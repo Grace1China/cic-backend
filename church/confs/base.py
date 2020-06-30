@@ -646,7 +646,7 @@ CKEDITOR_CONFIGS = {
             'clipboard',
             'widgetselection', 
             'abbr',
-            'stylesheetparser',
+            # 'stylesheetparser',
             # 'docprops',
 
             # 'filerimage',
@@ -711,7 +711,9 @@ CKEDITOR_CONFIGS = {
 # 'xml'
             
         ]),
-        'extraAllowedContent': 'video [*]{*}(*); p [*]{*}(*); script [*]{*}(*); img [*]{*}(*); audio [*]{*}(*); source [*]{*}(*)  ',
+        'removePlugins': 'stylesheetparser',
+        'allowedContent': True,
+        # 'extraAllowedContent': 'video [*]{*}(*); p [*]{*}(*); script [*]{*}(*); img [*]{*}(*); audio [*]{*}(*); source [*]{*}(*)  ',
     }
 }
 

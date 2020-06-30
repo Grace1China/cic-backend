@@ -173,8 +173,8 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 			imgs.forEach(function(e){
 				typ = e.getAttribute('typ')
 				if(typ == 'images'){
-					html = html + `<p><img style="width:100%;" src="${e.getAttribute('src').replace('/wh100_auto','')}"></p>` 
-					imgList.push(e.getAttribute('src').replace('/wh100_auto',''))
+					html = html + `<p><img style="width:100%;" src="${e.getAttribute('data-src')}?x-oss-process=style/w730"></p>` 
+					// imgList.push(e.getAttribute('src').replace('/wh100_auto','/w730'))
 				}else if(typ == 'videos'){
 					html = html + `<div class="ckeditor-html5-video" style="text-align:center">
 						<video controls="controls" controlslist="nodownload"  src="${e.getAttribute('data-src')}" width="100%">&nbsp;</video>

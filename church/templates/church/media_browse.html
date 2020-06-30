@@ -474,7 +474,11 @@
                 
             </el-main>
             <el-footer v-if="isFromCtrl()">
-                <el-button type="primary" @click.native='winClose'>取消</el-button><el-button type="primary" @click=mediaReturn('ok')>确定返回结果</el-button>
+                <el-button type="primary" @click.native='winClose'>取消</el-button>
+                <el-button type="primary" @click=mediaReturn('ok')>确定返回结果</el-button>
+            </el-footer>
+            <el-footer v-if="isFrom_ckeditor_browse()">
+                <el-button type="primary" @click=mediaEmbed()>嵌入</el-button>
             </el-footer>
         </el-container>
 
@@ -615,6 +619,18 @@
                             window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
                             window.close()
                         },
+                        mediaEmbed(){
+                            console.log('-----mediaReturn-----------')
+                            console.log(this.images)
+                            arr = this.checkedImages[0].split('-')
+                            index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
+                            //from = this.getQueryVariable('from')
+                            o = this.images[index]
+                            console.log(o)
+                            funcNum = this.getQueryVariable('CKEditorFuncNum')
+                            window.opener.CKEDITOR.tools.callFunction(funcNum, `${o.src}?x-oss-process=style/w730`);
+                            window.close();
+                        },
                         winClose(){
                             window.close()
                         },
@@ -642,7 +658,15 @@
                             }else{
                                 return true
                             }
-                        },                 
+                        },     
+                        isFrom_ckeditor_browse:function(){
+                            console.log(this.getQueryVariable('from'))
+                            if (this.getQueryVariable('from').indexOf('ckeditor_browse')>=0){
+                                return true
+                            }else{
+                                return false
+                            }
+                        },            
                         theImage(i,j){
                             return (store.state.images||[])[(i-1)*6 + j-1]||{}
                         },
