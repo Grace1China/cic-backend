@@ -176,7 +176,7 @@
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="最新主日内容" name="curlorday">
                         <ul style="padding:0;">
-                            {% for media in ccol.medias %}
+                            {% for media in ccol_medias %}
                                 <li style="display:flex;padding:15px;height:17vw;">
                                     <div>
                                         <a href="/blog/media/{{ media.id }}" style="display:contents;" target="_self">

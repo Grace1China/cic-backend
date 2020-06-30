@@ -54,6 +54,9 @@ def column_content_Lord_Day(request,pk=0):
                 raise Exception('User has no church')
             theLogger.info('church:%s' % chs)
         CColsz = CColSerializer(chs.Lord_Day_column)
+        ccol_medias = MediaSerializer4ListAPI(chs.Lord_Day_column.medias_list(),many=True)
+        theLogger.info('---------------column_content_Lord_Day-------------------')
+        theLogger.info(CColsz.data)
         banners = chs.Lord_Day_swipe.all()
         theLogger.info('----------banners:')
         theLogger.info(banners)
@@ -62,6 +65,7 @@ def column_content_Lord_Day(request,pk=0):
         template = loader.get_template('blog/ccol.html')
         context = {
             'ccol': CColsz.data,
+            'ccol_medias':ccol_medias.data,
             'banners':banners.data
         }
         return HttpResponse(template.render(context, request))

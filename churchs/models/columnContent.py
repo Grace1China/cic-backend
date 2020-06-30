@@ -40,6 +40,9 @@ class ContentColumn(models.Model):
     # medias = GenericRelation(Media, related_query_name='ContentColumn',verbose_name='内容')
     medias = models.ManyToManyField(Media,through='ColumnMedias')
 
+    def medias_list(self):
+        return [colMedia.Media for colMedia in ColumnMedias.objects.filter(ContentColumn=self).order_by('order')]
+
     class Meta:
         app_label = 'churchs'
         verbose_name = "内容专栏"
@@ -59,6 +62,7 @@ class ColumnMedias(models.Model):
         app_label = 'churchs'
         verbose_name = "专栏内容列表"
         verbose_name_plural = "专栏内容列表"
+        ordering = ['order',]
 
     def __str__(self):
         return 'ContentColumn:%s -> Media:%s' % (self.ContentColumn,self.Media)

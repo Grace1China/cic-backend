@@ -61,7 +61,7 @@ class ColumnMediasInline(admin.TabularInline):
     model = ColumnMedias
     template = 'admin/churchs/content_tabular.html'
     readonly_fields = ('Media_one',)  #'Media_cover','Media_link','Media_edit','Media_delete'
-    
+    ordering = ('order',)
     extra = 0
     can_delete = False
     # max_num = 4
