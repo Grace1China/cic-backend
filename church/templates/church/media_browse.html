@@ -203,7 +203,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
+                                                        @click.stop.prevent="handlePictureCardPreview(theImage(ii,jj))"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -258,7 +258,7 @@
                                                 <!-- 2、转码开始 状态为3。显示一个比较好图 -->
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':(theImage(ii,jj).video_tcinfo||{}).sd,'qrcode':theImage(ii,jj).src_qrcode})"
+                                                        @click.stop.prevent="handlePictureCardPreview(theImage(ii,jj))"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -306,7 +306,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
+                                                        @click.stop.prevent="handlePictureCardPreview(theImage(ii,jj))"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -356,7 +356,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
+                                                        @click.stop.prevent="handlePictureCardPreview(theImage(ii,jj))"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -406,7 +406,7 @@
                                             <hovercard>
                                                 <div class='extra-bar'>
                                                     <span
-                                                        @click.stop.prevent="handlePictureCardPreview({'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode})"
+                                                        @click.stop.prevent="handlePictureCardPreview(theImage(ii,jj))"
                                                     >
                                                         <i class="el-icon-zoom-in"></i>
                                                     </span>
@@ -837,17 +837,24 @@
                             this.showFiles(this.activeTab,this.curdir,1,{'delete':key})
                         },
                         handlePictureCardPreview(file) {
+                            /*is_image: false
+                            key: "L3/default/be608047-8da4-eacb-08ba-7e263edb1ae9"
+                            src: "https://api.bicf.org/mediabase/L3/default/be608047-8da4-eacb-08ba-7e263edb1ae9"
+                            thumb: "https://api.bicf.org/mediabase/L3/default/be608047-8da4-eacb-08ba-7e263edb1ae9?x-oss-process=style/wh100_auto"
+                            typ: "images"
+                            visible_filename: "ckeditorpasted_2020/7/5_31a794ef-6ee7-3abe-d4f5-bb9155813911"
+                            {'oname':theImage(ii,jj).visible_filename,'url':theImage(ii,jj).src,'qrcode':theImage(ii,jj).src_qrcode},'typ':*/
                             console.log('------------handlePictureCardPreview---------------')
                             console.log(file)
                             
-                            if (((file||{}).oname||'').match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')){
-                                this.$alert(`<span>${file.oname}</span><img style="width:100%;height:auto;" src="${file.url}">`, {
+                            if (file.typ=='images'){//((file||{}).oname||'').match('(.jpg$)|(.png$)|(.gif$)|(.ico$)')
+                                this.$alert(`<span>${file.visible_filename}</span><img style="width:100%;height:auto;" src="${file.src}">`, {
                                     dangerouslyUseHTMLString: true,
                                     customClass:"image-preview"
                                 });
                                 return
-                            } else if (((file||{}).oname||'').match('(.mp4$)')){
-                                this.$alert(`<span>${file.oname}</span><video id="media-preview" style="width:100%;height:auto;" controls src="${file.url}">`, {
+                            } else if (file.typ=='videos'){//((file||{}).oname||'').match('(.mp4$)')
+                                this.$alert(`<span>${file.visible_filename}</span><video id="media-preview" style="width:100%;height:auto;" controls src="${file.src}">`, {
                                     dangerouslyUseHTMLString: true,
                                     customClass:"image-preview",
                                     beforeClose:(action,instance,done)=>{
@@ -857,8 +864,8 @@
                                     }
                                 });
                                 return
-                            }else if(((file||{}).oname||'').match('(.mp3$)|(.wav$)')){
-                                this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.oname}</span><video controls="" autoplay="" id="media-preview" name="media"><source src="${file.url}" type="audio/mpeg"></video></div>`, {
+                            }else if(file.typ=='audios'){//((file||{}).oname||'').match('(.mp3$)|(.wav$)')
+                                this.$alert(`<div style="display:flex;flex-direction:column;"><span>${file.visible_filename}</span><video controls="" autoplay="" id="media-preview" name="media"><source src="${file.src}" type="audio/mpeg"></video></div>`, {
                                     dangerouslyUseHTMLString: true,
                                     customClass:"image-preview",
                                     beforeClose:(action,instance,done)=>{
@@ -867,7 +874,7 @@
                                         done()
                                     }
                                 });
-                            }else if(((file||{}).oname||'').match('(.pdf$)')){
+                            }else if(file.typ=='pdfs'){//((file||{}).oname||'').match('(.pdf$)')
                                 this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;"><span>${file.oname}</span><a href="${file.url}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
                                     dangerouslyUseHTMLString: true,
                                     customClass:"image-preview",

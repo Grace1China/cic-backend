@@ -6,7 +6,7 @@ from .views import ChurchViewSet,EweeklyViewSet,SermonViewOneSet,SermonListViewS
 from .user_view import CustomUserViewSet,CustomUserInfoViewSet
 from . import views
 from .views_column_content import Column_Content_ViewSet
-from .alioss_directup_views import AliOssSignature, AliOssCallBack,AliOssSignatureV2,AliOssCallBack_V2
+from .alioss_directup_views import AliOssSignature, AliOssCallBack,AliOssSignatureV2,AliOssCallBack_V2,AliOssSignatureV3
 from . import alioss_directup_views
 from rest_framework import permissions
 
@@ -101,6 +101,9 @@ urlpatterns = [
     path("course/<int:pk>",course,name="course"),
     path("alioss_directup_signature",AliOssSignature.as_view(),name="alioss_directup_signature"),
     path("alioss_directup_signature_v2",AliOssSignatureV2.as_view(),name="alioss_directup_signature_v2"),
+
+    path("alioss_directup_signature_v3",AliOssSignatureV3.as_view(),name="alioss_directup_signature_v3"),
+
     path("alioss_directup_callback",AliOssCallBack.as_view(),name="alioss_directup_callback"),
     path("alioss_directup_callback_v2",AliOssCallBack_V2.as_view(),name="alioss_directup_callback_v2"),
 

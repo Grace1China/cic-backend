@@ -241,6 +241,66 @@ class AliOssSignatureV2(AliOssSignature):
             #这里是除了本地环境不能做回调地址外，product sandbox各自用自已的回调地址。就是reqeust.META['HTTP_HOST']  本地是用服务器ip地址
         return AliOssSignature.cls_get_token(object_prefix,typ=typ)
 
+class AliOssSignatureV3(AliOssSignatureV2):
+    @permission_classes([IsAdminUser])
+    def get(self, request, *args, **kwargs):
+        """
+        """
+        ret = {'errCode': '1001', 'msg':'not complete','token': ''}
+        try:
+            if request.method == 'GET':
+                data = request.GET
+                typ = data.get('type','images')
+                object_prefix = data.get('object_prefix','')
+                theLogger.info('----------AliOssSignatureV3----------')
+                theLogger.info(typ)
+                theLogger.info(object_prefix)
+                if object_prefix == '':
+                    object_prefix = '%s/default' % request.user.church.code
+                theLogger.info(object_prefix)
+                
+                token = AliOssSignatureV3.cls_get_token(object_prefix=object_prefix,typ=typ,cbhost=request.META['HTTP_HOST']) 
+
+                # token=json.loads(token)
+
+                token['church'] = request.user.church.code
+                import re
+                from re import RegexFlag
+                tdir = re.sub('^%s/' % request.user.church.code,'',object_prefix,flags=RegexFlag.I)
+                # tdir = re.sub('\\\\$' ,'',tdir)
+                token['curDir'] = tdir
+                
+                from church.confs.base import get_ALIOSS_DESTINATIONS,ALIOSS_DESTINATIONS
+                uploadhost = "https://%s.%s" % (get_ALIOSS_DESTINATIONS(typ)['bucket'],get_ALIOSS_DESTINATIONS(typ)['endpoint.acc'])
+                token['desthost'] = uploadhost #AliOssSignature.desthost
+                token['redirect_url'] = get_ALIOSS_DESTINATIONS(typ)['redirecturl'] #AliOssSignature.desthost
+
+                
+                # token = json.dumps(token)
+                theLogger.info(token)
+                
+                # token = AliOssSignature.cls_get_token(object_prefix,typ=typ)#现在存储结构，不按教会在物理上分了。只在数据库中分。是在回写中，带入了前端传入的教会名称。
+                # AliOssSignature.cls_get_token(request.user.church.code,typ=typ)
+                # token = self.get_token(request)
+                ret = {'errCode': '0', 'msg':'success','token': token}
+        except Exception as e:
+            import traceback
+            ret = {'errCode': '1001', 'msg': 'there is an exception check err logs','sysErrMsg':traceback.format_exc()}
+            lg.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+        finally:
+            return JsonResponse(ret, safe=False)
+            
+    @classmethod
+    def cls_get_token(cls,object_prefix='',typ='images',cbhost=''):
+        if cbhost != '' and  'localhost' not in cbhost and '127.0.0.1' not in cbhost:
+            AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  cbhost
+        else:
+            AliOssSignature.callback_url = "http://%s/rapi/alioss_directup_callback_v2" %  settings.ALIOSS_MEDIA_CALLBACK_SERVER_ENV['localhost']
+            #这里是除了本地环境不能做回调地址外，product sandbox各自用自已的回调地址。就是reqeust.META['HTTP_HOST']  本地是用服务器ip地址
+        token = AliOssSignature.cls_get_token(object_prefix,typ=typ)
+        return token
+
 class AliOssCallBack(APIView):
     '''
     阿里上传完成视频后进行回写

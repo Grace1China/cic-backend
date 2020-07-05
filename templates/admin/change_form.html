@@ -342,7 +342,8 @@
                 }
             },
             data:{
-                ro:undefined
+                ro:undefined,
+                loading:undefined
             },
             store,
             mounted: function (){
@@ -513,6 +514,18 @@
                 on_mounted:function(e){
                     console.log(e)
                 },
+                openFullScreen2() {
+                    this.loading = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                    });
+                    
+                },
+                closeFullScreen2(){
+                    this.loading.close();
+                }
             }
         })
 

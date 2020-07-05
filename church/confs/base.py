@@ -711,8 +711,8 @@ CKEDITOR_CONFIGS = {
 # 'xml'
             
         ]),
-        'removePlugins': 'stylesheetparser',
-        'allowedContent': True,
+        # 'removePlugins': 'stylesheetparser',
+        # 'allowedContent': True,
         # 'extraAllowedContent': 'video [*]{*}(*); p [*]{*}(*); script [*]{*}(*); img [*]{*}(*); audio [*]{*}(*); source [*]{*}(*)  ',
     }
 }
