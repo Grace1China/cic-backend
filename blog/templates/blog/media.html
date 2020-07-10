@@ -382,7 +382,7 @@
                                 <svg @click="fullscreen()"  class="icon fullscreen" viewBox="0 0 1024 1024" version="1.1" style="font-size: 14px; width: 40px;height: 100%;"><path fill="#ffffff" d="M85.333333 682.666667v128a128 128 0 0 0 128 128h128a42.666667 42.666667 0 0 0 0-85.333334H213.333333a42.666667 42.666667 0 0 1-42.666666-42.666666v-128a42.666667 42.666667 0 0 0-85.333334 0z m597.333334 256h128a128 128 0 0 0 128-128v-128a42.666667 42.666667 0 0 0-85.333334 0v128a42.666667 42.666667 0 0 1-42.666666 42.666666h-128a42.666667 42.666667 0 0 0 0 85.333334z m256-597.333334V213.333333a128 128 0 0 0-128-128h-128a42.666667 42.666667 0 0 0 0 85.333334h128a42.666667 42.666667 0 0 1 42.666666 42.666666v128a42.666667 42.666667 0 0 0 85.333334 0zM341.333333 85.333333H213.333333a128 128 0 0 0-128 128v128a42.666667 42.666667 0 0 0 85.333334 0V213.333333a42.666667 42.666667 0 0 1 42.666666-42.666666h128a42.666667 42.666667 0 0 0 0-85.333334z" />
                                 </svg>
                         </div>
-                                <div class="vis-video__control_rate" >
+                                <div class="vis-video__control_rate hide" >
                                     <span class="vis-video__control_rate_item current" data-vtpidvthememain="vtp4">2X</span>
                                     <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp5">1.5X</span>
                                     <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp6">1.25X</span>
@@ -462,10 +462,17 @@ theV = new Vue({
         
 
         document.querySelector('#myplayer').addEventListener('touchstart', this.toggleCtrls);
+        document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', this.toggleSpeedBar);
         document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', this.toggleCtrls);
-        document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', this.toggleSpace);
-        document.querySelector('.vis-video__control_rate').addEventListener('touchstart', this.toggleSpace);
-         document.querySelector('.vis-video__control_rate_item').addEventListener('touchstart', this.speedChange);
+        document.querySelector('.vis-video__control_rate').addEventListener('touchstart', this.hideSpeedBar);
+        document.querySelector('.vis-video__control_rate').addEventListener('touchstart', this.toggleCtrls);
+
+        //document.querySelector('.vis-video__control_rate_item').addEventListener('touchstart', this.speedChange);
+        ctrl_rates = document.querySelectorAll('.vis-video__control_rate_item')
+        for(var i = 0; i <= ctrl_rates.length - 1 ; i++){
+            ctrl_rates[i].addEventListener('touchstart', this.speedChange);
+        }
+
 
         document.querySelector('.van-slider__button-wrapper').addEventListener('touchstart', this.handleStart);
         document.querySelector('.van-slider__button-wrapper').addEventListener('touchmove', this.handleMove);
@@ -477,7 +484,7 @@ theV = new Vue({
         },
         play(){
             ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
-            if (ctrl_bottom.classList.contains('hidden')){
+            if (ctrl_bottom.classList.contains('hide')){
                 return;
             }
             console.log('play')
@@ -499,17 +506,23 @@ theV = new Vue({
             //console.log(videojs('myplayer').duration())
         },
         pause(){
-            if (ctrl_bottom.classList.contains('hidden')){
+            ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+            if (ctrl_bottom.classList.contains('hide')){
                 return;
             }
             var myVideo=document.querySelector("video#myplayer");
             myVideo.pause()
         },
         fullscreen(){
+            ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+            if (ctrl_bottom.classList.contains('hide')){
+                return;
+            }
             var myVideo=document.querySelector("video#myplayer");
             myVideo.requestFullscreen()
         },
         toggleCtrls(e) {
+            
             if(document.querySelector('.vis-video__control_bottom').classList.contains('active')){
                 document.querySelector('.vis-video__control_bottom').classList.remove('active')
                 document.querySelector('.vis-video__control_bottom').classList.add('hide')
@@ -519,15 +532,27 @@ theV = new Vue({
             }
             console.log(e)
         },
-        toggleSpace(e){
-            if(document.querySelector('.vis-video__control_rate').classList.contains('active')){
-                document.querySelector('.vis-video__control_rate').classList.remove('active')
-                document.querySelector('.vis-video__control_rate').classList.add('hide')
+        toggleSpeedBar(e){
+            ctrl_rate = document.querySelector('.vis-video__control_rate')
+            if (ctrl_rate.classList.contains('hide')){
+                ctrl_rate.classList.remove('hide')
+                ctrl_rate.classList.add('active')
             }else{
-                document.querySelector('.vis-video__control_rate').classList.remove('hide')
-                document.querySelector('.vis-video__control_rate').classList.add('active')
+                ctrl_rate.classList.remove('active')
+                ctrl_rate.classList.add('hide')
             }
-            console.log(e)
+            /*if(document.querySelector('.vis-video__control_rate').classList.contains('active')){
+            }*/
+        },
+        hideSpeedBar(e){
+            document.querySelector('.vis-video__control_rate').classList.remove('active')
+            document.querySelector('.vis-video__control_rate').classList.add('hide')
+        },
+        speedChange(e){
+            var myVideo=document.querySelector("video#myplayer");
+            myVideo.playbackRate = parseFloat(e.srcElement.innerText)
+            console.log(e.srcElement.innerText)
+            document.querySelector(".vis-video__control_bottom_rate").innerText = e.srcElement.innerText
         },
         handleStart(ev){
             this.isDrag = true
@@ -567,7 +592,8 @@ theV = new Vue({
 
             ct = parseInt(ct)
             myVideo.currentTime = ct
-        }
+        },
+       
     }
 })
 
