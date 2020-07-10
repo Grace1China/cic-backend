@@ -3,8 +3,8 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
 <link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
-<link rel="stylesheet" href="{% static 'church/css/video-js.min.css' %}">
-<script type="text/javascript" src="{% static "church/js/videojs.min.js" %}"></script>
+{% comment %} <link rel="stylesheet" href="{% static 'church/css/video-js.min.css' %}">
+<script type="text/javascript" src="{% static "church/js/videojs.min.js" %}"></script> {% endcomment %}
 
 <script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
 
@@ -38,6 +38,7 @@
         height: 100%;
         background-size: cover;
         background-position: center;
+        top:0px;
     }
     .video-ctrl{
         position: absolute;
@@ -160,7 +161,7 @@
     #myplayer{
         width:100%;
         height:100%;
-        position:absolute;
+        //position:absolute;
     }
     #myplayer video{
         width:100%;
@@ -245,7 +246,7 @@
         z-index: 3;
         opacity:0;
     }
-  
+   
 
     @keyframes myshow
     {
@@ -274,6 +275,7 @@
         font-size: 14px;
         padding: 0 10px;
         color:#fff;
+        width:64px;
     }
     .icon.fullscreen{
         font-size: 14px;
@@ -281,6 +283,59 @@
         height: 100%;
         padding: 0 10px;
     }
+    .vis-video__control_rate{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 120px;
+        background: #33333357;
+    }
+    .vis-video__control_rate_item{
+        border-radius: 20px;
+        background: #dddddd6e;
+        margin: 4px;
+        color: #fff;
+        font-size: 14px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .vis-video__control_rate.active{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 120px;
+        background: #33333357;
+        animation:myshow 2s;
+        -moz-animation:myshow 2s; /* Firefox */
+        -webkit-animation:myshow 2s; /* Safari and Chrome */
+        -o-animation:myshow 2s; /* Opera */
+        opacity:1;
+    }
+    .vis-video__control_rate.hide{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 120px;
+        background: #33333357;
+        animation:myhide 2s;
+        -moz-animation:myhide 2s; /* Firefox */
+        -webkit-animation:myhide 2s; /* Safari and Chrome */
+        -o-animation:myhide 2s; /* Opera */
+        opacity:0;
+    }
+  
 
 
     
@@ -308,9 +363,9 @@
                 <div class="vis-video__control"><!---->
                     <div>
                         <div class="vis-video__control_bottom" >
-                            <svg @click="play()" class="icon play"  viewBox="0 0 1024 1024"  style="font-size: 14px; width: 40px;height: 100%;"><path fill="#ffffff" d="M768 506.026667v11.946666a32.426667 32.426667 0 0 1-15.786667 27.733334L370.346667 768c-23.04 13.653333-34.986667 13.653333-45.226667 7.68l-10.666667-5.973333a32.426667 32.426667 0 0 1-15.786666-26.88V281.173333a32.426667 32.426667 0 0 1 15.786666-27.733333l10.666667-5.973333c10.24-5.973333 22.186667-5.973333 52.053333 11.52l375.04 219.306666a32.426667 32.426667 0 0 1 15.786667 27.733334z" />
+                            <svg @click="play()" class="icon play"  viewBox="0 0 1024 1024"  style="font-size: 14px; width: 48px;height: 100%;"><path fill="#ffffff" d="M768 506.026667v11.946666a32.426667 32.426667 0 0 1-15.786667 27.733334L370.346667 768c-23.04 13.653333-34.986667 13.653333-45.226667 7.68l-10.666667-5.973333a32.426667 32.426667 0 0 1-15.786666-26.88V281.173333a32.426667 32.426667 0 0 1 15.786666-27.733333l10.666667-5.973333c10.24-5.973333 22.186667-5.973333 52.053333 11.52l375.04 219.306666a32.426667 32.426667 0 0 1 15.786667 27.733334z" />
                             </svg>
-                            <svg @click="pause()" class="icon pause"  viewBox="0 0 1024 1024"  style="font-size: 14px; width: 40px;height: 100%;"><path fill="#ffffff" d="M426.666667 288v448a32.426667 32.426667 0 0 1-32 32h-64a32.426667 32.426667 0 0 1-32-32V288A32.426667 32.426667 0 0 1 330.666667 256h64a32.426667 32.426667 0 0 1 32 32zM693.333333 256h-64a32.426667 32.426667 0 0 0-32 32v448a32.426667 32.426667 0 0 0 32 32h64a32.426667 32.426667 0 0 0 32-32V288a32.426667 32.426667 0 0 0-32-32z" />
+                            <svg @click="pause()" class="icon pause"  viewBox="0 0 1024 1024"  style="font-size: 14px; width: 48px;height: 100%;"><path fill="#ffffff" d="M426.666667 288v448a32.426667 32.426667 0 0 1-32 32h-64a32.426667 32.426667 0 0 1-32-32V288A32.426667 32.426667 0 0 1 330.666667 256h64a32.426667 32.426667 0 0 1 32 32zM693.333333 256h-64a32.426667 32.426667 0 0 0-32 32v448a32.426667 32.426667 0 0 0 32 32h64a32.426667 32.426667 0 0 0 32-32V288a32.426667 32.426667 0 0 0-32-32z" />
                             </svg>
                                 <span class="vis-video__control_bottom_time"></span>
                                 <div class="vis-video__control_bottom_slider">
@@ -371,49 +426,50 @@ theV = new Vue({
     },
     mounted:function(){
         thisV = this
-        videojs('myplayer', {}, function (){
-            console.log('视频可以播放了',this);
+        
+        var myVideo=document.querySelector("video#myplayer");
+        
+        myVideo.addEventListener('canplay', () => { 
+            console.log('canplay()')
             thisV.vicclass = 'el-icon-caret-right'
-            this.on('play', () => { 
-               
-                console.log('onplay()')
-                document.querySelector('.icon.play').style.display='none'
-                document.querySelector('.icon.pause').style.display='block'
-            });
-            this.on('pause', () => { 
-                
-                console.log('onpause()')
-                document.querySelector('.icon.play').style.display='block'
-                document.querySelector('.icon.pause').style.display='none'
-            });
-
-            this.on('timeupdate', function () {
-                //console.log(this.currentTime());
-                times = document.querySelectorAll('.vis-video__control_bottom_time')
-                sec = this.currentTime()
-                h = parseInt(sec / (60*60))
-                m = parseInt((sec - h*60*60)/60)
-                s = parseInt(sec - h*60*60 - m*60)
-                times[0].innerText=`${h>0?h+':':''}${m}:${s<=9?'0'+s:s}`
-                if(!thisV.isDrag){
-                    bar = document.querySelectorAll('.van-slider__bar')
-                    bar[0].style.width=`${parseInt(this.currentTime()/this.duration()*100)}%`
-                }
-                
-            });
-            this.on('fullscreenchange', function () {
-                console.log(`------fullscreenchange-----`)
-            });
         });
+
+        myVideo.addEventListener('play', () => { 
+            console.log('onplay()')
+            document.querySelector('.icon.play').style.display='none'
+            document.querySelector('.icon.pause').style.display='block'
+        });
+
+        myVideo.addEventListener('pause', () => { 
+            console.log('onpause()')
+            document.querySelector('.icon.play').style.display='block'
+            document.querySelector('.icon.pause').style.display='none'
+        });
+
+        myVideo.addEventListener('timeupdate',function () {
+            //console.log(this.currentTime());
+            times = document.querySelectorAll('.vis-video__control_bottom_time')
+            sec = this.currentTime
+            h = parseInt(sec / (60*60))
+            m = parseInt((sec - h*60*60)/60)
+            s = parseInt(sec - h*60*60 - m*60)
+            times[0].innerText=`${h>0?h+':':''}${m}:${s<=9?'0'+s:s}`
+            if(!thisV.isDrag){
+                bar = document.querySelectorAll('.van-slider__bar')
+                bar[0].style.width=`${parseInt(this.currentTime/this.duration*100)}%`
+            }
+        });
+        
+
         document.querySelector('#myplayer').addEventListener('touchstart', this.toggleCtrls);
+        document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', this.toggleCtrls);
+        document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', this.toggleSpace);
+        document.querySelector('.vis-video__control_rate').addEventListener('touchstart', this.toggleSpace);
+         document.querySelector('.vis-video__control_rate_item').addEventListener('touchstart', this.speedChange);
+
         document.querySelector('.van-slider__button-wrapper').addEventListener('touchstart', this.handleStart);
         document.querySelector('.van-slider__button-wrapper').addEventListener('touchmove', this.handleMove);
         document.querySelector('.van-slider__button-wrapper').addEventListener('touchend', this.handleEnd);
-
-
-        /*document.addEventListener("fullscreenchange", function(){
-            console.log('fullscreenchange')
-        })*/
     },
     methods:{
         handleClick:function(){
@@ -429,9 +485,11 @@ theV = new Vue({
             document.querySelector('.video-ctrl').style.visibility="hidden";
             document.querySelector('#myplayer').style.visibility="visible";
             ctrl_bottom.classList.add('active')
-            videojs('myplayer').play()
+            var myVideo=document.querySelector("video#myplayer");
+            myVideo.play()
+            //videojs('myplayer').play()
 
-            dur = videojs('myplayer').duration()
+            dur = myVideo.duration
 
             times = document.querySelectorAll('.vis-video__control_bottom_time')
             h = parseInt(dur / (60*60))
@@ -444,10 +502,12 @@ theV = new Vue({
             if (ctrl_bottom.classList.contains('hidden')){
                 return;
             }
-            videojs('myplayer').pause()
+            var myVideo=document.querySelector("video#myplayer");
+            myVideo.pause()
         },
         fullscreen(){
-            videojs('myplayer').requestFullscreen()
+            var myVideo=document.querySelector("video#myplayer");
+            myVideo.requestFullscreen()
         },
         toggleCtrls(e) {
             if(document.querySelector('.vis-video__control_bottom').classList.contains('active')){
@@ -456,6 +516,16 @@ theV = new Vue({
             }else{
                 document.querySelector('.vis-video__control_bottom').classList.remove('hide')
                 document.querySelector('.vis-video__control_bottom').classList.add('active')
+            }
+            console.log(e)
+        },
+        toggleSpace(e){
+            if(document.querySelector('.vis-video__control_rate').classList.contains('active')){
+                document.querySelector('.vis-video__control_rate').classList.remove('active')
+                document.querySelector('.vis-video__control_rate').classList.add('hide')
+            }else{
+                document.querySelector('.vis-video__control_rate').classList.remove('hide')
+                document.querySelector('.vis-video__control_rate').classList.add('active')
             }
             console.log(e)
         },
@@ -475,12 +545,14 @@ theV = new Vue({
                 dist = document.querySelector('.van-slider').clientWidth
             }
 
-            ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * videojs('myplayer').duration()
+            var myVideo=document.querySelector("video#myplayer");
+
+            ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * myVideo.duration
 
             ct = parseInt(ct)
             bar = document.querySelectorAll('.van-slider__bar')
             
-            bar[0].style.width=`${parseInt(ct/videojs('myplayer').duration()*100)}%`
+            bar[0].style.width=`${parseInt(ct/myVideo.duration*100)}%`
         },
         handleEnd(evt){
             this.isDrag = false
@@ -489,13 +561,13 @@ theV = new Vue({
             if (dist> document.querySelector('.van-slider').clientWidth){
                 dist = document.querySelector('.van-slider').clientWidth
             }
+            var myVideo=document.querySelector("video#myplayer");
 
-            ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * videojs('myplayer').duration()
+            ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * myVideo.duration
 
             ct = parseInt(ct)
-            videojs('myplayer').currentTime(ct)
+            myVideo.currentTime = ct
         }
-
     }
 })
 
