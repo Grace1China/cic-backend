@@ -77,6 +77,7 @@
     .headblock{
         position:relative;
         width: 100vw;
+        height: 56.25vw;
         background: gray;
         text-align: center;
     }
@@ -350,10 +351,8 @@
         <div id="toppad">
         </div>
         {% if media %}
-            <div id='videowrap' class="headblock" style="width: 375px; height: 210.938px;">
-                <video id="myplayer" playsinline="true" webkit-playsinline="true" x5-playsinline=""   preload="auto">
-                    <source src="{{ media.video }}" type="video/mp4">
-                    当前浏览器不支持最新的video播放
+            <div id='videowrap' class="headblock" >
+                <video id="myplayer" playsinline="true" webkit-playsinline="true" x5-playsinline="" src="{{ media.video }}"   preload="auto">
                 </video>
                 <i class="video-poster" style="background-image: url('{{ media.cover }}');">
                 </i>
