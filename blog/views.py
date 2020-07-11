@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from church.alioss_storage_backends_v3 import AliyunMediaStorage
+from api.serializers import MediaSerializer4ListAPI
 
 
 # Create your views here.
@@ -65,14 +66,18 @@ def media(request,pk=0):
         media.hits = media.hits+1
         media.save()
         
+        mediasz = MediaSerializer4ListAPI(media)
+
         mediaDict = {
-            'image':media.alioss_image,
-            'title':media.title,
-            'content':media.content,
-            'kind':media.kind,
-            'cover':'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='images')['redirecturl'],media.alioss_image),
-            'video':'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='videos')['redirecturl'],media.alioss_video),
-            'audio':'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='audios')['redirecturl'],media.alioss_audio),
+            'image':mediasz.data['image'],
+            'title':mediasz.data['title'],
+            'content':mediasz.data['content'],
+            'pubtime':mediasz.data['pub_time'],
+            'hits':mediasz.data['hits'],
+            'kind':mediasz.data['kind'],
+            'cover':'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ='images')['redirecturl'],mediasz.data['image']),
+            'video':'http://%s/%s/sd.mp4' % (get_ALIOSS_DESTINATIONS(typ='videos.destination')['redirecturl'],mediasz.data['video']),
+            'audio':'http://%s/%s/320.mp3' % (get_ALIOSS_DESTINATIONS(typ='audios')['redirecturl'],mediasz.data['audio']),
         }
         template = loader.get_template('blog/media.html')
         context = {

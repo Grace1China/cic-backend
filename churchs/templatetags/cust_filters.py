@@ -268,6 +268,8 @@ register.filter('jsondumps', jsondumps)
 
 @register.filter
 def datetime_to_date(dt):
+    if dt is None:
+        raise Exception('datetime should not be none')
     rt1 = dt.split('T')
     rt2 = dt.split(' ')
     if (len(rt1) != 2) and (len(rt2) != 2):

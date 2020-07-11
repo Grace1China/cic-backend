@@ -177,12 +177,12 @@ CKEDITOR.dialog.add( 'abbrDialog', function( editor ) {
 					// imgList.push(e.getAttribute('src').replace('/wh100_auto','/w730'))
 				}else if(typ == 'videos'){
 					html = html + `<div class="ckeditor-html5-video" style="text-align:center">
-						<video controls="controls" controlslist="nodownload"  src="${e.getAttribute('data-src')}" width="100%">&nbsp;</video>
+						<video controls="controls" controlslist="nodownload"  src="${e.getAttribute('data-src')}" width="100%" style='position: relative;z-index: 0;'>&nbsp;</video>
 					</div>`
 				}else if(typ == 'audios'){
 					//html = html + `<p><audio controls="" autoplay="" name="media" src="${e.getAttribute('data-src')}"></audio></p>` 
-					html = html + `<div class="ckeditor-html5-video" style="text-align:center">
-						<audio controls="controls" controlslist="nodownload" controlslist="nodownload" src="${e.getAttribute('data-src')}" width="100%" type="audio/mpeg">&nbsp;</audio>
+					html = html + `<div class="ckeditor-html5-audio" style="text-align:center">
+						<audio controls="controls" controlslist="nodownload" controlslist="nodownload" src="${e.getAttribute('data-src')}" width="100%" style='position: relative;z-index: 0;' type="audio/mpeg">&nbsp;</audio>
 					</div>`
 				}else if(typ == 'pdfs'){
 					html = html + `<p><iframe frameborder="0" scrolling="no" src="${e.getAttribute('data-src')}"></iframe></p>`
