@@ -452,7 +452,7 @@ window.onload=function setupVue(){
             
             var myVideo=document.querySelector("video#myplayer");
             
-            myVideo.addEventListener('loadedmetadata', () => { 
+            myVideo.addEventListener('canplay', () => { 
                 console.log('canplay()')
                 ldplay = document.querySelector('.el-icon-loading')
                 ldplay.classList.remove('el-icon-loading')
