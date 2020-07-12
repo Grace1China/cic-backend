@@ -368,7 +368,7 @@
         </div>
         {% if media %}
             <div id='videowrap' class="headblock" >
-                <video ref='myvideo' id="myplayer" class="showstep  postshow" playsinline="true" webkit-playsinline="true" x5-playsinline="" src="{{ media.video }}"   preload="auto">
+                <video ref='myvideo' id="myplayer"  class="showstep  postshow" playsinline="true" webkit-playsinline="true" x5-playsinline="" src="{{ media.video }}"   preload="auto">
                 </video>
                 <i class="video-poster showstep preshow" style="background-image: url('{{ media.cover }}?x-oss-process=style/w730');">
                 </i>
@@ -397,7 +397,7 @@
                                 <svg onclick="theV.$refs.myvideo.webkitEnterFullscreen()"  class="icon fullscreen" viewBox="0 0 1024 1024" version="1.1" style="font-size: 14px; width: 40px;height: 100%;"><path fill="#ffffff" d="M85.333333 682.666667v128a128 128 0 0 0 128 128h128a42.666667 42.666667 0 0 0 0-85.333334H213.333333a42.666667 42.666667 0 0 1-42.666666-42.666666v-128a42.666667 42.666667 0 0 0-85.333334 0z m597.333334 256h128a128 128 0 0 0 128-128v-128a42.666667 42.666667 0 0 0-85.333334 0v128a42.666667 42.666667 0 0 1-42.666666 42.666666h-128a42.666667 42.666667 0 0 0 0 85.333334z m256-597.333334V213.333333a128 128 0 0 0-128-128h-128a42.666667 42.666667 0 0 0 0 85.333334h128a42.666667 42.666667 0 0 1 42.666666 42.666666v128a42.666667 42.666667 0 0 0 85.333334 0zM341.333333 85.333333H213.333333a128 128 0 0 0-128 128v128a42.666667 42.666667 0 0 0 85.333334 0V213.333333a42.666667 42.666667 0 0 1 42.666666-42.666666h128a42.666667 42.666667 0 0 0 0-85.333334z" />
                                 </svg>
                         </div>
-                                <div class="vis-video__control_rate hide" >
+                                <div class="vis-video__control_rate postshow hide" >
                                     <span class="vis-video__control_rate_item current" data-vtpidvthememain="vtp4">2X</span>
                                     <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp5">1.5X</span>
                                     <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp6">1.25X</span>
@@ -433,7 +433,7 @@ window.onload=function setupVue(){
     
 
 
-    theV = new Vue({
+    window.theV = new Vue({
         el: '#elvue',
         data: {
             theme: '',
@@ -453,25 +453,22 @@ window.onload=function setupVue(){
             var myVideo=document.querySelector("video#myplayer");
             
             myVideo.addEventListener('canplay', () => { 
+                //alert('canplay now')
                 console.log('canplay()')
                 ldplay = document.querySelector('.el-icon-loading')
+                if((ldplay||0)==0) {return}
                 ldplay.classList.remove('el-icon-loading')
                 ldplay.classList.add('el-icon-caret-right')
                 
-                ctrls_ps = document.querySelectorAll(".postshow")
-                for(var i = 0 ; i <= ctrls_ps.length-1; i++){
-                    ctrls_ps[i].classList.remove('postshow')
-                }
+                
             });
 
             myVideo.addEventListener('play', () => { 
-                console.log('onplay()')
                 document.querySelector('.icon.play').style.display='none'
                 document.querySelector('.icon.pause').style.display='block'
             });
 
             myVideo.addEventListener('pause', () => { 
-                console.log('onpause()')
                 document.querySelector('.icon.play').style.display='block'
                 document.querySelector('.icon.pause').style.display='none'
             });
@@ -518,22 +515,30 @@ window.onload=function setupVue(){
                     return;
                 }
                 console.log('play')
-                document.querySelector('.video-poster').style.visibility="hidden";
+                /*document.querySelector('.video-poster').style.visibility="hidden";
                 document.querySelector('.video-ctrl').style.visibility="hidden";
                 document.querySelector('#myplayer').style.visibility="visible";
-                ctrl_bottom.classList.add('active')
+                ctrl_bottom.classList.add('active')*/
                 var myVideo=document.querySelector("video#myplayer");
                 myVideo.play()
-                //videojs('myplayer').play()
+                ctrls_ps = document.querySelectorAll(".postshow")
+                for(var i = 0 ; i <= ctrls_ps.length-1; i++){
+                    ctrls_ps[i].classList.remove('postshow')
+                }
+                ctrls_ps = document.querySelectorAll(".preshow")
+                for(var i = 0 ; i <= ctrls_ps.length-1; i++){
+                    ctrls_ps[i].style.display='none'
+                }
 
                 dur = myVideo.duration
-
                 times = document.querySelectorAll('.vis-video__control_bottom_time')
                 h = parseInt(dur / (60*60))
                 m = parseInt((dur - h*60*60)/60)
                 s = parseInt(dur - h*60*60 - m*60)
                 times[1].innerText=`${h>0?h+':':''}${m}:${s<=9?'0'+s:s}`
-                //console.log(videojs('myplayer').duration())
+
+                this.toggleCtrls()
+
             },
             pause(){
                 ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
@@ -590,6 +595,9 @@ window.onload=function setupVue(){
                 myVideo.playbackRate = parseFloat(e.srcElement.innerText)
                 console.log(e.srcElement.innerText)
                 document.querySelector(".vis-video__control_bottom_rate").innerText = e.srcElement.innerText
+            },
+            oncanplay(){
+                
             },
             handleStart(ev){
                 this.isDrag = true
@@ -672,5 +680,6 @@ window.addEventListener('scroll', function(e) {
     ticking = true;
   }
 });
+
 </script>
 </html>
