@@ -535,7 +535,7 @@
                             ref="upload"
                             :with-credentials="true"
                             action=""
-                            list-type="picture-card"
+                            list-type="picture"
                             :auto-upload='false'
                             :before-upload="onbeforeUpload"
                             :on-progress="onprogress"
@@ -831,7 +831,7 @@
                             console.log('--------onbeforeUpload----------')
                             console.log(file)
                         },
-                        onprogress(e, rawFile,fileList){az  `       ``1`
+                        onprogress(e, rawFile,fileList){
                 
                             this.fileArr = fileList
                             this.fileArr.forEach(item=>{
