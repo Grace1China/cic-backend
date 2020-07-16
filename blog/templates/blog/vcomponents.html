@@ -20,18 +20,19 @@
 </head>
 <body class ="wechatpromt">
 
-<div id="components" class="container" style="min-height: 937px;display: flex;justify-content: center;">
+<div id="V_el" class="container" style="min-height: 937px;display: flex;justify-content: center;">
     <div class="page-detail" >
         <div class="topblock">
         </div>
-            {% if vpo %}
-                {% if vpo.control == 1 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+            {{ vcomp }}
+            {% if vcomp %}
+                {% if vcomp.control == 1 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
                 {% endif %}
-                {% if vpo.control == 2 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+                {% if vcomp.control == 2 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
                 {% endif %}
-                {% if vpo.control == 3 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+                {% if vcomp.control == 3 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
                 {% endif %}
-                {% if vpo.control == 4 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
+                {% if vcomp.control == 4 %} <!-- CAROUSEL = 1 SLIDE = 2 LIST = 3 TEXT = 4-->
                 {% endif %}
         {% else %}
             <div>
@@ -46,7 +47,7 @@
 
 
 new Vue({
-    el: '#LordDay',
+    el: '#V_el',
     data: {
         theme: '',
         selected:'1',

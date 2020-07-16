@@ -19,7 +19,7 @@ from church.confs.base import get_ALIOSS_DESTINATIONS
 
 from datetime import datetime
 import django.utils.timezone as timezone
-
+from django.core.paginator import Paginator
 
 import logging 
 theLogger = logging.getLogger('church.all')
@@ -79,8 +79,8 @@ class SermonSeries(models.Model):
 
     class Meta:
         app_label = 'churchs'
-        verbose_name = "媒体分组"
-        verbose_name_plural = "媒体分组"
+        verbose_name = "资料分组"
+        verbose_name_plural = "资料分组"
 
     def __str__(self):
         return '%s' % (self.title)
@@ -528,6 +528,57 @@ class Media(models.Model):
 
     def __str__(self):
         return '%s' % (self.title)
+
+    def _url(self,request):
+        return "http://%s/blog/media/%d" % (request.META['HTTP_HOST'],self.id),
+
+    @classmethod
+    def getPage(cls,request=None,typ=None,series='',page=1,dkey='',skey=''): 
+        try:
+            if request == None:
+                raise Exception(' no request is pass in.')
+            user = request.user
+
+            if (dkey != ''):
+                #删除数据库
+                pass
+
+            qrset = None
+            if skey != '':
+                qrset = Media.objects.filter(church=user.church,title__icontains=skey).order_by('-update_time')
+            else:
+                theLogger.info('getPage church:%d' % user.church.id)
+                qrset = Media.objects.filter(church=user.church).order_by('-update_time')
+                
+
+            total = qrset.count()
+            pg = Paginator(qrset, 18)
+            results = pg.page(page)
+
+            # from  ckeditor_uploader import utils 
+            # from .utils import is_valid_image_extension
+            # lg.info(typ)
+            # lg.info(results)
+            files = []
+            # dirs = set()
+            for rc in results :
+                # if typ == 'tuwen':
+                files.append({
+                    'thumb': rc.dist_list_image,#AliyunMediaStorage.get_media_url('images', rc.image),
+                    'src': rc._url(request),
+                    'key':"/blog/media/%d" % rc.id,
+                    'is_image': False,
+                    'typ':typ,
+                    'visible_filename': rc.title,
+                })
+                
+                
+            theLogger.info('-----get_files_from_db----files---')
+            theLogger.info(files)
+            return (files,total)
+        except Exception as e:
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
 
 
 # def ContentColumn_changed(sender, **kwargs):

@@ -17,6 +17,7 @@ import urllib
 import re
 from churchs.widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField
 from church.confs.base import get_ALIOSS_DESTINATIONS
+from django.core.paginator import Paginator
 
 import logging 
 theLogger = logging.getLogger('church.all')
@@ -29,6 +30,7 @@ class ContentColumn(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
     pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
+    cover = models.CharField(max_length=400,blank=True,verbose_name='封面')
     STATUS_OPEN = 1
     STATUS_CLOSE = 2
 
@@ -51,6 +53,66 @@ class ContentColumn(models.Model):
     def __str__(self):
         return '%s' % (self.title)
 
+    @property
+    def dist_list_cover(self):
+        if self.cover is not None and self.cover != '':
+            #在目标桶是否存在 key,存在还要看下是否是可读，如果公共可读，直接返回url。如果不可读，返回签名的url
+            retval = 'http://%s/%s' % (get_ALIOSS_DESTINATIONS(typ = 'images')['redirecturl'],self.cover)
+            return retval 
+        else:
+            return ''
+
+    def _url(self,request):
+        return "http://%s/blog/ccol/%d" % (request.META['HTTP_HOST'],self.id),
+
+    @classmethod
+    def getPage(cls,request=None,typ=None,series='',page=1,dkey='',skey=''): 
+        try:
+            if request == None:
+                raise Exception(' no request is pass in.')
+            user = request.user
+
+            if (dkey != ''):
+                #删除数据库
+                pass
+
+            qrset = None
+            if skey != '':
+                qrset = ContentColumn.objects.filter(church=user.church,title__icontains=skey).order_by('-update_time')
+            else:
+                theLogger.info('getPage church:%d' % user.church.id)
+                qrset = ContentColumn.objects.filter(church=user.church).order_by('-update_time')
+                
+
+            total = qrset.count()
+            pg = Paginator(qrset, 18)
+            results = pg.page(page)
+
+            # from  ckeditor_uploader import utils 
+            # from .utils import is_valid_image_extension
+            # lg.info(typ)
+            # lg.info(results)
+            files = []
+            # dirs = set()
+            for rc in results :
+                # if typ == 'tuwen':
+                files.append({
+                    'thumb': rc.dist_list_cover,#AliyunMediaStorage.get_media_url('images', rc.image),
+                    'src': rc._url(request),
+                    'key':"/blog/ccol/%d" % rc.id,
+                    'is_image': False,
+                    'typ':typ,
+                    'visible_filename': rc.title,
+                })
+                
+                
+            theLogger.info('-----get_files_from_db----files---')
+            theLogger.info(files)
+            return (files,total)
+        except Exception as e:
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+
 from django.db.models.signals import pre_delete
 
 class ColumnMedias(models.Model):
@@ -66,3 +128,5 @@ class ColumnMedias(models.Model):
 
     def __str__(self):
         return 'ContentColumn:%s -> Media:%s' % (self.ContentColumn,self.Media)
+
+    

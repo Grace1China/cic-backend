@@ -10,6 +10,7 @@ from churchs.widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt
 from churchs.forms import MeidaForm2
 from users.models import CustomUser
 from church.models import Church
+from churchs.models.columnContent import ContentColumn
 
 from django import forms
 from django.db.models import Q
@@ -153,8 +154,18 @@ class ColumnMediasInline(admin.TabularInline):
         )
     Media_delete.short_description = ""
 
+
+class ContentColumnForm(forms.ModelForm):
+  
+    cover = forms.CharField(label="",widget=MediaBaseWidget(label='封面',typ='images'),required=False)
+    class Meta:
+        model = ContentColumn
+        fields = '__all__'
+        
+    def __init__(self, *args, **kwargs):
+        super(ContentColumnForm,self).__init__(*args, **kwargs)
 class ContentColumnAdmin(admin.ModelAdmin):
-    # form=MediaVideoForm
+    form=ContentColumnForm
     class Media:
         js = ("admin/js/jquery.init.js",)
     
@@ -163,13 +174,15 @@ class ContentColumnAdmin(admin.ModelAdmin):
     list_display = ('title_with_link','user','pub_time','status','promote')  
     fieldsets = (
         (None, {
-            'fields': ('title','pub_time','status','add_content')
+            'fields': ('title','pub_time','status','cover','add_content')
         },),
         # ('Advanced options', {
         #     'classes': ('collapse',),
         #     'fields': ('content',),
         # },),
     ) 
+    
+    
     readonly_fields = ('add_content',)
 
     def title_with_link(self,obj):

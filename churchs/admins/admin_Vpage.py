@@ -10,7 +10,7 @@ from churchs.widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt
 from churchs.forms import MeidaForm2
 from users.models import CustomUser
 from church.models import Church
-from churchs.models.vpage import VComponents,VPageComponents
+from churchs.models.vpage import VComponents,VPageComponents,VParts
 
 from django import forms
 from django.db.models import Q
@@ -28,7 +28,7 @@ loger = logging.getLogger('church.all')
 
 from datetime import datetime
 
-class Vpage_position_Form(forms.ModelForm):
+class VPageComponentForm(forms.ModelForm):
     '''------------------------------------
     Ver 1
     多选组件好的部分是他的修改联动 在form的保存时，修改调用者窗口的修改方法
@@ -50,38 +50,39 @@ class Vpage_position_Form(forms.ModelForm):
     '''
     # content = forms.t(label="",queryset=Media.objects.all(),widget=HiddenInput,required=False)
     components = forms.ModelChoiceField(label="微组件",queryset=VComponents.objects.all(),required=False)
-    church = forms.ModelChoiceField(label="教会",queryset=Church.objects.all(),required=False)
-    create_by = forms.ModelChoiceField(label="用户",queryset=CustomUser.objects.all(),required=False)
+    # church = forms.ModelChoiceField(label="教会",queryset=Church.objects.all(),required=False)
+    # create_by = forms.ModelChoiceField(label="用户",queryset=CustomUser.objects.all(),required=False)
     # content = forms.Field(label="富文本", required=False)
 
     class Meta:
-        model = VComponents
+        model = VPageComponents
         exclude = ()
+        show_url = False
 
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
-        self.initial = kwargs.get('initial', None)
-        theLogger.info('-------------Vpage_position_Form----__init__-----------')
-        theLogger.info(self.initial)
-        theLogger.info(instance)
+        # self.initial = kwargs.get('initial', None)
+        # theLogger.info('-------------Vpage_position_Form----__init__-----------')
+        # theLogger.info(self.initial)
+        # theLogger.info(instance)
         super().__init__(*args, **kwargs)
         
 
 
-from django.forms import models
-class vpos_FormSet(models.BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        super(vpos_FormSet, self).__init__(*args, **kwargs)
+# from django.forms import models
+# class vpos_FormSet(models.BaseInlineFormSet):
+#     def __init__(self, *args, **kwargs):
+#         super(vpos_FormSet, self).__init__(*args, **kwargs)
 
-        theLogger.info(kwargs['instance'])
-        self.initial = theLogger.info(kwargs['initial'])
-        instance = kwargs['instance']
-        # for form in self.forms:
-        # Check that the data doesn't already exist
-        if not instance.vpage_position_set.filter(vpage=instance.id):
-            theLogger.info(kwargs['initial'])
-            self.initial = kwargs['initial']
-            self.extra += len(self.initial)
+#         theLogger.info(kwargs['instance'])
+#         self.initial = theLogger.info(kwargs['initial'])
+#         instance = kwargs['instance']
+#         # for form in self.forms:
+#         # Check that the data doesn't already exist
+#         if not instance.vpage_position_set.filter(vpage=instance.id):
+#             theLogger.info(kwargs['initial'])
+#             self.initial = kwargs['initial']
+#             self.extra += len(self.initial)
 
     # def save(self, commit=True):
     #     """
@@ -112,13 +113,17 @@ class vpos_FormSet(models.BaseInlineFormSet):
     #     setattr(form.instance, self.fk.name,instance)
     #     return instance#super().save_new(form, commit=commit)
 
-class vpos_Inline(admin.TabularInline):
-    # form = Vpage_position_Form
+class VComponentsInline(admin.TabularInline):
+    form = VPageComponentForm
     model = VPageComponents
     # formset = vpos_FormSet
-    template = 'admin/churchs/vpage_tabular.html'
-    # fields = ('id','control','ContentColumn','Media','content','church','create_by')
+    # template = 'admin/churchs/vpage_tabular.html'
+    fields = ('components','order')
     ordering = ('order',)
+    extra = 1
+    can_delete = True
+    # max_num = 4
+    # min_num = 1
     # readonly_fields = ('church','create_by',)
 
     # def get_formset(self, request, obj=None, **kwargs):
@@ -158,14 +163,11 @@ class vpos_Inline(admin.TabularInline):
     #         '文字内容'
     #     ) 
     
-    extra = 0
-    can_delete = True
-    # max_num = 4
-    # min_num = 1
+    
 
    
 
-class VpageAdmin(admin.ModelAdmin):
+class VPageAdmin(admin.ModelAdmin):
     # form=MediaVideoForm
     class Media:
         js = ("admin/js/jquery.init.js",)
@@ -175,15 +177,14 @@ class VpageAdmin(admin.ModelAdmin):
     # list_filter = (MediaKindListFilter, 'alioss_video_status')
     fields = ('title','name', 'pub_time','promote_at','status')
     
-    change_form_template ="admin/churchs/change_form_vpage.html"
+    # change_form_template ="admin/churchs/change_form_page.html"
 
     formfield_overrides = {
         churchs_models.Media.content: {'widget': CKEditorWidget()},
     }
 
     def promote(self, obj):
-        button_html = """<a class="changelink" href="#" onclick='fontConfig.premote(%s,"%s")'>推广链接</a>
-        <a class="changelink" href="/admin/churchs/vpage/%d/change/">编辑</a>""" % (obj.id,'touvideo',obj.id)
+        button_html = """<a class="changelink" href="/admin/churchs/vpage/%d/change/">编辑</a>""" % obj.id
         return format_html(button_html)
     promote.short_description = "操作"
     
@@ -228,18 +229,95 @@ class VpageAdmin(admin.ModelAdmin):
         )
 
     inlines = [
-        vpos_Inline,
+        VComponentsInline,
     ]
 
+class VPartsForm(forms.ModelForm):
+    # components = forms.ModelChoiceField(label="微组件",queryset=VComponents.objects.all(),required=False)
+    cover = forms.CharField(label="图片",widget=MediaBaseWidget(label='',typ='images'),required=False)
+    title = forms.CharField(required=False)
+    url = forms.CharField(label="链接",widget=MediaBaseWidget(label='',typ='links'),required=False)
+    css = forms.CharField(required=False)
+    order = forms.IntegerField()
+    class Meta:
+        model = VParts
+        exclude = ()
+        show_url = False
 
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        # self.initial = kwargs.get('initial', None)
+        # theLogger.info('-------------Vpage_position_Form----__init__-----------')
+        # theLogger.info(self.initial)
+        # theLogger.info(instance)
+        super().__init__(*args, **kwargs)
 
-class VComponents(admin.ModelAdmin):
-    list_display = ('title','name', 'pub_time','promote_at','status','promote')  
+class VPartsInline(admin.TabularInline):
+    form = VPartsForm
+    model = VParts
+    # formset = vpos_FormSet
+    # template = 'admin/churchs/vpage_tabular.html'
+
+    fields = ('components','cover','title','url','css','order')#,'url_title','url_object','url_id'
+
+    ordering = ('order',)
+    extra = 1
+    can_delete = True
+
+class VComponentsAdmin(admin.ModelAdmin):
+    list_display = ('preview_title','control','create_by','ContentColumn','Media','content','promote')  
     # list_filter = (MediaKindListFilter, 'alioss_video_status')
-    fields = ('title','name', 'pub_time','promote_at','status')
+    fields = ('title','control','ContentColumn','Media','content')
+    change_form_template ="admin/churchs/change_form_components.html"
     formfield_overrides = {
-        churchs_models.Media.content: {'widget': CKEditorWidget()},
+        VComponents.content: {'widget': CKEditorWidget()},
     }
+    inlines = [
+        VPartsInline,
+    ]
+    
+    def preview_title(self, obj):
+        button_html = """<a  href="/blog/vcomponents/?componentid=%d">%s</a>""" % (obj.id,obj.title)
+        return format_html(button_html)
+    preview_title.short_description = "预览"
+    def promote(self, obj):
+        button_html = """<a class="changelink" href="/admin/churchs/vcomponents/%d/change/">编辑</a>""" % obj.id
+        return format_html(button_html)
+    promote.short_description = "操作"
+    def save_form(self, request, form,change):
+        """
+        Given a ModelForm return an unsaved instance. ``change`` is True if
+        the object is being changed, and False if it's being added.
+        """
+        loger.info('---------save_form-------')
+        loger.info(request.__dict__)
+        # loger.info(request.POST)
+
+        # data = request.POST
+        # count = data.get('vparts_set-TOTAL_FORMS',0)
+        # for num in range(0,count-1):
+            
+
+        instance = form.save(commit=False)
+        loger.info(instance)
+        instance.create_by = request.user
+        instance.church = request.user.church
+        return instance
+
+    def get_queryset(self, request):
+        try:
+            qs = super().get_queryset(request)
+            if not request.user.is_superuser:
+                qs = qs.filter(church=request.user.church)
+            # loger.info(qs)
+            return qs
+        except Exception as e:
+            import traceback
+            loger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            raise e
+
+
+    
 
 
 

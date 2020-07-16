@@ -15,6 +15,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .alioss_storage_backends_v3 import AliyunMediaStorage,AliyunVideoStorage
 from .utils import storage
+from churchs.models.base import Media
+from churchs.models.columnContent import ContentColumn
 
 
 from .utils import is_valid_image_extension
@@ -34,7 +36,7 @@ def browse(request):
         # path = ls_res_path[0]['res_path'] if len(ls_res_path)>0 else 'default'  #默认显示根目录的文件 同专栏系列的默认设置保持一致
         # files = _list_img(request.user,typ='images',path=path,marker='')
         sereis_dict = dict()
-        sereis_dict['default'] = '默认系列专栏'
+        sereis_dict['default'] =  SermonSeries._meta.__dict__['verbose_name']#'默认系列专栏'
         for i in ls_res_path:
             sereis_dict[i['res_path']] = i['title']
     
@@ -50,7 +52,7 @@ def browse(request):
             # 'files': files,
             'form': None ,#form
             'MEDIA_BROWSE_API_SERVER':settings.MEDIA_BROWSE_API_SERVER, #就是首次加载图片的地址，为了实现本地调试sandbox的api,但在sandbox和product中用的各自外网地址
-            'rediret_url_prefix':get_ALIOSS_DESTINATIONS(typ)['redirecturl'],#跨国的redirect 是国内外的nginx配置，参考设计文档
+            # 'rediret_url_prefix':get_ALIOSS_DESTINATIONS(typ)['redirecturl'],#跨国的redirect 是国内外的nginx配置，参考设计文档
             # 'OSSAccessKeyId': token['accessid'],
             # 'policy': token['policy'],
             # 'Signature': token['signature'],
@@ -122,7 +124,15 @@ def list_img(request,path=''):
             if series != '':
                 files = list()
                 total = 0
-                if typ == 'videos':
+                if typ == 'contentcolumn':
+                    files,total = ContentColumn.getPage(request,typ=typ,series=series,page=page,dkey=dkey,skey=skey)  #request=None,typ=None,series='',page=1,dkey='',skey=''
+                elif typ == 'content':
+                    # 取内容
+                    files,total = Media.getPage(request,typ=typ,series=series,page=page,dkey=dkey,skey=skey)  #request=None,typ=None,series='',page=1,dkey='',skey=''
+                elif typ == 'column':
+                    # 取专栏
+                    pass
+                elif typ == 'videos':
                     stg = AliyunVideoStorage()
                     files,total = stg.get_files_from_db(user=request.user,typ=typ,series=series,page=page,dkey=dkey,skey=skey)
                 else:

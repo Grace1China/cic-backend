@@ -144,7 +144,7 @@
                 <div class="toolbar">
                     <el-select 
                         v-model="curdir" 
-                        filterable placeholder="请选择专栏系列"
+                        filterable placeholder="请选择分组"
                         @change="onSeriesChange($event)"
                     >
                         {% for key,value in series.items %}
@@ -429,6 +429,106 @@
                             </div>
                         </el-checkbox-group>
                     </el-tab-pane>
+                    <el-tab-pane v-if="isShow('content')" label="内容" name="content">
+                        <el-checkbox-group  v-if="activeTab == 'content'" v-model="checkedImages" >
+                            <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
+                                :style="{ display: 'flex'}"
+                            >
+                                <div  v-for="jj in 6" :key="jj"
+                                >
+                                    <el-card :body-style="{ padding: '0px' ,border: '0', position: 'relative', minWidth: '128px' }"
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        class='mediacard'
+                                    >
+                                        <el-checkbox 
+                                            border
+                                            :style="{ width: '100%'}"
+                                            :label=`${ii}-${jj}`
+                                        >
+                                            <!--上面这个label是el-checkbox-group的v-model的值。它也是唯一的。可以用来反查images里的object-->
+
+                                            <img 
+                                                :src=`${theImage(ii,jj).thumb}` 
+                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg mediadata"
+                                                typ='content'
+                                                :style="{ width: '100%'}"
+                                            />
+                                            <hovercard>
+                                                <div class='extra-bar'>
+                                                    <span
+                                                        @click.stop.prevent="handlePictureCardPreview(theImage(ii,jj))"
+                                                    >
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span
+                                                        @click="removeKey(theImage(ii,jj).key)"
+                                                    >
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </div>
+                                            </hovercard>
+                                        </el-checkbox>
+                                            <span
+                                                :style="{ 'fontSize':'1rem' }" 
+                                                :title="[[ theImage(ii,jj).visible_filename  ]]"
+                                            >
+                                                [[ theImage(ii,jj).visible_filename | shorttitle ]]
+                                            </span>
+                                    </el-card>
+                                </div>
+                            </div>
+                        </el-checkbox-group>
+                    </el-tab-pane>
+                    <el-tab-pane v-if="isShow('contentcolumn')" label="内容专栏" name="contentcolumn">
+                        <el-checkbox-group  v-if="activeTab == 'contentcolumn'" v-model="checkedImages" >
+                            <div v-for="ii in Math.ceil(images.length/6)" :key="ii"
+                                :style="{ display: 'flex'}"
+                            >
+                                <div  v-for="jj in 6" :key="jj"
+                                >
+                                    <el-card :body-style="{ padding: '0px' ,border: '0', position: 'relative', minWidth: '128px' }"
+                                        v-if=" (theImage(ii,jj).src||'') != '' "
+                                        class='mediacard'
+                                    >
+                                        <el-checkbox 
+                                            border
+                                            :style="{ width: '100%'}"
+                                            :label=`${ii}-${jj}`
+                                        >
+                                            <!--上面这个label是el-checkbox-group的v-model的值。它也是唯一的。可以用来反查images里的object-->
+
+                                            <img 
+                                                :src=`${theImage(ii,jj).thumb}` 
+                                                :data-src=`${theImage(ii,jj).src}` class="thumbimg mediadata"
+                                                typ='contentcolumn'
+                                                :style="{ width: '100%'}"
+                                            />
+                                            <hovercard>
+                                                <div class='extra-bar'>
+                                                    <span
+                                                        @click.stop.prevent="handlePictureCardPreview(theImage(ii,jj))"
+                                                    >
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span
+                                                        @click="removeKey(theImage(ii,jj).key)"
+                                                    >
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </div>
+                                            </hovercard>
+                                        </el-checkbox>
+                                            <span
+                                                :style="{ 'fontSize':'1rem' }" 
+                                                :title="[[ theImage(ii,jj).visible_filename  ]]"
+                                            >
+                                                [[ theImage(ii,jj).visible_filename | shorttitle ]]
+                                            </span>
+                                    </el-card>
+                                </div>
+                            </div>
+                        </el-checkbox-group>
+                    </el-tab-pane>
                     <el-tab-pane label="上传" name="upload">
                         <el-upload
                             class="upload"
@@ -450,10 +550,8 @@
                             :limit="10"
                             multiple
                             drag
-                            >
-                            
+                        >
                             <i class="el-icon-upload"></i>
-                            
                         </el-upload> 
                         
                         <el-alert 
@@ -554,7 +652,8 @@
                                 'images':1,
                                 'videos':1,
                                 'audios':1,
-                                'pdfs':1
+                                'pdfs':1,
+                                'content':1,
                             },
                             loading:false,
                             ALIOSS_DESTINATIONS:JSON.parse(`{{ ALIOSS_DESTINATIONS|safe }}`),
@@ -578,7 +677,14 @@
                     store,
                     created:function(){
                         typ = this.getQueryVariable('type')
-                        this.showFiles(typ,this.curdir,1)
+                        if((typ||'') == ''){
+                            return
+                        }
+                        if (typ == 'links'){
+                            this.showFiles('content',this.curdir,1)
+                        }else{
+                            this.showFiles(typ,this.curdir,1)
+                        }
                     },
                     mounted: function (){
                         //this.showImages(this.curdir)
@@ -616,7 +722,7 @@
                             index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
                             from = this.getQueryVariable('from')
                             o = this.images[index]
-                            window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o } )
+                            window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o })
                             window.close()
                         },
                         mediaEmbed(){
@@ -648,7 +754,11 @@
                             if (this.getQueryVariable('from')=='ckeditor' || this.getQueryVariable('from')=='admin' ){
                                 return true
                             }else{
-                                return this.getQueryVariable('type') == typ
+                                if(this.getQueryVariable('type') == 'links' && ['contentcolumn','content'].includes(typ)){
+                                    return true
+                                }else{
+                                    return this.getQueryVariable('type') == typ
+                                }
                             }
                         },   
                         isFromCtrl:function(){
@@ -710,14 +820,18 @@
                     
                             this.loading = true
                             this.activeTab = tab.name
-                            this.showFiles(tab.name,this.curdir,this.page.image)
+                            if (tab.name == 'upload'){
+                                this.loading = false
+                            }else{
+                                this.showFiles(tab.name,this.curdir,this.page.image)
+                            }
                             this.checkedImages = []
                         },
                         onbeforeUpload(file){
                             console.log('--------onbeforeUpload----------')
                             console.log(file)
                         },
-                        onprogress(e, rawFile,fileList){
+                        onprogress(e, rawFile,fileList){az  `       ``1`
                 
                             this.fileArr = fileList
                             this.fileArr.forEach(item=>{
@@ -854,7 +968,7 @@
                                 });
                                 return
                             } else if (file.typ=='videos'){//((file||{}).oname||'').match('(.mp4$)')
-                                this.$alert(`<span>${file.visible_filename}</span><video id="media-preview" style="width:100%;height:auto;" controls src="${file.src}">`, {
+                                this.$alert(`<span>${file.visible_filename}</span><video id="media-preview" style="width:100%;height:auto;" controls src="${file.video_tcinfo.sd}">`, {
                                     dangerouslyUseHTMLString: true,
                                     customClass:"image-preview",
                                     beforeClose:(action,instance,done)=>{
@@ -875,7 +989,25 @@
                                     }
                                 });
                             }else if(file.typ=='pdfs'){//((file||{}).oname||'').match('(.pdf$)')
-                                this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;"><span>${file.oname}</span><a href="${file.url}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
+                                this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;"><span>${file.visible_filename}</span><a href="${file.url}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.url}" ></iframe></div>`, {
+                                    dangerouslyUseHTMLString: true,
+                                    customClass:"image-preview",
+                                    beforeClose:(action,instance,done)=>{
+                                        //console.log(instance)
+                                        done()
+                                    }
+                                });
+                            }else if(file.typ=='content'){//((file||{}).oname||'').match('(.pdf$)')
+                                this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;height:1rem;"><span>${file.visible_filename}</span><a href="${file.src}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.src}" style="height:500px;"></iframe></div>`, {
+                                    dangerouslyUseHTMLString: true,
+                                    customClass:"image-preview",
+                                    beforeClose:(action,instance,done)=>{
+                                        //console.log(instance)
+                                        done()
+                                    }
+                                });
+                            }else if(file.typ=='contentcolumn'){//((file||{}).oname||'').match('(.pdf$)')
+                                this.$alert(`<div style="display:flex;flex-direction:column;"><div style="display: flex;flex-direction: row;align-items: center;font-size: 1rem;justify-content: space-evenly;height:1rem;"><span>${file.visible_filename}</span><a href="${file.src}"><div id="qrcode"></div></a></div><iframe id="media-preview" name="media" src="${file.src}" style="height:500px;"></iframe></div>`, {
                                     dangerouslyUseHTMLString: true,
                                     customClass:"image-preview",
                                     beforeClose:(action,instance,done)=>{

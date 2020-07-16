@@ -72,8 +72,11 @@ class VPage(models.Model):
         verbose_name = "微页面"
         verbose_name_plural = "微页面"
 
+    
+
 class VComponents(models.Model):
     id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=250, default='',verbose_name='标题')
     church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
     create_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='用户')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -90,9 +93,12 @@ class VComponents(models.Model):
         (TEXT, '富文本')
     )
     control = models.IntegerField(choices=CONTROL_CHOICES,default=CAROUSEL,verbose_name='控件')
-    ContentColumn = models.ForeignKey(ContentColumn,null=True,blank=True, on_delete=models.CASCADE)#position 多 <-->1  ContentColumn
-    Media = models.ForeignKey(Media,null=True,blank=True, on_delete=models.CASCADE)
-    content = InlineContentField(null=True,blank=True,verbose_name='内容',)
+    ContentColumn = models.ForeignKey(ContentColumn,null=True,blank=True, on_delete=models.CASCADE,verbose_name='专栏')#position 多 <-->1  ContentColumn
+    Media = models.ForeignKey(Media,null=True,blank=True, on_delete=models.CASCADE,verbose_name='内容')
+    content = RichTextUploadingField(null=True,blank=True,verbose_name='富文本',external_plugin_resources=[('html5video',
+        '/static/ckeditor/ckeditor/plugins/html5video/',
+        'plugin.js'
+    ),]) 
     # vpage = models.ForeignKey(vpage,null=True, on_delete=models.CASCADE)#position 多 <-->1  ContentColumn
     class Meta:
         app_label = 'churchs'
@@ -102,6 +108,22 @@ class VComponents(models.Model):
 class VPageComponents(models.Model):
     page = models.ForeignKey(VPage,null=True, on_delete=models.CASCADE)
     components = models.ForeignKey(VComponents,null=True, on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField(null=False,default=0)
+
+
+
+from django_mysql.models import JSONField
+class VParts(models.Model):
+    id = models.AutoField(primary_key=True)
+    components = models.ForeignKey(VComponents,null=True, on_delete=models.CASCADE)
+    cover = models.CharField(max_length=400,blank=True,verbose_name='封面')
+    title = models.CharField(max_length=250,null=True, blank=True,default='',verbose_name='标题')
+    url_obj = JSONField()
+    url = models.CharField(max_length=250, default='',verbose_name='url')
+    url_title = models.CharField(max_length=250,null=True, blank=True,default='',verbose_name='标题')
+    url_object = models.CharField(max_length=250,null=True, blank=True,default='',verbose_name='反射对象')
+    url_id = models.IntegerField(null=True,verbose_name='反射对象id')
+    css = models.CharField(max_length=500, null=True, blank=True,default='',verbose_name='样式')
     order = models.PositiveSmallIntegerField(null=False,default=0)
 
 
