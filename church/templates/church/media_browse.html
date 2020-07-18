@@ -844,19 +844,24 @@
                                 }
                             })
                         },
-                        getTyp(filetype){
-                            if(filetype.match('image/')){
-                                return 'images'
-                                
-                            }
-                            if(filetype.match('video/')){
-                                return 'videos'
-                            }
-                            if(filetype.match('audio/')){
-                                return 'audios'
-                            }
-                            if(filetype.match('pdf/')){
-                                return 'pdfs'
+                        getTyp(filetype,name){
+                            if(filetype != ''){
+                                if(filetype.match('image/')){
+                                    return 'images'
+                                }
+                                if(filetype.match('video/')){
+                                    return 'videos'
+                                }
+                                if(filetype.match('audio/')){
+                                    return 'audios'
+                                }
+                                if(filetype.match('pdf/')){
+                                    return 'pdfs'
+                                }
+                            }else if (name != ''){
+                                if (name.includes('.VOB') || name.includes('.vob')){
+                                    return 'videos' 
+                                }
                             }
                             return 'destination'
                         },
@@ -1043,7 +1048,8 @@
                                 isLt2M = thefile.size / 1024 / 1024 < 2;
                             console.log('-----------diyUpload------------')
                             console.log(fileType)
-                            thedest = this.getTyp(fileType)
+                            
+                            thedest = this.getTyp(fileType,params.file.name)
                             thehost = `https://${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['bucket']}.${this.ALIOSS_DESTINATIONS[thedest=='videos'?`${thedest}.source`:thedest]['endpoint.acc']}`
 
                             console.log(`dest:${thedest};host:${thehost}`)

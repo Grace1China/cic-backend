@@ -25,6 +25,7 @@ from churchs.models import MediaFile,WeeklyReport
 from django.core.paginator import Paginator
 from churchs.models import Media
 import urllib.request
+from django.db.models import Q
 
 import qrcode
 from io import BytesIO
@@ -520,7 +521,7 @@ class AliyunMediaStorage(AliyunBaseStorage):
 
             if (dkey != ''):
                 #删除数据库
-                from django.db.models import Q
+                
                 MediaFile.objects.filter(name=dkey).delete()
                 medias = Media.objects.filter(Q(alioss_video=dkey) | Q(alioss_audio=dkey) |Q(alioss_image=dkey) | Q(alioss_pdf=dkey))
                 for md in medias:
@@ -729,6 +730,13 @@ class AliyunVideoStorage(AliyunBaseStorage):
         except Exception as e:
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             raise e
+
+    def get_mimetype(dest=''):
+        for mtype in settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix_arr']:
+            str = Q()
+
+        
+
     
     def get_files_from_db(self,user=None,typ=None,series='',page=1,dkey='',skey=''):
         '''
@@ -766,7 +774,8 @@ class AliyunVideoStorage(AliyunBaseStorage):
             if skey != '':
                 qrset = MediaFile.objects.filter(church_prefix=user.church.code,origin_name__icontains=skey,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
             else:
-                qrset = MediaFile.objects.filter(series_prefix=series,church_prefix=user.church.code,mime_type__startswith=settings.ALIOSS_DESTINATIONS[self.destination]['mimetype_prefix']).order_by('-update_time')
+                from django.db.models import Q
+                qrset = MediaFile.objects.filter(Q(series_prefix=series),Q(church_prefix=user.church.code),Q(mime_type__startswith=settings.ALIOSS_DESTINATIONS['videos.destination']['mimetype_prefix_arr'][0]) | Q(mime_type__startswith=settings.ALIOSS_DESTINATIONS['videos.destination']['mimetype_prefix_arr'][1])).order_by('-update_time')
             lg.info(qrset)
 
             total = qrset.count()

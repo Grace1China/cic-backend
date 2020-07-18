@@ -236,7 +236,7 @@ class VPartsForm(forms.ModelForm):
     # components = forms.ModelChoiceField(label="微组件",queryset=VComponents.objects.all(),required=False)
     cover = forms.CharField(label="图片",widget=MediaBaseWidget(label='',typ='images'),required=False)
     title = forms.CharField(required=False)
-    url = forms.CharField(label="链接",widget=MediaBaseWidget(label='',typ='links'),required=False)
+    url_obj = forms.CharField(label="链接",widget=MediaBaseWidget(label='',typ='links'),required=False)
     css = forms.CharField(required=False)
     order = forms.IntegerField()
     class Meta:
@@ -258,7 +258,7 @@ class VPartsInline(admin.TabularInline):
     # formset = vpos_FormSet
     # template = 'admin/churchs/vpage_tabular.html'
 
-    fields = ('components','cover','title','url','css','order')#,'url_title','url_object','url_id'
+    fields = ('components','cover','title','url_obj','css','order')#,'url_title','url_object','url_id'
 
     ordering = ('order',)
     extra = 1

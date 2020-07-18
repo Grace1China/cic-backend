@@ -311,24 +311,51 @@
                             this.rokey = ''
                             this.value = ''
                         },
+                        getLinkJson(){
+                            console.log(this.pro)
+                            return JSON.stringify(this.pro||this.value)
+                        },
+                        getUrl(pro1,val1){
+                            window.val1 = val1
+                            console.log(val1)
+                            if (pro1){
+                                return pro1.src[0]
+                            }else if ((val1||'{}')!='{}'){
+                                return eval(JSON.parse(val1)).src[0]
+                            }else{
+                                return ''
+                            }
+                        },
+                        getTitle(pro1,val1){
+                            if (pro1){
+                                return pro1.visible_filename
+                            }else if ((val1||'{}')!='{}'){
+                                return eval(JSON.parse(val1)).visible_filename
+                            }else{
+                                return ''
+                            }
+                        },
                     },
 
                     template: `
                     <div ref="media_select" class="media_select" :id="pname" @click="$emit('click', $event.target)">
-                        <input class="" :name="name" type="hidden" :value="rokey||value" />
+                        
                         ptyp: [[ ptyp ]] typ: [[ typ ]]
                         <template v-if="ptyp == 'links'">
-                            <input class="" :name="name+'_title'" type="hidden" :value="title" />
+                            <input class="" :name="name" type="hidden" :value="getLinkJson()" />
+                        </template>
+                        <template v-else>
+                            <input class="" :name="name" type="hidden" :value="rokey||value" />
                         </template>
                         <!--信息来自，对话框，然后应该有一个局部加载，共享对话框中的加载逻辑-->
 
-                        <el-card v-if="typ=='links'||typ=='content'||typ=='contentcolumn'">
+                        <el-card v-if="(ptyp||typ)=='links'||typ=='content'||typ=='contentcolumn'">
                             <el-tag
                                 v-if="(rokey||value) != ''"
                                 closable
                                 :disable-transitions="false"
                                 @close="handleClose()">
-                                <a :href="document.location.host+'\'+(rokey||value)">[[ title ]]</a>
+                                <a :href="getUrl(pro,value)">[[ getTitle(pro,value) ]]</a>
                             </el-tag>
                             <i v-else class="el-icon-plus" :style="{ fontSize: '3em' }"></i>
                         </el-card>
@@ -489,6 +516,7 @@
                                 this.$children[i].typ = o.obj.typ
                                 this.$children[i].thumb = o.obj.thumb
                                 this.$children[i].title = o.obj.visible_filename
+                                this.$children[i].pro = o.obj
 
                                 if(o.obj.typ == 'videos'){
                                     this.$children[i].video_tcinfo = o.obj.video_tcinfo
