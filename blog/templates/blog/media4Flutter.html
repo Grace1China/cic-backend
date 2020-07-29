@@ -368,8 +368,10 @@
         </div>
         {% if media %}
             <div id='videowrap' class="headblock" >
-                <video ref='myvideo' id="myplayer"  class="showstep  postshow" playsinline="true" webkit-playsinline="true" x5-playsinline="" src="{{ media.video }}"   preload="auto">
+                <video ref='myvideo' id="myplayer"  class="showstep  postshow" playsinline="true" webkit-playsinline="true" x5-playsinline=""  preload="auto">
+                    <source src="{{ media.video }}" type="video/mp4">
                 </video>
+      
                 <i class="video-poster showstep preshow" style="background-image: url('{{ media.cover }}?x-oss-process=style/w730');">
                 </i>
                 <div class="video-ctrl showstep preshow">
@@ -429,30 +431,33 @@
 <script>
 function setupPlayer(){
     var isDrag = false
-    var myVideo=document.querySelector("video#myplayer");
-            
-    myVideo.addEventListener('canplay', () => { 
-        //alert('canplay now')
+    var durationSeconds = 0
+    var isLoading = false
+    var e=document.querySelector("video#myplayer");
+
+    e.addEventListener("loadedmetadata", (function() {
+        durationSeconds = e.duration
+    }
+    ))
+    e.addEventListener("waiting", (function() {
+        isLoading = true
+    }
+    ))
+    e.addEventListener("canplay", (function() {
+        isLoading = false
+        alert('canplay now')
         console.log('canplay()')
         ldplay = document.querySelector('.el-icon-loading')
         if((ldplay||0)==0) {return}
         ldplay.classList.remove('el-icon-loading')
         ldplay.classList.add('el-icon-caret-right')
-        
-        
-    });
-
-    myVideo.addEventListener('play', () => { 
-        document.querySelector('.icon.play').style.display='none'
-        document.querySelector('.icon.pause').style.display='block'
-    });
-
-    myVideo.addEventListener('pause', () => { 
-        document.querySelector('.icon.play').style.display='block'
-        document.querySelector('.icon.pause').style.display='none'
-    });
-
-    myVideo.addEventListener('timeupdate',function () {
+    }
+    ))
+    /*e.addEventListener("progress", (function() {
+        t.updateLoadedPercentage()
+    }
+    )),*/
+    e.addEventListener("timeupdate", (function() {
         //console.log(this.currentTime());
         times = document.querySelectorAll('.vis-video__control_bottom_time')
         sec = this.currentTime
@@ -464,7 +469,30 @@ function setupPlayer(){
             bar = document.querySelectorAll('.van-slider__bar')
             bar[0].style.width=`${parseInt(this.currentTime/this.duration*100)}%`
         }
+    }
+    ))
+    e.addEventListener("ended", (function() {
+        //t.status = L,
+        //t.$emit("video-end")
+    }
+    ))
+
+
+
+            
+  
+
+    myVideo.addEventListener('play', () => { 
+        document.querySelector('.icon.play').style.display='none'
+        document.querySelector('.icon.pause').style.display='block'
     });
+
+    myVideo.addEventListener('pause', () => { 
+        document.querySelector('.icon.play').style.display='block'
+        document.querySelector('.icon.pause').style.display='none'
+    });
+
+ 
 
     function hideSpeedBar(e){
         console.log('-------hideSpeedBar--------')
