@@ -368,10 +368,11 @@
         </div>
         {% if media %}
             <div id='videowrap' class="headblock" style="position:fixed;z-index:7;top:0;">
-                <video ref='myvideo' id="myplayer"  playsinline="true" webkit-playsinline="true" x5-playsinline="" controls poster='{{ media.cover }}?x-oss-process=style/w730' src="{{ media.video }}" type="video/mp4">
+                <video  ref='myvideo' id="myplayer"  playsinline="true" webkit-playsinline="true" x5-playsinline="true" controls poster='{{ media.cover }}?x-oss-process=style/w730' src="{{ media.video }}" type="video/mp4">
                 </video>
             </div>
-            <div class="infoblock">
+            
+            <div class="infoblock" onclick="document.querySelector('#myplayer').play()">
                 <h3>{{ media.title }}</h3>
                 <div  style="margin: 0 0 10px 0;"><span style="margin: 0 20px 0 0;">观看</span>{{ media.hits }}次</div>
                 <div><span style="margin: 0 20px 0 0;">时间</span>{{ media.pubtime | datetime_to_date }}</div>
