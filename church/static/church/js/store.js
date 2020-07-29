@@ -131,6 +131,53 @@ function deleteContent(context,options){
   }); 
 }
 
+function deleteParts(context,options){
+  return new Promise((resolve, reject) =>{        
+    console.log(`deleteParts=============`)
+    console.log(options)
+    host = store.getters.getHost()
+    axios.post(`http://${host}/rapi/comp_delete_parts`,{params: { 'partid':options.partid}}).then(function (res) {
+        console.log(res)
+        resolve(res)
+    })
+    .catch(function (err) {
+      console.log(err)
+      reject(err)
+    });
+  }); 
+}
+
+function getCookie (name) {
+  var value = '; ' + document.cookie
+  var parts = value.split('; ' + name + '=')
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+function addParts(context,options){
+  return new Promise((resolve, reject) =>{        
+    console.log(`addParts=============`)
+    console.log(options)
+    host = store.getters.getHost()
+    axios.request({
+      url:`http://${host}/rapi/comp_add_parts`,
+      method:'post',
+      data:{"compid":options.compid ,"linkjsons":JSON.stringify(options.linkjsons)},
+      headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json',
+      },
+    }).then(function (res) {
+      console.log(res)
+      resolve(res)
+    })
+    .catch(function (err) {
+      console.log(err)
+      reject(err)
+    });
+    // axios.post(`http://${host}/rapi/comp_add_parts`,{params: { 'compid':options.compid ,'linkjsons':options.linkjsons}},{headers: {'X-CSRFToken': getCookie('csrftoken')}})
+  }); 
+}
+
 function ccolList(context,options){
   return new Promise((resolve, reject) =>{        
     console.log(`ccolList=============`)
@@ -187,6 +234,8 @@ const store = new Vuex.Store({
       getObjByKey,
       deleteContent,
       ccolList,
+      deleteParts,
+      addParts,
       
     }
   })

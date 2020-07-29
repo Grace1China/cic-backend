@@ -16,6 +16,7 @@ from django.contrib.auth.models import Group
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import never_cache
 from .media_base import get_media
+from .views_vpage import add_parts,delete_parts
 
 #----------------------------v1---------------------------------------------------------
 
@@ -115,6 +116,10 @@ urlpatterns = [
     path('get_media_by_key',never_cache(staff_member_required(get_media)),name='get_media_by_key'),
     path('delete_content',never_cache(staff_member_required(delete_content_of_column)),name='delete_content'),#删除内容专栏的内容
     path('ccolList',never_cache(staff_member_required(ccolList)),name='ccolList'),
+    path('comp_add_parts',never_cache(staff_member_required(add_parts)),name='comp_add_parts'),
+    path('comp_delete_parts',never_cache(staff_member_required(delete_parts)),name='comp_delete_parts'),
+
+
     
  
 ]

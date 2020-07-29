@@ -716,15 +716,33 @@
                         checkij(value,ev){
                             console.log(`${value}-${ev}`)
                         },
+
+                      
+
                         mediaReturn(o){
                             console.log('-----mediaReturn-----------')
                             console.log(this.images)
-                            arr = this.checkedImages[0].split('-')
-                            index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
+                            
                             from = this.getQueryVariable('from')
-                            o = this.images[index]
-                            window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o })
-                            window.close()
+                            if(from=='vcomponent'){
+                                var objs = []
+                                for(var i = 0 ; i <= this.checkedImages.length-1; i++){
+                                    arr = this.checkedImages[i].split('-')
+                                    index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
+                                    objs.push(this.images[index])
+                                }
+                                console.log(`objs:${objs}`)
+                                store.dispatch('addParts',{'linkjsons':objs,'compid':this.getQueryVariable('vcompid')})
+                                window.opener.window.formVue.loadForm()
+                                //window.close()
+                                return
+                            }else{
+                                arr = this.checkedImages[i].split('-')
+                                index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
+                                o = this.images[index]
+                                window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o })
+                                window.close()
+                            }
                         },
                         mediaEmbed(){
                             console.log('-----mediaReturn-----------')

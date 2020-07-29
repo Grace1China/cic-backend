@@ -261,13 +261,14 @@ class VPartsInline(admin.TabularInline):
     fields = ('components','cover','title','url_obj','css','order')#,'url_title','url_object','url_id'
 
     ordering = ('order',)
-    extra = 1
+    extra = 0
     can_delete = True
 
 class VComponentsAdmin(admin.ModelAdmin):
     list_display = ('preview_title','control','create_by','ContentColumn','Media','content','promote')  
     # list_filter = (MediaKindListFilter, 'alioss_video_status')
-    fields = ('title','control','ContentColumn','Media','content')
+    fields = ('title','control','ContentColumn','Media','content','add_content')
+    readonly_fields = ('add_content',)
     change_form_template ="admin/churchs/change_form_components.html"
     formfield_overrides = {
         VComponents.content: {'widget': CKEditorWidget()},
@@ -284,6 +285,22 @@ class VComponentsAdmin(admin.ModelAdmin):
         button_html = """<a class="changelink" href="/admin/churchs/vcomponents/%d/change/">编辑</a>""" % obj.id
         return format_html(button_html)
     promote.short_description = "操作"
+
+    def add_content(self, instance):
+        # assuming get_full_address() returns a list of strings
+        # for each line of the address and you want to separate each
+        # line by a linebreak
+        if instance.id is None:
+            return format_html(
+                '''<el-button disabled @click="popupCenter('/media_browse/?from=vcomponent','媒体库',900,600)">{}</el-button>''',
+                '批量添加内容,先保存微组件'
+            ) 
+        else:
+            return format_html(
+                '''<el-button @click="popupCenter('/media_browse/?type=links&from=vcomponent&vcompid={}','媒体库',900,600)">{}</el-button>''',
+                instance.id,
+                '批量添加内容'
+            )
     def save_form(self, request, form,change):
         """
         Given a ModelForm return an unsaved instance. ``change`` is True if

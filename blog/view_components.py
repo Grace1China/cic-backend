@@ -9,7 +9,7 @@ import logging
 theLogger = logging.getLogger('church.all')
 from rest_framework import serializers
 from churchs.models.vpage import VPage
-from churchs.models.vpage import VComponents 
+from churchs.models.vpage import VComponents, VParts
 
 
 from api.serializers import MediaSerializer4ListAPI
@@ -19,12 +19,17 @@ from rest_framework_simplejwt.state import token_backend
 from users.models import CustomUser
 
 from django.conf import settings
-
+class VPartsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VParts
+        fields = '__all__'
 
 class VComponentsSerializer(serializers.ModelSerializer):
+    vparts = VPartsSerializer(many=True, read_only=True)
     class Meta:
         model = VComponents
-        fields = '__all__'
+        fields = ('id','title','church','create_by','create_time','update_time','control','ContentColumn','Media','content','vparts',)
+
 
 class vpageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,8 +41,9 @@ def vcomp(request,pk=0):
         data = request.GET
         id = data.get('componentid',0)
         vcomp = VComponents.objects.get(id=id)
-        
         compsz = VComponentsSerializer(vcomp)
+        theLogger.info('-------------vcomp--------')
+        theLogger.info(compsz.data)
         template = loader.get_template('blog/vcomponents.html')
         context = {
             'vcomp': compsz.data,

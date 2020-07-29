@@ -209,7 +209,7 @@
                             pvalue: this.value,
                             pro:this.ro,
                             rosrc:undefined,
-                            rokey:undefined,
+                            rokey:undefined,//从媒体库中返回的，资料的key
                             thumb:undefined,
                             video_tcinfo:{},
                             typ:undefined,//加载后preview的时候，根据类型,默认为undefined后可取ptyp
@@ -316,12 +316,31 @@
                             return JSON.stringify(this.pro||this.value)
                         },
                         getUrl(pro1,val1){
+                            console.log(`getUrl(${pro1},${val1})`)
+                            if (eval(val1)=="") return
                             window.val1 = val1
                             console.log(val1)
                             if (pro1){
                                 return pro1.src[0]
-                            }else if ((val1||'{}')!='{}'){
-                                return eval(JSON.parse(val1)).src[0]
+                            }else if ( (val1||'{}')!='{}' && eval(val1)!="" ){
+                                return eval(JSON.parse(eval(val1))).src[0]
+                            }else{
+                                return ''
+                            }
+                        },
+                        getUrl_v1(pro1,val1){
+                            console.log(val1)
+                            console.log(typeof val1)
+                            if (pro1){
+                                return pro1.src[0]
+                            }else if(val1){
+                                if(typeof JSON.parse(val1) == "string"){
+                                    return JSON.parse(JSON.parse(val1)).src[0]
+                                }else if (typeof JSON.parse(val1) == "object"){
+                                    return JSON.parse(val1).src[0]
+                                }else{
+                                    throw 'the json url is not in right type'
+                                }
                             }else{
                                 return ''
                             }
@@ -329,12 +348,35 @@
                         getTitle(pro1,val1){
                             if (pro1){
                                 return pro1.visible_filename
-                            }else if ((val1||'{}')!='{}'){
-                                return eval(JSON.parse(val1)).visible_filename
+                            }else if ( (val1||'{}')!='{}' && eval(val1)!="" ){
+                                return eval(JSON.parse(eval(val1))).visible_filename
                             }else{
                                 return ''
                             }
                         },
+                        getTitle_v1(pro1,val1){
+                            if (pro1){
+                                return pro1.visible_filename
+                            }else if(val1){
+                                if(typeof JSON.parse(val1) == "string"){
+                                    return JSON.parse(JSON.parse(val1)).visible_filename
+                                }else if (typeof JSON.parse(val1) == "object"){
+                                    return val1.visible_filename
+                                }else{
+                                    throw 'the json url is not in right type'
+                                }
+                            }else{
+                                return ''
+                            }
+                        },
+                        isValueEmpty(val){
+                            console.log(`isValueEmpty(${val})`)
+                            if ((val||'{}') == '{}' || val == "\"\""){
+                                return true
+                            }else{
+                                return false
+                            }
+                        }
                     },
 
                     template: `
@@ -351,11 +393,11 @@
 
                         <el-card v-if="(ptyp||typ)=='links'||typ=='content'||typ=='contentcolumn'">
                             <el-tag
-                                v-if="(rokey||value) != ''"
+                                v-if="!isValueEmpty(rokey||value)"
                                 closable
                                 :disable-transitions="false"
                                 @close="handleClose()">
-                                <a :href="getUrl(pro,value)">[[ getTitle(pro,value) ]]</a>
+                                <a target="_blank" onclick='event.stopPropagation()' :href="getUrl_v1(pro,value)">[[ getTitle_v1(pro,value) ]]:[[ getUrl_v1(pro,value) ]]</a>
                             </el-tag>
                             <i v-else class="el-icon-plus" :style="{ fontSize: '3em' }"></i>
                         </el-card>

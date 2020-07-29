@@ -115,7 +115,7 @@ class VPageComponents(models.Model):
 from django_mysql.models import JSONField
 class VParts(models.Model):
     id = models.AutoField(primary_key=True)
-    components = models.ForeignKey(VComponents,null=True, on_delete=models.CASCADE)
+    components = models.ForeignKey(VComponents,null=True,related_name='vparts', on_delete=models.CASCADE)
     cover = models.CharField(max_length=400,blank=True,verbose_name='封面')
     title = models.CharField(max_length=250,null=True, blank=True,default='',verbose_name='标题')
     url_obj = JSONField()

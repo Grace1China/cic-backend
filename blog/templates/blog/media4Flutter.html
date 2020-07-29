@@ -1,0 +1,893 @@
+{% load i18n static  %}
+{% load cust_filters %}
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
+<link href="{% static 'blog/images/favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+{% comment %} <link rel="stylesheet" href="{% static 'church/css/video-js.min.css' %}">
+<script type="text/javascript" src="{% static "church/js/videojs.min.js" %}"></script> {% endcomment %}
+
+<script type="text/javascript" src="{% static "church/js/vue.js" %}"></script>
+
+<link rel="stylesheet" href="{% static "admin/simpleui-x/elementui/theme-chalk/index.css" %}" type="text/css" />
+<script type="text/javascript" src="{% static "admin/simpleui-x/elementui/index.js" %}"></script>
+
+<style>
+    .cover{
+        z-index: 1;
+        background-position: 57%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    .videowrap{
+        position:relative;
+    }
+    .video-js{
+        position:absolute;
+        width: 100%;
+        z-index:0;
+        height: 100%;
+    }
+    .video-poster{
+        position: absolute;
+        display: block;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        top:0px;
+    }
+    .video-ctrl{
+        position: absolute;
+        left:50%;
+        top:50%;
+        transform: translate(-50%, -50%);
+        z-index:2
+    }
+    .video-ctrl i{
+        font-size: 36px;
+        color: white;
+        border: 3px solid;
+        border-radius: 100%;
+    }
+
+   
+    .sticky{
+        position: fixed !important;
+        top: 0px;
+        left: 50%;
+        transform: translate(-50%, 0px);
+        width: 100vw;
+        z-index:7;
+    }
+    .toppad{
+        width: 100vw;
+        height: 56.25vw;
+    }
+
+    
+    body{
+        margin:0px;
+    }
+    .page-detail{
+        width: 100%;
+        background:#80808014;
+    }
+    .headblock{
+        position:relative;
+        width: 100vw;
+        height: 56.25vw;
+        background: gray;
+        text-align: center;
+        background:#fff
+    }
+    .contentblock{
+        width: 100vw;
+        padding-top:20px !important;
+        background:#fff;
+    }
+
+    .contentblock p{
+        margin:0px;
+    }
+    
+    .cap-image-ad__title{
+        margin: 0;
+        background: #000000a1;
+        color: #fff;
+        text-align: left;
+        /*position: relative;
+        top: 124px;*/
+        padding: 5px 13px;
+        font-size: 13px;
+    }
+    {% comment %} .banner_item{
+        display: flex;
+        flex-direction:column;
+        justify-content: flex-end;
+    } {% endcomment %}
+    .banner-item div{
+        width:100%;
+        height:100%;
+        display: flex;
+        flex-direction:column;
+        justify-content: flex-end;
+    }
+    .mint-swipe-indicator.is-active{
+        background:#1dec8c !important;
+    }
+    .col_title{
+        font-size:1rem;
+    }
+    .row_title{
+        font-size:1rem;
+    }
+    .row_rpart{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding:0 0 0 10px;
+        flex-grow: 1;
+    }
+    .row_rb_part{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size:0.75rem;
+    }
+    .infoblock{
+        padding:5px 15px;
+        background:#fff;
+        margin-bottom:10px !important;
+    }
+    .mint-navbar .mint-tab-item{
+        padding:0px;
+    }
+    .bottom_tool{
+        position: fixed;
+        z-index: 99999;
+        bottom: 0px;
+        font-size: 2rem;
+        display: flex;
+        justify-content: space-around;
+        background: #33333394;
+        width: 100%;
+        height: fit-content;
+        padding: 5px 0 10px;
+    }
+
+    .bottom_tool i{
+        color:#fff;
+    }
+    .active{
+        transition-timing-function:ease-in;
+    }
+
+    #myplayer{
+        width:100%;
+        height:100%;
+        position:absolute;
+        top:0;
+        left:0;
+    }
+    #myplayer video{
+        width:100%;
+        height:100%;
+    }
+
+    .vis-video__control{
+        width:100%;
+        height:100%;
+    }
+    .vis-video__control_bottom{
+        display:flex;
+        width:100%;
+        position: absolute;
+        bottom: 0;
+    }
+    .vis-video__control_bottom_slider{
+        width:100%;
+        display: flex;
+        align-items: center;
+        margin:0 14px;
+    }
+    .van-slider{
+        height:4px;
+        width: 100%;
+    }
+    .van-slider__bar{
+        position:relative;
+        height:4px !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .van-slider__button-wrapper{
+        position:absolute;
+        width:12px;
+        height:12px;
+        background: #fff;
+        border-radius: 100%;
+        right:-6px;
+    }
+    .vis-video__control_bottom_slider_btn{
+        background: green;
+        width: 7px;
+        height: 7px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 100%;
+    }
+    /*.easein {
+        animation-timing-function: ease-in;
+    }
+    .easeout {
+        animation-timing-function: ease-out;
+    }*/
+
+    .vis-video__control_bottom.active{
+        height:46px;
+        background:linear-gradient(transparent,rgba(74,74,74,.35) 50%,rgba(0,0,0,.5));
+        animation:myshow 2s;
+        -moz-animation:myshow 2s; /* Firefox */
+        -webkit-animation:myshow 2s; /* Safari and Chrome */
+        -o-animation:myshow 2s; /* Opera */
+        bottom: 0;
+        position: absolute;
+        height: 46px;
+        z-index: 3;
+        opacity:1;
+    }
+    .vis-video__control_bottom.hide{
+        height:46px;
+        background:linear-gradient(transparent,rgba(74,74,74,.35) 50%,rgba(0,0,0,.5));
+        animation:myhide 2s;
+        -moz-animation:myhide 2s; /* Firefox */
+        -webkit-animation:myhide 2s; /* Safari and Chrome */
+        -o-animation:myhide 2s; /* Opera */
+        bottom: 0;
+        position: absolute;
+        height: 46px;
+        z-index: 3;
+        opacity:0;
+    }
+   
+
+    @keyframes myshow
+    {
+        from {opacity:0;}
+        to {opacity:1;}
+    }
+
+    @keyframes myhide
+    {
+        from {opacity:1;}
+        to {opacity:0;}
+    }
+
+    .contentblock{
+        width: calc(100% - 20px);
+        padding: 0 10px;
+    }
+    .vis-video__control_bottom_time, .vis-audio__control_bottom_time{
+        margin:auto;
+        color:#fff;
+        font-size:14px;
+    }
+
+    .vis-video__control_bottom_rate, .vis-audio__control_bottom_rate{
+        margin: auto;
+        font-size: 14px;
+        padding: 0 10px;
+        color:#fff;
+        width:64px;
+    }
+    .icon.fullscreen{
+        font-size: 14px;
+        width: 40px;
+        height: 100%;
+        padding: 0 10px;
+    }
+    .vis-video__control_rate, .vis-audio__control_rate{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 120px;
+        background: #33333357;
+    }
+    .vis-video__control_rate_item, .vis-audio__control_rate_item{
+        border-radius: 20px;
+        background: #dddddd6e;
+        margin: 4px;
+        color: #fff;
+        font-size: 14px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .vis-video__control_rate.active, .vis-audio__control_rate.active{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 120px;
+        background: #33333357;
+        animation:myshow 2s;
+        -moz-animation:myshow 2s; /* Firefox */
+        -webkit-animation:myshow 2s; /* Safari and Chrome */
+        -o-animation:myshow 2s; /* Opera */
+        opacity:1;
+    }
+    .vis-video__control_rate.hide, .vis-audio__control_rate.hide{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 120px;
+        background: #33333357;
+        animation:myhide 2s;
+        -moz-animation:myhide 2s; /* Firefox */
+        -webkit-animation:myhide 2s; /* Safari and Chrome */
+        -o-animation:myhide 2s; /* Opera */
+        opacity:0;
+    }
+
+    .postshow{
+        visibility:hidden;
+    }
+
+    .preshow{
+        visibility:visible;
+    }
+  
+
+
+    
+</style>
+</head>
+<body class ="wechatpromt">
+
+<div id="elvue" class="container" style="min-height: 937px;display: flex;justify-content: center;">
+    <div class="page-detail" >
+        <div id="toppad">
+        </div>
+        {% if media %}
+            <div id='videowrap' class="headblock" >
+                <video ref='myvideo' id="myplayer"  class="showstep  postshow" playsinline="true" webkit-playsinline="true" x5-playsinline="" src="{{ media.video }}"   preload="auto">
+                </video>
+                <i class="video-poster showstep preshow" style="background-image: url('{{ media.cover }}?x-oss-process=style/w730');">
+                </i>
+                <div class="video-ctrl showstep preshow">
+                    <i class="el-icon-loading" onclick="play()"></i>
+                </div>
+                <div class="vis-video__control" class="showstep postshow"><!---->
+                    <div>
+                        <div class="vis-video__control_bottom" >
+                            <svg onclick="play()" class="icon play"  viewBox="0 0 1024 1024"  style="font-size: 14px; width: 48px;height: 100%;"><path fill="#ffffff" d="M768 506.026667v11.946666a32.426667 32.426667 0 0 1-15.786667 27.733334L370.346667 768c-23.04 13.653333-34.986667 13.653333-45.226667 7.68l-10.666667-5.973333a32.426667 32.426667 0 0 1-15.786666-26.88V281.173333a32.426667 32.426667 0 0 1 15.786666-27.733333l10.666667-5.973333c10.24-5.973333 22.186667-5.973333 52.053333 11.52l375.04 219.306666a32.426667 32.426667 0 0 1 15.786667 27.733334z" />
+                            </svg>
+                            <svg onclick="pause()" class="icon pause"  viewBox="0 0 1024 1024"  style="font-size: 14px; width: 48px;height: 100%;"><path fill="#ffffff" d="M426.666667 288v448a32.426667 32.426667 0 0 1-32 32h-64a32.426667 32.426667 0 0 1-32-32V288A32.426667 32.426667 0 0 1 330.666667 256h64a32.426667 32.426667 0 0 1 32 32zM693.333333 256h-64a32.426667 32.426667 0 0 0-32 32v448a32.426667 32.426667 0 0 0 32 32h64a32.426667 32.426667 0 0 0 32-32V288a32.426667 32.426667 0 0 0-32-32z" />
+                            </svg>
+                                <span class="vis-video__control_bottom_time"></span>
+                                <div class="vis-video__control_bottom_slider">
+                                    <div class="van-slider" style="background: rgb(255, 255, 255);">
+                                        <div class="van-slider__bar" style="width: 0%; background: rgb(0, 179, 137);">
+                                            <div role="slider" tabindex="0" aria-valuemin="0" aria-valuenow="0" aria-valuemax="100" aria-orientation="horizontal" class="van-slider__button-wrapper">
+                                                <i class="vis-video__control_bottom_slider_btn"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="vis-video__control_bottom_time"></span>
+                                <span class="vis-video__control_bottom_rate">倍数</span>
+                                <svg onclick="fullscreen()"  class="icon fullscreen" viewBox="0 0 1024 1024" version="1.1" style="font-size: 14px; width: 40px;height: 100%;"><path fill="#ffffff" d="M85.333333 682.666667v128a128 128 0 0 0 128 128h128a42.666667 42.666667 0 0 0 0-85.333334H213.333333a42.666667 42.666667 0 0 1-42.666666-42.666666v-128a42.666667 42.666667 0 0 0-85.333334 0z m597.333334 256h128a128 128 0 0 0 128-128v-128a42.666667 42.666667 0 0 0-85.333334 0v128a42.666667 42.666667 0 0 1-42.666666 42.666666h-128a42.666667 42.666667 0 0 0 0 85.333334z m256-597.333334V213.333333a128 128 0 0 0-128-128h-128a42.666667 42.666667 0 0 0 0 85.333334h128a42.666667 42.666667 0 0 1 42.666666 42.666666v128a42.666667 42.666667 0 0 0 85.333334 0zM341.333333 85.333333H213.333333a128 128 0 0 0-128 128v128a42.666667 42.666667 0 0 0 85.333334 0V213.333333a42.666667 42.666667 0 0 1 42.666666-42.666666h128a42.666667 42.666667 0 0 0 0-85.333334z" />
+                                </svg>
+                        </div>
+                                <div class="vis-video__control_rate postshow hide" >
+                                    <span class="vis-video__control_rate_item current" data-vtpidvthememain="vtp4">2X</span>
+                                    <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp5">1.5X</span>
+                                    <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp6">1.25X</span>
+                                    <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp7">1X</span>
+                                    <span class="vis-video__control_rate_item" data-vtpidvthememain="vtp8">0.5X</span>
+                                </div>
+                    </div>
+                </div>
+            </div>
+            <div class="infoblock">
+                <h3>{{ media.title }}</h3>
+                <div  style="margin: 0 0 10px 0;"><span style="margin: 0 20px 0 0;">观看</span>{{ media.hits }}次</div>
+                <div><span style="margin: 0 20px 0 0;">时间</span>{{ media.pubtime | datetime_to_date }}</div>
+            </div>
+            <div class="contentblock">
+                {{ media.content|safe }}
+            </div>
+        {% else %}
+            <p>No info found now.</p>
+        {% endif %}
+    </div>
+    <div class="bottom_tool">
+        <a href="javascript:void(0);" onclick="document.location.href='/blog/LordDay'"><i class="el-icon-d-arrow-left"></i></a>
+        <a href="javascript:void(0);" onclick="document.location.reload()"><i class="el-icon-refresh"></i></a>
+    </div>
+</div>
+
+</body>
+<script>
+function setupPlayer(){
+    var isDrag = false
+    var myVideo=document.querySelector("video#myplayer");
+            
+    myVideo.addEventListener('canplay', () => { 
+        //alert('canplay now')
+        console.log('canplay()')
+        ldplay = document.querySelector('.el-icon-loading')
+        if((ldplay||0)==0) {return}
+        ldplay.classList.remove('el-icon-loading')
+        ldplay.classList.add('el-icon-caret-right')
+        
+        
+    });
+
+    myVideo.addEventListener('play', () => { 
+        document.querySelector('.icon.play').style.display='none'
+        document.querySelector('.icon.pause').style.display='block'
+    });
+
+    myVideo.addEventListener('pause', () => { 
+        document.querySelector('.icon.play').style.display='block'
+        document.querySelector('.icon.pause').style.display='none'
+    });
+
+    myVideo.addEventListener('timeupdate',function () {
+        //console.log(this.currentTime());
+        times = document.querySelectorAll('.vis-video__control_bottom_time')
+        sec = this.currentTime
+        h = parseInt(sec / (60*60))
+        m = parseInt((sec - h*60*60)/60)
+        s = parseInt(sec - h*60*60 - m*60)
+        times[0].innerText=`${h>0?h+':':''}${m}:${s<=9?'0'+s:s}`
+        if(!isDrag){
+            bar = document.querySelectorAll('.van-slider__bar')
+            bar[0].style.width=`${parseInt(this.currentTime/this.duration*100)}%`
+        }
+    });
+
+    function hideSpeedBar(e){
+        console.log('-------hideSpeedBar--------')
+        document.querySelector('.vis-video__control_rate').classList.remove('active')
+        document.querySelector('.vis-video__control_rate').classList.add('hide')
+    }
+    
+    function toggleCtrls(e) {
+        console.log('-------toggleCtrls--------')
+        if(document.querySelector('.vis-video__control_bottom').classList.contains('active')){
+            document.querySelector('.vis-video__control_bottom').classList.remove('active')
+            document.querySelector('.vis-video__control_bottom').classList.add('hide')
+        }else{
+            document.querySelector('.vis-video__control_bottom').classList.remove('hide')
+            document.querySelector('.vis-video__control_bottom').classList.add('active')
+            hideSpeedBar()
+        }
+        console.log(e)
+    }
+    function toggleSpeedBar(e){
+        console.log('-------toggleSpeedBar--------')
+        ctrl_rate = document.querySelector('.vis-video__control_rate')
+        if (ctrl_rate.classList.contains('hide')){
+            ctrl_rate.classList.remove('hide')
+            ctrl_rate.classList.add('active')
+        }else{
+            ctrl_rate.classList.remove('active')
+            ctrl_rate.classList.add('hide')
+        }
+        /*if(document.querySelector('.vis-video__control_rate').classList.contains('active')){
+        }*/
+    }
+
+    function handleStart(ev){
+        this.isDrag = true
+    }
+    function handleMove(evt){
+        console.log(`clientX:${evt.changedTouches[0].clientX}`)
+        console.log(`pageX:${evt.changedTouches[0].pageX}`)
+        console.log(`getBoundingClientRect().x:${document.querySelector('.van-slider').getBoundingClientRect().x}`)
+
+        
+        dist = evt.changedTouches[0].clientX-document.querySelector('.van-slider').getBoundingClientRect().x
+        console.log(`dist:${dist}`)
+        
+        if (dist> document.querySelector('.van-slider').clientWidth){
+            dist = document.querySelector('.van-slider').clientWidth
+        }
+
+        var myVideo=document.querySelector("video#myplayer");
+
+        ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * myVideo.duration
+
+        ct = parseInt(ct)
+        bar = document.querySelectorAll('.van-slider__bar')
+        
+        bar[0].style.width=`${parseInt(ct/myVideo.duration*100)}%`
+    }
+    function handleEnd(evt){
+        isDrag = false
+        dist = evt.changedTouches[0].clientX-document.querySelector('.van-slider').getBoundingClientRect().x
+        
+        if (dist> document.querySelector('.van-slider').clientWidth){
+            dist = document.querySelector('.van-slider').clientWidth
+        }
+        var myVideo=document.querySelector("video#myplayer");
+
+        ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * myVideo.duration
+
+        ct = parseInt(ct)
+        myVideo.currentTime = ct
+    }
+
+    function speedChange(e){
+        console.log('-------speedChange--------')
+
+        var myVideo=document.querySelector("video#myplayer");
+        myVideo.playbackRate = parseFloat(e.srcElement.innerText)
+        console.log(e.srcElement.innerText)
+        document.querySelector(".vis-video__control_bottom_rate").innerText = e.srcElement.innerText
+    }
+
+    document.querySelector('#myplayer').addEventListener('touchstart', toggleCtrls,{passive: true});
+    document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', toggleSpeedBar,{passive: true});
+    document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', toggleCtrls,{passive: true});
+    document.querySelector('.vis-video__control_rate').addEventListener('touchstart', hideSpeedBar,{passive: true});
+    document.querySelector('.vis-video__control_rate').addEventListener('touchstart', toggleCtrls,{passive: true});
+
+    //document.querySelector('.vis-video__control_rate_item').addEventListener('touchstart', this.speedChange);
+    ctrl_rates = document.querySelectorAll('.vis-video__control_rate_item')
+    for(var i = 0; i <= ctrl_rates.length - 1 ; i++){
+        ctrl_rates[i].addEventListener('touchstart', speedChange,{passive: true});
+    }
+
+
+    document.querySelector('.van-slider__button-wrapper').addEventListener('touchstart', handleStart,{passive: true});
+    document.querySelector('.van-slider__button-wrapper').addEventListener('touchmove', handleMove,{passive: true});
+    document.querySelector('.van-slider__button-wrapper').addEventListener('touchend', handleEnd,{passive: true});
+    
+
+}
+setupPlayer()
+
+function play(){
+
+
+    function hideSpeedBar(e){
+        console.log('-------hideSpeedBar--------')
+        document.querySelector('.vis-video__control_rate').classList.remove('active')
+        document.querySelector('.vis-video__control_rate').classList.add('hide')
+    }
+    
+    function toggleCtrls(e) {
+        console.log('-------toggleCtrls--------')
+        if(document.querySelector('.vis-video__control_bottom').classList.contains('active')){
+            document.querySelector('.vis-video__control_bottom').classList.remove('active')
+            document.querySelector('.vis-video__control_bottom').classList.add('hide')
+        }else{
+            document.querySelector('.vis-video__control_bottom').classList.remove('hide')
+            document.querySelector('.vis-video__control_bottom').classList.add('active')
+            hideSpeedBar()
+        }
+        console.log(e)
+    }
+
+    ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+    if (ctrl_bottom.classList.contains('hide')){
+        return;
+    }
+    console.log('play')
+    /*document.querySelector('.video-poster').style.visibility="hidden";
+    document.querySelector('.video-ctrl').style.visibility="hidden";
+    document.querySelector('#myplayer').style.visibility="visible";
+    ctrl_bottom.classList.add('active')*/
+    var myVideo=document.querySelector("video#myplayer");
+    myVideo.play()
+    ctrls_ps = document.querySelectorAll(".postshow")
+    for(var i = 0 ; i <= ctrls_ps.length-1; i++){
+        ctrls_ps[i].classList.remove('postshow')
+    }
+    ctrls_ps = document.querySelectorAll(".preshow")
+    for(var i = 0 ; i <= ctrls_ps.length-1; i++){
+        ctrls_ps[i].style.display='none'
+    }
+
+    dur = myVideo.duration
+    times = document.querySelectorAll('.vis-video__control_bottom_time')
+    h = parseInt(dur / (60*60))
+    m = parseInt((dur - h*60*60)/60)
+    s = parseInt(dur - h*60*60 - m*60)
+    times[1].innerText=`${h>0?h+':':''}${m}:${s<=9?'0'+s:s}`
+
+    toggleCtrls()
+
+}
+
+function pause(){
+    ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+    if (ctrl_bottom.classList.contains('hide')){
+        return;
+    }
+    var myVideo=document.querySelector("video#myplayer");
+    myVideo.pause()
+}
+function fullscreen(){
+    ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+    if (ctrl_bottom.classList.contains('hide')){
+        return;
+    }
+    var myVideo=document.querySelector("video#myplayer");
+    myVideo.webkitEnterFullscreen()
+}
+
+
+{% comment %} window.onload=function setupVue(){
+
+    window.theV = new Vue({
+        el: '#elvue',
+        data: {
+            theme: '',
+            selected:'1',
+            activeName:'curlorday',
+            loading:true,
+            vicclass:'el-icon-loading',
+            player:undefined,
+            isDrag:false,
+        },
+        created: function () {
+            
+        },
+        mounted:function(){
+            thisV = this
+            
+            var myVideo=document.querySelector("video#myplayer");
+            
+            myVideo.addEventListener('canplay', () => { 
+                //alert('canplay now')
+                console.log('canplay()')
+                ldplay = document.querySelector('.el-icon-loading')
+                if((ldplay||0)==0) {return}
+                ldplay.classList.remove('el-icon-loading')
+                ldplay.classList.add('el-icon-caret-right')
+                
+                
+            });
+
+            myVideo.addEventListener('play', () => { 
+                document.querySelector('.icon.play').style.display='none'
+                document.querySelector('.icon.pause').style.display='block'
+            });
+
+            myVideo.addEventListener('pause', () => { 
+                document.querySelector('.icon.play').style.display='block'
+                document.querySelector('.icon.pause').style.display='none'
+            });
+
+            myVideo.addEventListener('timeupdate',function () {
+                //console.log(this.currentTime());
+                times = document.querySelectorAll('.vis-video__control_bottom_time')
+                sec = this.currentTime
+                h = parseInt(sec / (60*60))
+                m = parseInt((sec - h*60*60)/60)
+                s = parseInt(sec - h*60*60 - m*60)
+                times[0].innerText=`${h>0?h+':':''}${m}:${s<=9?'0'+s:s}`
+                if(!thisV.isDrag){
+                    bar = document.querySelectorAll('.van-slider__bar')
+                    bar[0].style.width=`${parseInt(this.currentTime/this.duration*100)}%`
+                }
+            });
+            
+
+            document.querySelector('#myplayer').addEventListener('touchstart', this.toggleCtrls,{passive: true});
+            document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', this.toggleSpeedBar,{passive: true});
+            document.querySelector('.vis-video__control_bottom_rate').addEventListener('touchstart', this.toggleCtrls,{passive: true});
+            document.querySelector('.vis-video__control_rate').addEventListener('touchstart', this.hideSpeedBar,{passive: true});
+            document.querySelector('.vis-video__control_rate').addEventListener('touchstart', this.toggleCtrls,{passive: true});
+
+            //document.querySelector('.vis-video__control_rate_item').addEventListener('touchstart', this.speedChange);
+            ctrl_rates = document.querySelectorAll('.vis-video__control_rate_item')
+            for(var i = 0; i <= ctrl_rates.length - 1 ; i++){
+                ctrl_rates[i].addEventListener('touchstart', this.speedChange,{passive: true});
+            }
+
+
+            document.querySelector('.van-slider__button-wrapper').addEventListener('touchstart', this.handleStart,{passive: true});
+            document.querySelector('.van-slider__button-wrapper').addEventListener('touchmove', this.handleMove,{passive: true});
+            document.querySelector('.van-slider__button-wrapper').addEventListener('touchend', this.handleEnd,{passive: true});
+        },
+        methods:{
+            handleClick:function(){
+                console.log(1)
+            },
+            play(){
+                ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+                if (ctrl_bottom.classList.contains('hide')){
+                    return;
+                }
+                console.log('play')
+                /*document.querySelector('.video-poster').style.visibility="hidden";
+                document.querySelector('.video-ctrl').style.visibility="hidden";
+                document.querySelector('#myplayer').style.visibility="visible";
+                ctrl_bottom.classList.add('active')*/
+                var myVideo=document.querySelector("video#myplayer");
+                myVideo.play()
+                ctrls_ps = document.querySelectorAll(".postshow")
+                for(var i = 0 ; i <= ctrls_ps.length-1; i++){
+                    ctrls_ps[i].classList.remove('postshow')
+                }
+                ctrls_ps = document.querySelectorAll(".preshow")
+                for(var i = 0 ; i <= ctrls_ps.length-1; i++){
+                    ctrls_ps[i].style.display='none'
+                }
+
+                dur = myVideo.duration
+                times = document.querySelectorAll('.vis-video__control_bottom_time')
+                h = parseInt(dur / (60*60))
+                m = parseInt((dur - h*60*60)/60)
+                s = parseInt(dur - h*60*60 - m*60)
+                times[1].innerText=`${h>0?h+':':''}${m}:${s<=9?'0'+s:s}`
+
+                this.toggleCtrls()
+
+            },
+            pause(){
+                ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+                if (ctrl_bottom.classList.contains('hide')){
+                    return;
+                }
+                var myVideo=document.querySelector("video#myplayer");
+                myVideo.pause()
+            },
+            fullscreen(){
+                ctrl_bottom = document.querySelector('.vis-video__control .vis-video__control_bottom')
+                if (ctrl_bottom.classList.contains('hide')){
+                    return;
+                }
+                var myVideo=document.querySelector("video#myplayer");
+                myVideo.requestFullscreen()
+            },
+            toggleCtrls(e) {
+
+                console.log('-------toggleCtrls--------')
+                if(document.querySelector('.vis-video__control_bottom').classList.contains('active')){
+                    document.querySelector('.vis-video__control_bottom').classList.remove('active')
+                    document.querySelector('.vis-video__control_bottom').classList.add('hide')
+                }else{
+                    document.querySelector('.vis-video__control_bottom').classList.remove('hide')
+                    document.querySelector('.vis-video__control_bottom').classList.add('active')
+                    this.hideSpeedBar()
+                }
+                console.log(e)
+            },
+            toggleSpeedBar(e){
+                console.log('-------toggleSpeedBar--------')
+                ctrl_rate = document.querySelector('.vis-video__control_rate')
+                if (ctrl_rate.classList.contains('hide')){
+                    ctrl_rate.classList.remove('hide')
+                    ctrl_rate.classList.add('active')
+                }else{
+                    ctrl_rate.classList.remove('active')
+                    ctrl_rate.classList.add('hide')
+                }
+                /*if(document.querySelector('.vis-video__control_rate').classList.contains('active')){
+                }*/
+            },
+            hideSpeedBar(e){
+                console.log('-------hideSpeedBar--------')
+
+                document.querySelector('.vis-video__control_rate').classList.remove('active')
+                document.querySelector('.vis-video__control_rate').classList.add('hide')
+            },
+            speedChange(e){
+                console.log('-------speedChange--------')
+
+                var myVideo=document.querySelector("video#myplayer");
+                myVideo.playbackRate = parseFloat(e.srcElement.innerText)
+                console.log(e.srcElement.innerText)
+                document.querySelector(".vis-video__control_bottom_rate").innerText = e.srcElement.innerText
+            },
+            oncanplay(){
+                
+            },
+            handleStart(ev){
+                this.isDrag = true
+            },
+            handleMove(evt){
+                console.log(`clientX:${evt.changedTouches[0].clientX}`)
+                console.log(`pageX:${evt.changedTouches[0].pageX}`)
+                console.log(`getBoundingClientRect().x:${document.querySelector('.van-slider').getBoundingClientRect().x}`)
+
+                
+                dist = evt.changedTouches[0].clientX-document.querySelector('.van-slider').getBoundingClientRect().x
+                console.log(`dist:${dist}`)
+                
+                if (dist> document.querySelector('.van-slider').clientWidth){
+                    dist = document.querySelector('.van-slider').clientWidth
+                }
+
+                var myVideo=document.querySelector("video#myplayer");
+
+                ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * myVideo.duration
+
+                ct = parseInt(ct)
+                bar = document.querySelectorAll('.van-slider__bar')
+                
+                bar[0].style.width=`${parseInt(ct/myVideo.duration*100)}%`
+            },
+            handleEnd(evt){
+                this.isDrag = false
+                dist = evt.changedTouches[0].clientX-document.querySelector('.van-slider').getBoundingClientRect().x
+                
+                if (dist> document.querySelector('.van-slider').clientWidth){
+                    dist = document.querySelector('.van-slider').clientWidth
+                }
+                var myVideo=document.querySelector("video#myplayer");
+
+                ct = (dist)/document.querySelector('.van-slider').parentElement.clientWidth * myVideo.duration
+
+                ct = parseInt(ct)
+                myVideo.currentTime = ct
+            },
+        
+        }
+    })
+} {% endcomment %}
+
+
+
+if(document.getElementsByClassName('wechatpromt').length>0){
+    if(document.getElementsByTagName('video').length>0){
+        document.getElementsByTagName('video')[0].classList.add('fixtop')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('webkit-playsinline','webkit-playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('playsinline','playsinline')
+        document.getElementsByTagName('video')[0].setAttribute('x5-playsinline','x5-playsinline')
+    }
+}
+
+
+window.onresize = function(){
+    /*console.log('re')
+    vh = document.getElementsByTagName('video').length>0?document.getElementsByTagName('video')[0].offsetHeight:0
+    container_v = document.getElementsByClassName('ckeditor-html5-video').length>0 ? document.getElementsByClassName('ckeditor-html5-video')[0]:{}
+    container_v.style.height=vh*/
+}
+ticking=false
+window.addEventListener('DOMContentLoaded', function(e) {
+  window.scrollTo(0,0)
+});
+window.addEventListener('scroll', function(e) {
+  current_scroll_position = window.scrollY;
+  if (!ticking) {
+    window.requestAnimationFrame(function() {
+        if (current_scroll_position>0){
+            console.log(current_scroll_position)
+            document.getElementById('videowrap').classList.add('sticky');
+            document.getElementById('toppad').classList.add('toppad')
+        }
+        ticking = false;
+    });
+    ticking = true;
+  }
+});
+
+</script>
+</html>

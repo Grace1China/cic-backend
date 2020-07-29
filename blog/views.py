@@ -79,7 +79,7 @@ def media(request,pk=0):
             'video':'http://%s/%s/sd.mp4' % (get_ALIOSS_DESTINATIONS(typ='videos.destination')['redirecturl'],mediasz.data['video']),
             'audio':'http://%s/%s/320.mp3' % (get_ALIOSS_DESTINATIONS(typ='audios')['redirecturl'],mediasz.data['audio']),
         }
-        template = loader.get_template('blog/media.html')
+        template = loader.get_template('blog/media4Flutter.html')
         context = {
             'media': mediaDict,
         }
