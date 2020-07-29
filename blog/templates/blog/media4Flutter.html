@@ -368,8 +368,7 @@
         </div>
         {% if media %}
             <div id='videowrap' class="headblock" style="position:fixed;z-index:7;top:0;">
-                <video ref='myvideo' id="myplayer"  playsinline="true" webkit-playsinline="true" x5-playsinline="" controls poster='{{ media.cover }}?x-oss-process=style/w730'>
-                    <source src="{{ media.video }}" type="video/mp4">
+                <video ref='myvideo' id="myplayer"  playsinline="true" webkit-playsinline="true" x5-playsinline="" controls poster='{{ media.cover }}?x-oss-process=style/w730' src="{{ media.video }}" type="video/mp4">
                 </video>
             </div>
             <div class="infoblock">
