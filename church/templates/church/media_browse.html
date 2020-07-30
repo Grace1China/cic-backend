@@ -734,10 +734,10 @@
                                 console.log(`objs:${objs}`)
                                 store.dispatch('addParts',{'linkjsons':objs,'compid':this.getQueryVariable('vcompid')})
                                 window.opener.window.formVue.loadForm()
-                                //window.close()
+                                window.close()
                                 return
                             }else{
-                                arr = this.checkedImages[i].split('-')
+                                arr = this.checkedImages[0].split('-')
                                 index = parseInt((arr[0]-1))*6+parseInt(arr[1]-1)
                                 o = this.images[index]
                                 window.opener.window.formVue.setRo({ "from":`${from}`, "obj":o })
