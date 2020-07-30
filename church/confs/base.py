@@ -482,8 +482,8 @@ ALIOSS_DESTINATIONS = {
         'bucket':ALIOSS_DESTINATION_BUCKET_NAME,
         'redirecturl':'api.bicf.org/mediabase',
         'x-oss-object-acl':'private',   #public-read、private、public-read-write
-        'mimetype_prefix':'unkown/',
-        'mimetype_prefix_arr':['unkown/','application/octet-stream'],
+        'mimetype_prefix':'video/',
+        'mimetype_prefix_arr':['video/','application/octet-stream'],
     },
     'audios':{
         'endpoint':ALIOSS_DESTINATION_ENDPOINT,
