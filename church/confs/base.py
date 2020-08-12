@@ -47,6 +47,8 @@ DEFAULT_FROM_EMAIL = 'churchplatform@bicf.org'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN' 
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+
 
 
 def getPermissionClass():
