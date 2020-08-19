@@ -185,7 +185,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
         kind = data.get('kind','6')
         
         # churchs_models.Media.  
-        validKind(kind)
+        self.validKind(kind)
 
         theLogger.info('kind: %d' % kind)
 
@@ -218,7 +218,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
 
         data = request.GET
         kind = data.get('kind','6')
-        validKind(kind)
+        self.validKind(kind)
 
         instance.kind = int(kind)
         return instance
