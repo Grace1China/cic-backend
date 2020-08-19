@@ -121,8 +121,13 @@ class MediaVideoAdmin(admin.ModelAdmin):
             # theLogger.info(obj.__dict__)
             data = request.GET
             kind = data.get('kind','')
-            if kind == '':
+            if kind == '' and obj is not None:
                 kind = obj.kind
+            
+            if kind == '':
+                kind = churchs_models.Media.MEDIA_VIDEOS
+
+            self.validKind(kind)
             # theLogger.info(type(kind))
             # theLogger.info(type(churchs_models.Media.MEDIA_VIDEOS))
             # theLogger.info('kind:%s' % kind)
@@ -158,8 +163,6 @@ class MediaVideoAdmin(admin.ModelAdmin):
                         },),
                     
                     )
-            else:
-                raise Exception('not support %s' % kind)
             return fs 
         except Exception as e:
             import traceback
@@ -187,7 +190,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
         # churchs_models.Media.  
         self.validKind(kind)
 
-        theLogger.info('kind: %d' % kind)
+        theLogger.info('kind: %s' % kind)
 
         # MEDIA_VIDEOS = 6
         # MEDIA_AUDIOS = 7

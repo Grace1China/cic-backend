@@ -37,9 +37,12 @@
                             添加内容<i class="el-icon-arrow-down el-icon--right"></i>
                         </el-button>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item command="video">视频</el-dropdown-item>
-                            <el-dropdown-item command="audio">音频</el-dropdown-item>
-                            <el-dropdown-item command="tuwen">图文</el-dropdown-item>
+                            <!--MEDIA_VIDEOS = 6
+                            MEDIA_AUDIOS = 7
+                            MEDIA_TUWEN = 8 -->
+                            <el-dropdown-item command="6">视频</el-dropdown-item>
+                            <el-dropdown-item command="7">音频</el-dropdown-item>
+                            <el-dropdown-item command="8">图文</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>  
                 {% else %}
@@ -128,7 +131,7 @@
                 label: 'html'
             }],
 
-            addcontents:[{
+            addcontents_del:[{
                     value: 0,
                     label: '视频'
                 }, {
