@@ -256,63 +256,103 @@ class MediaBaseWidget(TextInput):
         return mark_safe(render_to_string( 'admin/media-select.tpl',ctx))
 
 
-class MediaContentField(Field):
-    def __init__(self, *args, **kwargs):
-        self.widget = MediaContentField(label=kwargs.get('verbose_name', None))
-        super(MediaContentField, self).__init__(*args, **kwargs)
+# class MediaContentField_del(Field):
+#     def __init__(self, *args, **kwargs):
+#         self.widget = MediaContentField_del(label=kwargs.get('verbose_name', None))
+#         super(MediaContentField_del, self).__init__(*args, **kwargs)
 
-    def get_internal_type(self):
-        return 'TextField'
+#     def get_internal_type(self):
+#         return 'TextField'
 
-    def formfield(self, *args, **kwargs):
-        kwargs['widget'] = self.widget
-        return super(MediaContentField, self).formfield(*args, **kwargs)
+#     def formfield(self, *args, **kwargs):
+#         kwargs['widget'] = self.widget
+#         return super(MediaContentField_del, self).formfield(*args, **kwargs)
 
 
-class MediaContentWidget(TextInput):
+# class MediaContentWidget_del(TextInput):
+#     class Media:
+#         pass
+
+#     def __init__(self, *args, **kwargs):
+#         self.label = kwargs.pop('label', None)
+#         self.typ = kwargs.pop('typ', None)
+#         self.cover = kwargs.pop('cover', None)
+
+
+#         super(MediaContentWidget_del, self).__init__(*args, **kwargs)
+
+
+#     def render(self, name, value, **kwargs):
+#         ctx = {
+#             'typ':self.typ,
+#             'label':self.label,
+#             'name':name,
+#             'value':'' if value is None else value,
+#             'cover':'' if self.cover is None else self.cover,
+#         }
+#         # theLogger.info(mark_safe(render_to_string( 'admin/content-select.tpl',ctx)))
+#         return mark_safe(render_to_string( 'admin/content-select.tpl',ctx))
+
+# class InlineContentField_del(Field):
+#     def __init__(self, *args, **kwargs):
+#         self.widget = InlineContentWidget(label=kwargs.get('verbose_name', None))
+#         super(InlineContentWidget_del, self).__init__(*args, **kwargs)
+
+#     def get_internal_type(self):
+#         return 'TextField'
+
+#     def formfield(self, *args, **kwargs):
+#         kwargs['widget'] = self.widget
+#         return super(InlineContentField_del, self).formfield(*args, **kwargs)
+
+# class InlineContentWidget_del(TextInput):
+#     class Media:
+#         pass
+
+#     def __init__(self, *args, **kwargs):
+#         self.label = kwargs.pop('label', None)
+
+#         super(InlineContentWidget_del, self).__init__(*args, **kwargs)
+
+#     def render(self, name, value, **kwargs):
+#         ctx = {
+#             'label':self.label,
+#             'name':name,
+#             'value':'' if value is None else value,
+#         }
+#         # theLogger.info(mark_safe(render_to_string( 'admin/content-select.tpl',ctx)))
+#         return mark_safe(render_to_string( 'admin/inline-content.tpl',ctx))
+
+
+
+class InlineMediaCoverWidget(TextInput):
     class Media:
         pass
 
     def __init__(self, *args, **kwargs):
         self.label = kwargs.pop('label', None)
-        self.typ = kwargs.pop('typ', None)
-        self.cover = kwargs.pop('cover', None)
+        self.mediaid = kwargs.pop('mediaid', None)
 
-
-        super(MediaContentWidget, self).__init__(*args, **kwargs)
-
+        super(InlineMediaCoverWidget, self).__init__(*args, **kwargs)
 
     def render(self, name, value, **kwargs):
         ctx = {
-            'typ':self.typ,
             'label':self.label,
             'name':name,
             'value':'' if value is None else value,
-            'cover':'' if self.cover is None else self.cover,
+            'mediaid':self.mediaid
         }
-        # theLogger.info(mark_safe(render_to_string( 'admin/content-select.tpl',ctx)))
-        return mark_safe(render_to_string( 'admin/content-select.tpl',ctx))
+        return mark_safe(render_to_string( 'admin/media-cover-widget.tpl',ctx))
 
-class InlineContentField(Field):
-    def __init__(self, *args, **kwargs):
-        self.widget = InlineContentWidget(label=kwargs.get('verbose_name', None))
-        super(InlineContentField, self).__init__(*args, **kwargs)
 
-    def get_internal_type(self):
-        return 'TextField'
-
-    def formfield(self, *args, **kwargs):
-        kwargs['widget'] = self.widget
-        return super(InlineContentField, self).formfield(*args, **kwargs)
-
-class InlineContentWidget(TextInput):
+class InlineTitleWidget(TextInput):
     class Media:
         pass
 
     def __init__(self, *args, **kwargs):
         self.label = kwargs.pop('label', None)
 
-        super(InlineContentWidget, self).__init__(*args, **kwargs)
+        super(InlineTitleWidget, self).__init__(*args, **kwargs)
 
     def render(self, name, value, **kwargs):
         ctx = {
@@ -320,7 +360,10 @@ class InlineContentWidget(TextInput):
             'name':name,
             'value':'' if value is None else value,
         }
-        # theLogger.info(mark_safe(render_to_string( 'admin/content-select.tpl',ctx)))
-        return mark_safe(render_to_string( 'admin/inline-content.tpl',ctx))
+        return mark_safe(render_to_string( 'admin/title-widget.tpl',ctx))
+
+
+
+
 
 

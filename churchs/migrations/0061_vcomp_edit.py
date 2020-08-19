@@ -27,11 +27,11 @@ class Migration(migrations.Migration):
             name='Media',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='churchs.Media', verbose_name='内容'),
         ),
-        migrations.AlterField(
-            model_name='vcomponents',
-            name='content',
-            field=churchs.widget.InlineContentField(blank=True, null=True, verbose_name='富文本'),
-        ),
+        # migrations.AlterField(
+        #     model_name='vcomponents',
+        #     name='content',
+        #     field=churchs.widget.InlineContentField(blank=True, null=True, verbose_name='富文本'),
+        # ),
         migrations.AlterField(
             model_name='vpagecomponents',
             name='page',

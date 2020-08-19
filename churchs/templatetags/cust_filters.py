@@ -8,7 +8,12 @@ from django.utils.encoding import force_text
 from django.utils.functional import Promise
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+import jsonpickle # pip install jsonpickle
+import json
 # from django.utils.safestring import mark_safe   
+
+import yaml # pip install pyyaml
+
 
 import logging
 theLogger = logging.getLogger('church.all')
@@ -255,6 +260,13 @@ def managed_church(context, _get_config=None):
     #         }
     #     ret.append(cd)
     return '<script type="text/javascript">var managed_church="{}"</script>'.format(ret)
+
+# Custom tag for diagnostics
+@register.simple_tag()
+def debug_object_dump(var):
+    return vars(var)
+    # serialized = jsonpickle.encode(var)
+    # return json.dumps(json.loads(serialized), indent=2)
 
 
     

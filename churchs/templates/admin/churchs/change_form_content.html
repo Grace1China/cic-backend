@@ -25,10 +25,78 @@
         .media_select{
             width:fit-content;
         }
+        .inline-related:nth-child(odd) {
+            background-color: #eee;
+        }
+        .inlinehead{
+            color:#fff; 
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .inlinehead div:nth-child(1){
+            flex-grow:1;
+        }
+        .inlinehead div:nth-child(2){
+            flex-grow:1;
+        }
+        .inlinehead div:nth-child(3){
+            flex-grow:1;
+        }
+        .inlinehead div:nth-child(4){
+            flex-grow:1;
+        }
+        .inlinehead div:nth-child(5){
+            flex-grow:1;
+        }
+
+        .inline-related > div{
+            color:#fff; 
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+        .inline-related > div >div:nth-child(1){
+            flex-grow:1;
+        }
+         .inline-related > div >div:nth-child(2){
+            flex-grow:1;
+        }
+
+        .inline-related > div >div:nth-child(3){
+            flex-grow:1;
+        }
+
+        .inline-related > div >div:nth-child(4){
+            flex-grow:1;
+        }
+
+        .inline-related > div >div:nth-child(5){
+            flex-grow:1;
+        }
+
+        .inline-related h3{
+            height:0px;
+            padding:0px;
+        }
+
+        .inline-related h3 span.delete {
+            {% comment %} float: right; {% endcomment %}
+            position: relative;
+            top: 55px;
+        }
+
+        .field-fromColumn {
+            color:#000;
+        }
+
+
+
 
     </style>
     <div id="content-main" class="form-main">
-        <div class="page-header">
+        <div class="page-header  daniel1">
             <el-header><el-button  @click="goBack1" icon="el-icon-arrow-left">返回</el-button>&nbsp;&nbsp;{{title}}</el-header>
             {% comment %} <el-page-header @click="alert(1)" class="Daniel_t" content="{{title}}"/> {% endcomment %}
             
@@ -80,6 +148,7 @@
                         {% include "admin/includes/fieldset.html" %}
                     {% endfor %}
                 {% endblock %}
+             
 
                 {% block inline_field_sets %}
                     {% for inline_admin_formset in inline_admin_formsets %}
@@ -488,6 +557,7 @@
                    
                 },
                 popupCenter :function (url, title, w, h)  {
+                    console.log(`popupCenter(url,title,w,h):(${url},${title},${w},${h})`);
                     const dualScreenLeft = window.screenLeft !==  undefined ? window.screenLeft : window.screenX;
                     const dualScreenTop = window.screenTop !==  undefined   ? window.screenTop  : window.screenY;
 

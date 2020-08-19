@@ -187,6 +187,7 @@ class Media(models.Model):
     content_object = GenericForeignKey("content_type", "object_id")
 
     column = models.ManyToManyField('ContentColumn',through='ColumnMedias')
+    sermon1 = models.ManyToManyField('Sermon',through='Sermon2Medias')
 
 
 
@@ -592,35 +593,7 @@ class Media(models.Model):
 
 from church.alioss_storage_backends_v2 import AliyunMediaStorage,AliyunStaticStorage
 
-class Sermon(models.Model):
-    STATUS_DRAFT = 1
-    STATUS_PUBLISHED = 2
 
-    STATUS_CHOICES = (
-        (STATUS_DRAFT, '草稿'),
-        (STATUS_PUBLISHED, '发布')
-    )
-    id = models.AutoField(primary_key=True)
-    church = models.ForeignKey(Church, on_delete=models.CASCADE,default=None,verbose_name='教会')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,default=None,verbose_name='编辑员',)
-    title = models.CharField(max_length=200, default='',verbose_name='标题')
-    speaker = models.ForeignKey("Speaker",on_delete=models.CASCADE,default=None,verbose_name='讲员')
-    cover = models.ImageField(storage=AliyunMediaStorage(), null=True, blank=True,verbose_name='海报封面')
-    scripture = models.CharField(max_length=100, default='',blank=True,verbose_name='经文')
-    series = models.ForeignKey(SermonSeries, on_delete=models.CASCADE,null=True,blank=True,default=None,verbose_name='讲道系列')
-
-    medias = GenericRelation(Media, related_query_name='Sermon',verbose_name='视听媒体')
-    create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    update_time = models.DateTimeField(auto_now=True, null=True, blank=True)
-    pub_time = models.DateTimeField(null=True, blank=True,editable=True,verbose_name='发布时间')
-    status = models.IntegerField(choices=STATUS_CHOICES,default=STATUS_DRAFT,verbose_name='状态')
-    class Meta:
-        app_label = 'churchs'
-        verbose_name = "主日信息"
-        verbose_name_plural = "主日信息"
-
-    def __str__(self):
-        return '%s' % (self.title)
 
 class WeeklyReport(models.Model):
     STATUS_DRAFT = 1

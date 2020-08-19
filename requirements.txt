@@ -31,3 +31,5 @@ easy_thumbnails
 django-polymorphic
 django-ckeditor-filebrowser-filer
 django-crequest
+pyyaml
+jsonpickle

@@ -1,19 +1,46 @@
 {% load i18n admin_urls static %}
+{% load cust_filters %}
 <div class="js-inline-admin-formset inline-group"
      id="{{ inline_admin_formset.formset.prefix }}-group"
      data-inline-type="stacked"
      data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
 <fieldset class="module {{ inline_admin_formset.classes }}">
-  <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
+  <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}
+  
+  </h2>
+  <div class="inlinehead">
+    {% for inline_admin_form in inline_admin_formset %}
+      {% if forloop.first %}
+        {% for fieldset in inline_admin_form %}
+            {% for line in fieldset %}
+              <!-- fieldset  --> 
+              {% for field in line %}
+                <!-- line  --> 
+                {% comment %} {% debug_object_dump field %} {% endcomment %}
+                <div>{{ field.label_tag }}</div>
+              {% endfor %}
+            {% endfor %}
+          
+        {% endfor %}
+      {% endif %}
+          {% comment %} {{ forloop.counter0 }} {% endcomment %}
+          {% comment %} {% endif %} {% endcomment %}
+    {% endfor %}
+  </div>
 {{ inline_admin_formset.formset.management_form }}
 {{ inline_admin_formset.formset.non_form_errors }}
 
+
+
+
 {% for inline_admin_form in inline_admin_formset %}<div class="inline-related{% if inline_admin_form.original or inline_admin_form.show_url %} has_original{% endif %}{% if forloop.last and inline_admin_formset.has_add_permission %} empty-form last-related{% endif %}" id="{{ inline_admin_formset.formset.prefix }}_{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}">
-    <h3>
-        {% comment %} <b>{{ inline_admin_formset.opts.verbose_name|capfirst }}:</b> {% endcomment %}
+
+
+     <h3>
+        {% comment %} <b>{{ inline_admin_formset.opts.verbose_name|capfirst }}:</b>
         <span class="inline_label">
         {% if inline_admin_form.original %}
-            {% comment %} {{ inline_admin_form.original }} {% endcomment %}
+            {{ inline_admin_form.original }}
             {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %} 
                 <a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="{% if inline_admin_formset.has_change_permission %}inlinechangelink{% else %}inlineviewlink{% endif %}">
                 {% if inline_admin_formset.has_change_permission %}{% trans "Change" %}{% else %}{% trans "View" %}{% endif %}</a>
@@ -22,12 +49,12 @@
         {% endif %}</span>
         {% if inline_admin_form.show_url %}
             <a href="{{ inline_admin_form.absolute_url }}">{% trans "View on site" %}</a>
-        {% endif %}
+        {% endif %} {% endcomment %}
         {% if inline_admin_formset.formset.can_delete and inline_admin_form.original %}
             <span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}
             </span>
         {% endif %}
-    </h3>
+    </h3> 
   {% if inline_admin_form.form.non_field_errors %}{{ inline_admin_form.form.non_field_errors }}{% endif %}
   {% for fieldset in inline_admin_form %}
     {% include "admin/churchs/content_tabular_fieldset.html" %}

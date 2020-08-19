@@ -27,7 +27,7 @@ class ColumnContentSerializer(serializers.ModelSerializer):
 
 class  Column_Content_ViewSet(viewsets.ModelViewSet):
     '''
-    课程视图
+    专栏内容视频
     
     '''
     from churchs.models import ContentColumn
@@ -41,7 +41,7 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
     @action(detail=True,methods=['get','post'], format="json")
     def delete_content_of_column(self,request):
         '''
-        查找课程列表信息
+        删除某一专栏的内容
         '''
         try:
             # theLogger.info('start GetCourseList-------------')
@@ -79,7 +79,7 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
     @action(detail=True,methods=['get','post'], format="json")
     def ccolList(self,request):
         '''
-        查找
+        查找某一专栏内容列表
         '''
         try:
             # theLogger.info('start GetCourseList-------------')
@@ -89,8 +89,8 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
                 data = request.GET
                 theLogger.info(data)
                 columnid = int(data.get('columnid',-1))
-                contentid = int(data.get('contentid',-1))  
-                theLogger.info('columnid:%dcontentid:%d' % (columnid,contentid))
+                # contentid = int(data.get('contentid',-1))  
+                theLogger.info('columnid:%d' % columnid)
                 if columnid < 0 or contentid < 0:
                     raise Exception('column id or content id is wrong.')  
 
@@ -98,14 +98,10 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
                 col = qr.get(id=columnid)
                 if col is None:
                     raise Exception('column is not find')
+                # col.medias.all()
+                # 这里需要返回一个专栏的所有内容的列表，并序列化返回
 
-                media = Media.objects.get(id=contentid)
-                if media is None:
-                    raise Exception('content media is not find')
-
-                col.medias.remove(media)
-
-                return JsonResponse({'errCode': '0', 'msg':'delete content(%d) from column(%d)' % (columnid,contentid)}, safe=False)
+                return JsonResponse({'errCode': '0', 'msg':'column %ds content here % (columnid)',data:{}}, safe=False)
            
         except Exception as e:
             import traceback

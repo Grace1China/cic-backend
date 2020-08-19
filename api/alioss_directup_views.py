@@ -535,7 +535,7 @@ class AliMtsCallBack_process(APIView):
                 theLogger.info('Bucket %s Object %s Location %s' % (Bucket,Object,Location))
                 qrset = MediaFile.objects.filter(name=Object,bucket=Bucket,endpoint=('https://%s.aliyuncs.com' % Location))
                 if len(qrset) != 1:
-                    raise Exception ('file record count is %d, need be 1' % len(qrset))
+                    raise Exception ('file record count is %d, need be 1 but Object:%s, bucket:%s, endpoint:%s ' % (len(qrset),Object,Bucket,Location))
                 mfile = qrset[0]
                 mfile.video_file_status = MediaFile.STATUS_TRANSCODED
                 dictInfo = dict()

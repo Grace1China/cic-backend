@@ -4,6 +4,8 @@
         <div class="description">{{ fieldset.description|safe }}</div>
     {% endif %}
     {% for line in fieldset %}
+
+        {{ line.as_table }}
         <div style="width:100%;" class="form-row{% if line.fields|length_is:'1' and line.errors %} errors{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}  {% if line.fields|length > 1 %} linewithcap {% endif %}">
             
             {% if line.fields|length_is:'1' %}{{ line.errors }}{% endif %}
@@ -29,7 +31,7 @@
                             {{ field.field }}{{ field.label_tag }}
                         {% else %}
                             {% if field.field.label %}
-                                {{ field.label_tag }}
+                                {% comment %} {{ field.label_tag }} {% endcomment %}
                             {% endif %} 
                             
                             {% if field.is_readonly %}

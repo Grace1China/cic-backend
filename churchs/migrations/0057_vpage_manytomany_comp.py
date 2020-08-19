@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('create_time', models.DateTimeField(auto_now_add=True, null=True)),
                 ('update_time', models.DateTimeField(auto_now=True, null=True)),
                 ('control', models.IntegerField(choices=[(1, 'BANNER'), (2, '小图横滑'), (3, '列表'), (4, '富文本')], default=1, verbose_name='控件')),
-                ('content', churchs.widget.InlineContentField(blank=True, null=True, verbose_name='内容')),
+                ('content', models.TextField(blank=True, null=True, verbose_name='富文本')),
                 ('ContentColumn', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='churchs.ContentColumn')),
                 ('Media', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='churchs.Media')),
                 ('church', models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='church.Church', verbose_name='教会')),

@@ -6,7 +6,7 @@ from ckeditor.widgets import CKEditorWidget
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 from .widget import AliVideoWidgetExt
 from django.forms import ModelForm,Form
-from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget,MediaContentWidget
+from .widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
 from .forms import MeidaForm2
 from users.models import CustomUser
 from church.models import Church

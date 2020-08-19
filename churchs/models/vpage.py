@@ -14,7 +14,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 import oss2
 import urllib
 import re
-from churchs.widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField,InlineContentField
+from churchs.widget import S3DirectField,AliOssDirectField,AliMediaField,MediaBaseField
 from church.confs.base import get_ALIOSS_DESTINATIONS
 from churchs.models.columnContent import ContentColumn
 from churchs.models.base import Media

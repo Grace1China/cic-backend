@@ -6,7 +6,7 @@ from ckeditor.widgets import CKEditorWidget
 from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 from churchs.widget import AliVideoWidgetExt
 from django.forms import ModelForm,Form
-from churchs.widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget,MediaContentWidget
+from churchs.widget import S3DirectField,AliOssDirectField,AliOssDirectWidgetExt,AliMediaWidgetExt,MediaBaseWidget
 from churchs.forms import MeidaForm2
 from users.models import CustomUser
 from church.models import Church
@@ -18,7 +18,7 @@ from django.forms import fields
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
-from churchs.models import ContentColumn
+from churchs.models import ContentColumn,Sermon2Medias
 from church.confs.prod import get_ALIOSS_DESTINATIONS
 from django.forms.widgets import HiddenInput
 
@@ -59,7 +59,31 @@ class MediaKindListFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
-        return queryset.filter(kind=self.value())
+        if self.value() == None:
+            return queryset
+        else:
+            return queryset.filter(Q(kind=self.value()))
+
+class MediaColumnListFilter(admin.SimpleListFilter):
+
+    title = _('所属专栏')
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'column'
+
+    def lookups(self, request, model_admin):
+
+        ccls = ContentColumn.objects.filter(church=request.user.church)
+        t = ()
+        for cl in ccls:
+            t = t + ((cl.id,cl.title),)
+        return t
+
+    def queryset(self, request, queryset):
+        if self.value() == None:
+            return queryset
+        else:
+            return queryset.filter(Q(column=self.value()))
 
 
 class MediaVideoAdmin(admin.ModelAdmin):
@@ -67,7 +91,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
     class Media:
         js = ("admin/js/jquery.init.js",)
     list_display = ('title_with_link','kind', 'alioss_video_status','promote')  
-    list_filter = (MediaKindListFilter, 'alioss_video_status')
+    list_filter = (MediaKindListFilter, 'alioss_video_status',MediaColumnListFilter)
     # readonly_fields = ('kind',)
     # fieldsets = (
     #     (None, {
@@ -94,11 +118,16 @@ class MediaVideoAdmin(admin.ModelAdmin):
         MEDIA_TUWEN = 8
         '''
         try:
+            # theLogger.info(obj.__dict__)
             data = request.GET
-            kind = data.get('kind','video')
-            theLogger.info('kind:%s' % kind)
+            kind = data.get('kind','')
+            if kind == '':
+                kind = obj.kind
+            # theLogger.info(type(kind))
+            # theLogger.info(type(churchs_models.Media.MEDIA_VIDEOS))
+            # theLogger.info('kind:%s' % kind)
             fs = None
-            if kind == 'video' or kind == '6':
+            if int(kind) == churchs_models.Media.MEDIA_VIDEOS:
                 fs = (
                         (None, {
                             'fields': ('title','kind','alioss_video_status','alioss_video','alioss_image','pub_time')
@@ -108,7 +137,11 @@ class MediaVideoAdmin(admin.ModelAdmin):
                             'fields': ('content',),
                         },),
                     )
-            elif kind == 'audio' or kind == '7':
+
+                # MEDIA_VIDEOS = 6
+                # MEDIA_AUDIOS = 7
+                # MEDIA_TUWEN = 8
+            elif int(kind) == churchs_models.Media.MEDIA_AUDIOS:
                 fs = (
                         (None, {
                             'fields': ('title','kind','alioss_audio','alioss_image','pub_time')
@@ -118,7 +151,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
                             'fields': ('content',),
                         },),
                     )
-            elif kind == 'tuwen' or kind == '8':
+            elif int(kind) == churchs_models.Media.MEDIA_TUWEN:
                 fs = (
                         (None, {
                             'fields': ('title','kind','alioss_image','content','pub_time')
@@ -149,17 +182,10 @@ class MediaVideoAdmin(admin.ModelAdmin):
     
     def get_changeform_initial_data(self, request):
         data = request.GET
-        kind = data.get('kind','video')
+        kind = data.get('kind','6')
         
         # churchs_models.Media.  
-        if kind == 'video' or kind == '6':
-            kind = churchs_models.Media.MEDIA_VIDEOS
-        elif kind == 'audio'  or kind == '7':
-            kind = churchs_models.Media.MEDIA_AUDIOS
-        elif kind == 'tuwen' or kind == '8':
-            kind = churchs_models.Media.MEDIA_TUWEN
-        else:
-            raise Exception('not support %s' % kind)
+        validKind(kind)
 
         theLogger.info('kind: %d' % kind)
 
@@ -170,7 +196,14 @@ class MediaVideoAdmin(admin.ModelAdmin):
         # STATUS_UPLOADED = 2
         # STATUS_DISTRIBUTED = 3
 
-        return {'alioss_video_status': churchs_models.Media.STATUS_DISTRIBUTED,'kind':kind}
+        return {'alioss_video_status': churchs_models.Media.STATUS_DISTRIBUTED,'kind':int(kind)}
+
+    def validKind(self,kind):
+        if int(kind) == churchs_models.Media.MEDIA_VIDEOS or int(kind) == churchs_models.Media.MEDIA_AUDIOS or int(kind) == churchs_models.Media.MEDIA_TUWEN:
+            pass
+        else:
+            raise Exception('not support %s' % kind)
+
 
     def save_form(self, request, form,change):
         """
@@ -184,16 +217,10 @@ class MediaVideoAdmin(admin.ModelAdmin):
         instance.church = request.user.church
 
         data = request.GET
-        kind = data.get('kind','video')
-        if kind == 'video' or kind == '6' :
-            kind = churchs_models.Media.MEDIA_VIDEOS
-        elif kind == 'audio' or kind == '7':
-            kind = churchs_models.Media.MEDIA_AUDIOS
-        elif kind == 'tuwen' or kind == '8':
-            kind = churchs_models.Media.MEDIA_TUWEN
-        else:
-            raise Exception('no support %s' % kind)
-        instance.kind = kind
+        kind = data.get('kind','6')
+        validKind(kind)
+
+        instance.kind = int(kind)
         return instance
     
 
@@ -207,11 +234,16 @@ class MediaVideoAdmin(admin.ModelAdmin):
             request.GET = request.GET.copy()
             fp = request.GET.pop('frompage', [])
             columnid = request.GET.pop('columnid', [])
+            sermonid = request.GET.pop('sermonid', [])
+            # 在个queryset里面，为什么要取出参数保存为成员变量呢？ 因为，只有在这里pop后台的处理代码，才不会把参数处理成 e=1这样的错误信息。
 
             if (len(fp) == 1):
                 self.frompage = fp[0]
             if (len(columnid) == 1):
                 self.columnid = columnid[0]
+            if (len(sermonid) == 1):
+                self.sermonid = sermonid[0]
+
             if not request.user.is_superuser:
                 qs = qs.filter(Q(church=request.user.church) |  Q(kind__in=[churchs_models.Media.MEDIA_VIDEOS,churchs_models.Media.MEDIA_AUDIOS,churchs_models.Media.MEDIA_TUWEN]))
             return qs
@@ -221,15 +253,13 @@ class MediaVideoAdmin(admin.ModelAdmin):
             raise e
     frompage = ''
     columnid = 0
+    sermonid = 0
     
-    actions = ['add_to_column','add_content']
+    actions = ['add_to_column','add_to_sermon','add_content']
     def add_to_column(self, request, queryset):
-        # from django.contrib.contenttypes.fields import GenericForeignKey
-        # from django.contrib.contenttypes.models import ContentType
-        # ctype = ContentType.objects.get(app_label='churchs', model='contentcolumn')
-        # Media.objects.update(content_object=comment, activity_type=Activity.LIKE, user=request.user)
-
         from django.http import HttpResponse
+        data = request.GET
+        kind = data.get('kind','video')
         col = ContentColumn.objects.get(id=self.columnid)
         for m in queryset.all():
             col.medias.add(m)
@@ -240,6 +270,30 @@ class MediaVideoAdmin(admin.ModelAdmin):
             window.close();
         </script>''')
         return response
+    # add_to_column.allowed_permissions = ('加入专栏',)
+    add_to_column.short_description = "加入专栏"
+
+    def add_to_sermon(self, request, queryset):
+        from django.http import HttpResponse
+        sermon = Sermon.objects.get(id=self.sermonid)
+        for m in queryset.all():
+            sermon.medias.add(m)
+        sermon.save()
+
+        # kind = request.GET('kind',-1)
+        # alioss_video_status__exact = request.GET('alioss_video_status__exact',-1)
+        column = request.GET.get('column',-1)
+        if int(column) > 0 :
+            Sermon2Medias.objects.filter(Sermon=sermon, Media__in=queryset.all()).update(fromColumn=column)
+
+        response = HttpResponse(content_type="text/html")
+        response.write('''<script>
+            window.opener.window.formVue.loadForm();
+            window.close();
+        </script>''')
+        return response
+    # add_to_column.allowed_permissions = ('加入专栏',)
+    add_to_column.short_description = "加入主日信息"
 
     def add_content(self, request, queryset):
         # from django.http import HttpResponse
@@ -253,10 +307,13 @@ class MediaVideoAdmin(admin.ModelAdmin):
         actions = super().get_actions(request)
         if self.frompage != 'content_column' and 'add_to_column' in actions:
             del actions['add_to_column']
+        
+        if self.frompage != 'sermon' and 'add_to_sermon' in actions:
+            del actions['add_to_sermon']
+
         return actions
 
-    # add_to_column.allowed_permissions = ('加入专栏',)
-    add_to_column.short_description = "加入专栏"
+    
 
     list_display_links = None
 

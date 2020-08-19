@@ -20,7 +20,7 @@
            
 
             {% if line.fields|length > 1 %}
-                <div>
+                <div style="display: flex;justify-content: space-around;">
             {% endif %}   
                 {% for field in line %}
                     <div{% if not line.fields|length_is:'1' %} class="fieldBox{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}{% if field.field.is_hidden %} hidden{% endif %}"{% elif field.is_checkbox %} class="checkbox-row"{% endif %}>
