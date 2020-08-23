@@ -121,7 +121,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             import traceback
             import sys
             theLogger.exception('There is and exceptin', exc_info=True, stack_info=True)
-            return JsonResponse({'errCode': '1001','msg': str(e), 'data': None}, safe=False)
+            return JsonResponse({'errCode': '1001','msg': str(e), 'data': None,'sysErrMsg':traceback.format_exc()}, safe=False)
         
         #httplib2 方案
         # import httplib2
