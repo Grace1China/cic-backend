@@ -447,6 +447,7 @@
                     vm = this
                     this.$store.dispatch('deleteContent',{'columnid':columnid,'contentid':contentid}).then(function(rsp){
                         console.log(rsp)
+                        vm.loadForm()
                     }).catch(function(err){
                         console.log(err)
                     })

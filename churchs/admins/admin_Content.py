@@ -296,10 +296,11 @@ class MediaVideoAdmin(admin.ModelAdmin):
         </script>''')
         return response
     # add_to_column.allowed_permissions = ('加入专栏',)
-    add_to_column.short_description = "加入主日信息"
+    add_to_sermon.short_description = "加入主日信息"
 
     def add_content(self, request, queryset):
         # from django.http import HttpResponse
+        # 这个是为了能在内容编辑页面显示出来，一个下拉的动作按钮。
         response = HttpResponse(content_type="text/html")
         response.write('''<script>
         </script>''')

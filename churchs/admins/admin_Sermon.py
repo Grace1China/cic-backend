@@ -120,7 +120,7 @@ class SermonMediasInline(admin.TabularInline):
     # }   
     extra = 0
     max_num = 0
-    ordering = ('order',)
+    ordering = ('order','-Media__pub_time')
     can_delete = True
 
     # def Media_cover(self, instance):
