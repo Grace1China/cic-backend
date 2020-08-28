@@ -277,7 +277,7 @@ class SermonSeriesAdmin(admin.ModelAdmin):
 # admin.site.register(churchs_models.Venue)
 admin.site.register(churchs_models.SermonSeries,SermonSeriesAdmin)
 
-# admin.site.register(churchs_models.Speaker, SpeakerAdmin)
+admin.site.register(churchs_models.Speaker, SpeakerAdmin)
 # admin.site.register(churchs_models.Meeting)
 # admin.site.register(churchs_models.BibleStudy)
 # admin.site.register(churchs_models.BibleStudyComment)
