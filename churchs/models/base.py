@@ -31,7 +31,7 @@ class Speaker(models.Model):
     name = models.CharField(max_length=32)
     title = models.CharField(max_length=32)
     introduction = models.CharField(max_length=255)
-    profile = AliMediaField(max_length=255,null=True,verbose_name='照片')
+    profile = models.CharField(max_length=255,null=True,verbose_name='照片')
     create_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update_time = models.DateTimeField(auto_now=True, null=True, blank=True) 
     class Meta:

@@ -97,13 +97,29 @@ class WeeklyReportAdmin(admin.ModelAdmin):
 admin.site.register(WeeklyReport, WeeklyReportAdmin)
 
 
+
+
+class SpeakerForm(forms.ModelForm):
+    profile = forms.CharField(label="肖像",widget=MediaBaseWidget(label='',typ='images'),required=False)
+
+    class Meta:
+        model = churchs_models.Speaker
+        fields = ('name', 'churchs','title', 'introduction','profile')
+        formfield_overrides = {
+            churchs_models.Speaker.profile: {'widget': MediaBaseWidget(label='头像',typ='images')},
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(SpeakerForm,self).__init__(*args, **kwargs)
+
 class SpeakerAdmin(admin.ModelAdmin):
+    form = SpeakerForm
     list_display = ('name', 'title') 
     search_fields = ('churchs','name', 'title')
     fields = ('name', 'churchs','title', 'introduction','profile')
-    formfield_overrides = {
-        Speaker.profile: {'widget': AliMediaWidgetExt()},
-    }
+
+
+
 
 
 
