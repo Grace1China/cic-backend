@@ -178,7 +178,7 @@ class SermonViewOneSet(viewsets.ModelViewSet):
             return JsonResponse(
                 {'errCode': '1001', 'data': None, 'msg': e.__str__(), 'sysErrMsg': traceback.format_exc()}, safe=False)
 
-    @action(detail=True, methods=['POST'], format="json")  # , permission_classes=[AllowAny]
+    @action(detail=True,methods=['get'], format="json")
     def GetNewestSermonMedias(self, request):
         '''
         查找最新主日的媒体例表。

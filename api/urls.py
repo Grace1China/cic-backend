@@ -95,7 +95,7 @@ urlpatterns = [
     # path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
     path("lorddayinfos/list", lorddayinfolist, name="lorddayinfolist"),
     path("lorddayinfos/<int:pk>", lorddayinfoByID, name="lorddayinfobyid"),
-    path("GetNewestSermonMedias", views.SermonViewOneSet.as_view({'post':'GetNewestSermonMedias'}), name="GetNewestSermonMedias"),
+    path("GetNewestSermonMedias", views.SermonViewOneSet.as_view({'get':'GetNewestSermonMedias'}), name="GetNewestSermonMedias"),
     
     
     
