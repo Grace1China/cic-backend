@@ -52,6 +52,9 @@ course = views.CourseViewSet.as_view({'get':'GetCoursebyID'})
 
 search_course = views.CourseViewSet.as_view({'post':'SearchCourse'})
 
+
+
+
 #------------------------------v2------------------------------------------------------
 
 v2_church_eweekly = EweeklyViewSet.as_view({
@@ -92,6 +95,9 @@ urlpatterns = [
     # path("lorddayinfo",church_lorddayinfo,name="lorddayinfo"),
     path("lorddayinfos/list", lorddayinfolist, name="lorddayinfolist"),
     path("lorddayinfos/<int:pk>", lorddayinfoByID, name="lorddayinfobyid"),
+    path("GetNewestSermonMedias", views.SermonViewOneSet.as_view({'post':'GetNewestSermonMedias'}), name="GetNewestSermonMedias"),
+    
+    
     
     path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>/orderby/<str:orderby>",course_list,name="courses_search_order"),
     path("courses/pagesize/<int:pagesize>/page/<int:page>/keyword/<str:keyword>",course_list,name="courses_search"),
@@ -116,6 +122,7 @@ urlpatterns = [
     path('get_media_by_key',never_cache(staff_member_required(get_media)),name='get_media_by_key'),
     path('delete_content',never_cache(staff_member_required(delete_content_of_column)),name='delete_content'),#删除内容专栏的内容
     path('ccolList',never_cache(staff_member_required(ccolList)),name='ccolList'),
+    
     path('comp_add_parts',never_cache(staff_member_required(add_parts)),name='comp_add_parts'),
     path('comp_delete_parts',never_cache(staff_member_required(delete_parts)),name='comp_delete_parts'),
 

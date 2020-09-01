@@ -33,3 +33,5 @@ django-ckeditor-filebrowser-filer
 django-crequest
 pyyaml
 jsonpickle
+pytz
+tzlocal
