@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from users.models import CustomUser
 from church.models import Church
-from churchs.models import Venue, Sermon, Media, Speaker, SermonSeries
+from churchs.models import Venue, Sermon, Media, Speaker, SermonSeries,ContentColumn,Sermon2Medias
 from payment.serializers import IAPChargeSerializer
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
@@ -10,6 +10,12 @@ from django.db import models
 from rest_framework import serializers
 from .import models
 
+
+class ColumnSerializer4APIPOST(serializers.ModelSerializer):
+    class Meta:
+        model = ContentColumn
+        fields = ['id','title','pub_time','cover']
+        
 class CustomUser4Info(serializers.ModelSerializer):
     class Meta:
         model=CustomUser
@@ -109,6 +115,14 @@ class MediaSerializer4ListAPI(serializers.ModelSerializer):
     class Meta:
         model = Media
         fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','content','pub_time','hits']
+
+class MediaSerializerThroughSermonMedias(serializers.ModelSerializer):
+    medias = MediaSerializer4ListAPI(many=True, read_only=True)
+    fromColumn = ColumnSerializer4APIPOST(read_only=True)
+    class Meta:
+        model = Sermon2Medias
+        fields = ['order','fromColumn','medias']
+
     
 
 class MediaSerializer4API(serializers.ModelSerializer):
@@ -129,17 +143,33 @@ class MediaSerializer4API(serializers.ModelSerializer):
         fields = ['kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','content']
     
 
+class Sermon2MediasSerializer(serializers.HyperlinkedModelSerializer):
+
+    # id = serializers.ReadOnlyField(source='group.id')
+    # video = serializers.ReadOnlyField(source='Media.video')
+    Media = MediaSerializer4ListAPI(read_only=True)
+    fromColumn = ColumnSerializer4APIPOST(read_only=True)
+    class Meta:
+        model = Sermon2Medias
+
+        fields = ('id','order', 'fromColumn','Media')
 
 class SermonSerializer4API(serializers.ModelSerializer):
     medias = MediaSerializer4ListAPI(many=True, read_only=True)
     church = ChurchSerializer4Sermon(read_only=True)
     speaker = SpeakerSerializer4API(read_only=True)
     series = SermonSeriesSerializer4API(read_only=True)
-
-
+    # medias1 = MediaSerializerThroughSermonMedias(many=True,read_only=True)
+    # medias1 = Sermon2MediasSerializer(source='Sermon2Medias_set', many=True)
+    medias1 = serializers.SerializerMethodField()
     class Meta:
         model = Sermon
-        fields = ['id','church','user','title','pub_time','status','speaker','scripture','series','medias','create_time','update_time']
+        fields = ['id','church','user','title','pub_time','status','speaker','scripture','series','medias','medias1','create_time','update_time']
+        depth = 1
+    def get_medias1(self, obj):
+        "obj is a Member instance. Returns list of dicts"""
+        qset = Sermon2Medias.objects.filter(Sermon=obj)
+        return [Sermon2MediasSerializer(m).data for m in qset]
 
 class SermonListSerializer4API(serializers.ModelSerializer):
     speaker = SpeakerSerializer4API(read_only=True)
@@ -178,4 +208,6 @@ class CourseSerializer4API(serializers.ModelSerializer):
     class Meta:
         model = models.Course
         fields = ['id','church','speaker','title','description','content','price','price_usd','iap_charge','medias','sales_num','is_buy','create_time','update_time']
+
+
 
