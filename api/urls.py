@@ -121,7 +121,11 @@ urlpatterns = [
     path('oss_object_exists/<path:key>',alioss_directup_views.oss_object_exists,name='oss_object_exists'),
     path('get_media_by_key',never_cache(staff_member_required(get_media)),name='get_media_by_key'),
     path('delete_content',never_cache(staff_member_required(delete_content_of_column)),name='delete_content'),#删除内容专栏的内容
-    path('ccolList',never_cache(staff_member_required(ccolList)),name='ccolList'),
+
+    path('ccolList',never_cache(staff_member_required(ccolList)),name='ccolList'),  #DeprecationWarning
+    path('GetColumnByID',never_cache(staff_member_required(Column_Content_ViewSet.as_view({'get':'GetColumnByID'}))),name='GetColumnByID'),  #
+    path('GetColumnMediasByColumnID',never_cache(staff_member_required(Column_Content_ViewSet.as_view({'get':'GetColumnMediasByColumnID'}))),name='GetColumnMediasByColumnID'),  #
+
     
     path('comp_add_parts',never_cache(staff_member_required(add_parts)),name='comp_add_parts'),
     path('comp_delete_parts',never_cache(staff_member_required(delete_parts)),name='comp_delete_parts'),
