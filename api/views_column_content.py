@@ -38,8 +38,7 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
     
     queryset = ContentColumn.objects
     serializer_class=ColumnContentSerializer
-    # permission_classes=[AllowAny] user url decoratios staff_required
-
+    # permission_classes=[AllowAny] #user url decoratios staff_required
     @action(detail=True,methods=['get','post'], format="json")
     def delete_content_of_column(self,request):
         '''

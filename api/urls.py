@@ -124,7 +124,7 @@ urlpatterns = [
 
     path('ccolList',never_cache(staff_member_required(ccolList)),name='ccolList'),  #DeprecationWarning
     path('GetColumnByID',never_cache(staff_member_required(Column_Content_ViewSet.as_view({'get':'GetColumnByID'}))),name='GetColumnByID'),  #
-    path('GetColumnMediasByColumnID',never_cache(staff_member_required(Column_Content_ViewSet.as_view({'get':'GetColumnMediasByColumnID'}))),name='GetColumnMediasByColumnID'),  #
+    path('GetColumnMediasByColumnID',never_cache(Column_Content_ViewSet.as_view({'get':'GetColumnMediasByColumnID'})),name='GetColumnMediasByColumnID'),  #
 
     
     path('comp_add_parts',never_cache(staff_member_required(add_parts)),name='comp_add_parts'),
