@@ -137,7 +137,7 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
                 qry = self.get_queryset()
                 col = qry.get(id=columnid)
 
-                paginator = Paginator(col.medias.all(), pageSize) # Show 25 contacts per page
+                paginator = Paginator(col.medias.order_by('-pub_time').all(), pageSize) # Show 25 contacts per page
 
                 if col is None:
                     raise Exception('column is not find')
