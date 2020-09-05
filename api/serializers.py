@@ -100,6 +100,22 @@ class SermonSeriesSerializer4API(serializers.ModelSerializer):
         model = SermonSeries
         fields = '__all__'
 
+class MediaSerializer4RefreshListAPI(serializers.ModelSerializer):
+    # image_presigned_url = serializers.SerializerMethodField()
+    # pdf_presigned_url = serializers.SerializerMethodField()
+    video = serializers.CharField(source='dist_list_video', max_length=400)
+    video_status = serializers.IntegerField(source='dist_video_status')
+    SHD_URL = serializers.CharField(source='dist_list_SHD_URL', max_length=400)
+    HD_URL = serializers.CharField(source='dist_list_HD_URL', max_length=400)
+    SD_URL = serializers.CharField(source='dist_list_SD_URL', max_length=400)
+    audio = serializers.CharField(source='dist_list_audio', max_length=400)
+    image = serializers.CharField(source='dist_list_image', max_length=400)
+    pdf = serializers.CharField(source='dist_list_pdf', max_length=400)
+
+    class Meta:
+        model = Media
+        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','pub_time','hits']
+        
 class MediaSerializer4ListAPI(serializers.ModelSerializer):
     # image_presigned_url = serializers.SerializerMethodField()
     # pdf_presigned_url = serializers.SerializerMethodField()

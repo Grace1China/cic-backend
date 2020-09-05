@@ -16,7 +16,7 @@ from rest_framework.decorators import action
 from django.http import HttpResponse, JsonResponse
 from .utill import timeSpan
 from datetime import datetime as dd
-from .serializers import MediaSerializer4ListAPI
+from .serializers import MediaSerializer4ListAPI,MediaSerializer4RefreshListAPI
 
 
 theLogger = logging.getLogger('church.all')
@@ -144,7 +144,7 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
                     raise Exception('column is not find')
                 # col.medias.all()
                 # 这里需要返回一个专栏的所有内容的列表，并序列化返回
-                slzMedias = MediaSerializer4ListAPI(paginator.get_page(page),many=True)
+                slzMedias = MediaSerializer4RefreshListAPI(paginator.get_page(page),many=True)
                 return JsonResponse({'errCode': '0', 'msg':'column %ds content here' % (columnid),'data': slzMedias.data}, safe=False)
            
         except Exception as e:
