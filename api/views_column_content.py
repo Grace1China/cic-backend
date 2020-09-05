@@ -130,13 +130,21 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
                     columnid = request.user.church.Lord_Day_column.id
                     # raise Exception('column id is wrong.')  
 
-                qr = self.get_queryset()
-                col = qr.get(id=columnid)
+                
+
+                page = request.GET.get('page',1)
+                pageSize = request.GET.get('pagesize',20)
+
+                qry = self.get_queryset()
+                col = qry.get(id=columnid)
+
+                paginator = Paginator(col.medias.all(), pageSize) # Show 25 contacts per page
+
                 if col is None:
                     raise Exception('column is not find')
                 # col.medias.all()
                 # 这里需要返回一个专栏的所有内容的列表，并序列化返回
-                slzMedias = MediaSerializer4ListAPI(col.medias,many=True)
+                slzMedias = MediaSerializer4ListAPI(paginator.get_page(page),many=True)
                 return JsonResponse({'errCode': '0', 'msg':'column %ds content here' % (columnid),'data': slzMedias.data}, safe=False)
            
         except Exception as e:

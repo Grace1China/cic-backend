@@ -43,7 +43,7 @@ class ContentColumn(models.Model):
     medias = models.ManyToManyField(Media,through='ColumnMedias')
 
     def medias_list(self):
-        return [colMedia.Media for colMedia in ColumnMedias.objects.filter(ContentColumn=self).order_by('order')]
+        return [colMedia.Media for colMedia in ColumnMedias.objects.filter(ContentColumn=self).order_by('pub_date','order')]
 
     class Meta:
         app_label = 'churchs'
