@@ -144,7 +144,7 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
                 # col.medias.all()
                 # 这里需要返回一个专栏的所有内容的列表，并序列化返回
                 slzMedias = MediaSerializer4RefreshListAPI(paginator.get_page(page),many=True)
-                return JsonResponse({'errCode': '0', 'msg':'column %ds content here' % (columnid),'data': slzMedias.data}, safe=False)
+                return JsonResponse({'errCode': '0', 'msg':'column %ds content here' % (columnid),'data': slzMedias.data,'page':page,'totalPage':paginator.num_pages}, safe=False)
            
         except Exception as e:
             import traceback
