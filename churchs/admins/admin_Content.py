@@ -44,6 +44,27 @@ class MediaVideoForm(forms.ModelForm):
         super(MediaVideoForm,self).__init__(*args, **kwargs)
 
 
+# class MediaTitleListFilter(admin.SimpleListFilter):
+
+#     title = _('标题')
+
+#     # Parameter for the filter that will be used in the URL query.
+#     parameter_name = 'title'
+
+#     def lookups(self, request, model_admin):
+#         return (
+#             (6, _('视频')),
+#             (7, _('音频')),
+#             (8, _('图文')),
+#         )
+
+#     def queryset(self, request, queryset):
+#         if self.value() == None:
+#             return queryset
+#         else:
+#             return queryset.filter(Q(kind=self.value()))
+
+
 class MediaKindListFilter(admin.SimpleListFilter):
 
     title = _('内容类型')
@@ -90,8 +111,8 @@ class MediaVideoAdmin(admin.ModelAdmin):
     # form=MediaVideoForm
     class Media:
         js = ("admin/js/jquery.init.js",)
-    list_display = ('title_with_link','kind', 'alioss_video_status','promote')  
-    list_filter = (MediaKindListFilter, 'alioss_video_status',MediaColumnListFilter)
+    list_display = ('title_with_link','kind', 'alioss_video_status','pub_time','speaker','promote')  
+    list_filter = ('title',MediaKindListFilter, 'alioss_video_status',MediaColumnListFilter)
     # readonly_fields = ('kind',)
     # fieldsets = (
     #     (None, {
@@ -135,7 +156,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
             if int(kind) == churchs_models.Media.MEDIA_VIDEOS:
                 fs = (
                         (None, {
-                            'fields': ('title','kind','alioss_video_status','alioss_video','alioss_image','pub_time')
+                            'fields': ('title','kind','alioss_video_status','alioss_video','alioss_image','pub_time','speaker')
                         },),
                         ('Advanced options', {
                             'classes': ('collapse',),
@@ -149,7 +170,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
             elif int(kind) == churchs_models.Media.MEDIA_AUDIOS:
                 fs = (
                         (None, {
-                            'fields': ('title','kind','alioss_audio','alioss_image','pub_time')
+                            'fields': ('title','kind','alioss_audio','alioss_image','pub_time','speaker')
                         },),
                         ('Advanced options', {
                             'classes': ('collapse',),
@@ -159,7 +180,7 @@ class MediaVideoAdmin(admin.ModelAdmin):
             elif int(kind) == churchs_models.Media.MEDIA_TUWEN:
                 fs = (
                         (None, {
-                            'fields': ('title','kind','alioss_image','content','pub_time')
+                            'fields': ('title','kind','alioss_image','content','pub_time','speaker')
                         },),
                     
                     )
