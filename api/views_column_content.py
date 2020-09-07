@@ -164,7 +164,7 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
             if(request.META['REQUEST_METHOD']  == 'GET'):
                 data = request.GET
                 theLogger.info(data)
-                columntitle = data.get('columntitle','')
+                columntitle = data.get('title','')
                 # contentid = int(data.get('contentid',-1))   or contentid < 0
                 theLogger.info('column title:%s' % columntitle)
                 if columntitle == '' :
