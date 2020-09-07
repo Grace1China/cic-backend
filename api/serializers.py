@@ -114,7 +114,7 @@ class MediaSerializer4RefreshListAPI(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','pub_time','hits']
+        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','pub_time','hits','speaker']
         
 class MediaSerializer4ListAPI(serializers.ModelSerializer):
     # image_presigned_url = serializers.SerializerMethodField()
@@ -130,7 +130,7 @@ class MediaSerializer4ListAPI(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','content','pub_time','hits']
+        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','content','pub_time','hits','speaker']
 
 class MediaSerializerThroughSermonMedias(serializers.ModelSerializer):
     medias = MediaSerializer4ListAPI(many=True, read_only=True)
@@ -156,7 +156,7 @@ class MediaSerializer4API(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ['kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','content']
+        fields = ['kind','title','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','content','speaker']
     
 
 class Sermon2MediasSerializer(serializers.HyperlinkedModelSerializer):

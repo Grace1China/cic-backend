@@ -150,6 +150,51 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
             import traceback
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'msg':'get column content err','sysErrMsg':traceback.format_exc()}, safe=False)
+
+
+    @action(detail=True,methods=['get','post'], format="json")
+    def GetColumnMediasByColumnTitle(self,request):
+        '''
+        查找某一专栏内容列表
+        '''
+        try:
+            # theLogger.info('start GetCourseList-------------')
+            tmspan = timeSpan(dd.now())
+
+            if(request.META['REQUEST_METHOD']  == 'GET'):
+                data = request.GET
+                theLogger.info(data)
+                columntitle = data.get('columntitle','')
+                # contentid = int(data.get('contentid',-1))   or contentid < 0
+                theLogger.info('column title:%s' % columntitle)
+                if columntitle == '' :
+                    raise Exception('column title is wrong.')  
+
+                
+
+                page = request.GET.get('page',1)
+                pageSize = request.GET.get('pagesize',20)
+
+                qry = self.get_queryset()
+                col = qry.filter(title__contains=columntitle)
+                theLogger.info(col)
+                if(len(col)<=0):
+                    raise Exception('there is no such column : %s' % columntitle)  
+                aCol = col[0]
+
+                paginator = Paginator(aCol.medias.order_by('-pub_time').all(), pageSize) # Show 25 contacts per page
+
+                # if col is None:
+                #     raise Exception('column is not find')
+                # # col.medias.all()
+                # 这里需要返回一个专栏的所有内容的列表，并序列化返回
+                slzMedias = MediaSerializer4RefreshListAPI(paginator.get_page(page),many=True)
+                return JsonResponse({'errCode': '0', 'msg':'column %s content here' % (columntitle),'data': slzMedias.data,'page':page,'totalPage':paginator.num_pages}, safe=False)
+           
+        except Exception as e:
+            import traceback
+            theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+            return JsonResponse({'errCode': '1001', 'msg':'get column content err','sysErrMsg':traceback.format_exc()}, safe=False)
     # @action(detail=True,methods=['POST'], format="json")
     # def GetCoursebyID(self,request,pk):
     #     '''
