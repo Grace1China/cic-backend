@@ -130,7 +130,7 @@ class MediaSerializer4ListAPI(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','content','pub_time','hits','speaker']
+        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','pub_time','hits','speaker']#,'content'
 
 class MediaSerializerThroughSermonMedias(serializers.ModelSerializer):
     medias = MediaSerializer4ListAPI(many=True, read_only=True)
