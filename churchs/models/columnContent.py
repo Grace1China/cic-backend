@@ -43,6 +43,11 @@ class ContentColumn(models.Model):
     medias = models.ManyToManyField(Media,through='ColumnMedias')
 
     hierarchy = models.CharField(max_length=400,blank=True,verbose_name='层级')
+    content = RichTextUploadingField(blank=True,verbose_name='摘要',external_plugin_resources=[('html5video',
+    '/static/ckeditor/ckeditor/plugins/html5video/',
+    'plugin.js'
+    ),
+    ]) 
     # 1.2.3.4   or  3.2.1.4    or    5.1.3.4
 
 

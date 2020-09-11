@@ -174,12 +174,12 @@ class ContentColumnAdmin(admin.ModelAdmin):
     list_display = ('title_with_link','user','pub_time','status','hierarchy','promote',)  
     fieldsets = (
         (None, {
-            'fields': ('title','pub_time','status','cover','hierarchy','add_content')
+            'fields': ('title','pub_time','status','cover','add_content')
         },),
-        # ('Advanced options', {
-        #     'classes': ('collapse',),
-        #     'fields': ('content',),
-        # },),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('hierarchy','content',),
+        },),
     ) 
     
     
