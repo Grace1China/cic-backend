@@ -42,6 +42,10 @@ class ContentColumn(models.Model):
     # medias = GenericRelation(Media, related_query_name='ContentColumn',verbose_name='内容')
     medias = models.ManyToManyField(Media,through='ColumnMedias')
 
+    hierarchy = models.CharField(max_length=400,blank=True,verbose_name='层级')
+    # 1.2.3.4   or  3.2.1.4    or    5.1.3.4
+
+
     def medias_list(self):
         return [colMedia.Media for colMedia in ColumnMedias.objects.filter(ContentColumn=self).order_by('pub_date','order')]
 
