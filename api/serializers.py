@@ -114,7 +114,7 @@ class MediaSerializer4RefreshListAPI(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ['video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','pub_time','hits','speaker']
+        fields = ['id','video','video_status','SHD_URL','HD_URL','SD_URL','audio','image','pdf','kind','title','id','pub_time','hits','speaker']
         
 class MediaSerializer4ListAPI(serializers.ModelSerializer):
     # image_presigned_url = serializers.SerializerMethodField()
