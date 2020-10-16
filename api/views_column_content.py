@@ -195,19 +195,33 @@ class  Column_Content_ViewSet(viewsets.ModelViewSet):
             import traceback
             theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
             return JsonResponse({'errCode': '1001', 'msg':'get column content err','sysErrMsg':traceback.format_exc()}, safe=False)
-    # @action(detail=True,methods=['POST'], format="json")
-    # def GetCoursebyID(self,request,pk):
-    #     '''
-    #     按照id查找课程信息
-    #     '''
-    #     try:
-    #         course = self.get_queryset().filter(id=pk).order_by('-update_time')[0]
+    
+    @action(detail=True,methods=['get','post'], format="json")
+    def GetColumnByHierarchy(self,request,pk):
+        '''
+        按照id查找课程信息
+        '''
+        pass
+        # try:
+        #     if(request.META['REQUEST_METHOD']  == 'GET'):
+        #         data = request.GET
+        #         theLogger.info(data)
+        #         prefix = data.get('prefix','')
+        #         if prefix != '':
+        #             prefix = '%s#' % prefix; 
+        #         course = self.get_queryset().filter(hierarchy__regex=r'^%s\d$' % prefix)
 
-    #         addSalesInfosOn(course, request.user)
-    #         slzCourse = CourseSerializer4API(course)
-    #         return JsonResponse({'errCode': '0', 'data': slzCourse.data}, safe=False)
-    #     except Exception as e:
-    #         import traceback
-    #         import sys
-    #         theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
-    #         return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)
+        #         # contentid = int(data.get('contentid',-1))   or contentid < 0
+        #         theLogger.info('column title:%s' % columntitle)
+        #         if columntitle == '' :
+        #             raise Exception('column title is wrong.')  
+
+
+        #     addSalesInfosOn(course, request.user)
+        #     slzCourse = CourseSerializer4API(course)
+        #     return JsonResponse({'errCode': '0', 'data': slzCourse.data}, safe=False)
+        # except Exception as e:
+        #     import traceback
+        #     import sys
+        #     theLogger.exception('There is and exceptin',exc_info=True,stack_info=True)
+        #     return JsonResponse({'errCode': '1001', 'data': None,'msg':'没有课程列表','sysErrMsg':traceback.format_exc()}, safe=False)

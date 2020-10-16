@@ -178,7 +178,7 @@ class ContentColumnAdmin(admin.ModelAdmin):
         },),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('hierarchy','content',),
+            'fields': ('hierarchy','parentColumn','content',),
         },),
     ) 
     
