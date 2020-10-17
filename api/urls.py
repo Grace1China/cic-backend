@@ -16,7 +16,7 @@ from django.contrib.auth.models import Group
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import never_cache
 from .media_base import get_media
-from .views_vpage import add_parts,delete_parts
+# from .views_vpage import add_parts,delete_parts
 from .views_medias import Media_ViewSet
 
 #----------------------------v1---------------------------------------------------------
@@ -130,8 +130,8 @@ urlpatterns = [
 
 
     
-    path('comp_add_parts',never_cache(staff_member_required(add_parts)),name='comp_add_parts'),
-    path('comp_delete_parts',never_cache(staff_member_required(delete_parts)),name='comp_delete_parts'),
+    # path('comp_add_parts',never_cache(staff_member_required(add_parts)),name='comp_add_parts'),
+    # path('comp_delete_parts',never_cache(staff_member_required(delete_parts)),name='comp_delete_parts'),
 
     path('GetMediaByID',never_cache(Media_ViewSet.as_view({'get':'GetMediaByID'})),name='GetMediaByID'),  
 

@@ -309,9 +309,9 @@ admin.site.register(churchs_models.ContentColumn,ContentColumnAdmin)
 from churchs.admins.admin_Sermon import SermonAdmin
 admin.site.register(churchs_models.Sermon, SermonAdmin)
 
-from churchs.admins.admin_Vpage import VPageAdmin,VComponentsAdmin
-admin.site.register(churchs_models.VPage,VPageAdmin)
-admin.site.register(churchs_models.VComponents,VComponentsAdmin)
+# from churchs.admins.admin_Vpage import VPageAdmin,VComponentsAdmin
+# admin.site.register(churchs_models.VPage,VPageAdmin)
+# admin.site.register(churchs_models.VComponents,VComponentsAdmin)
 
 
 

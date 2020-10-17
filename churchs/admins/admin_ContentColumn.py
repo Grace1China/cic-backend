@@ -171,14 +171,14 @@ class ContentColumnAdmin(admin.ModelAdmin):
     
     change_form_template ="admin/churchs/change_form_content.html"
 
-    list_display = ('title_with_link','user','pub_time','status','hierarchy','promote',)  
+    list_display = ('title_with_link','user','pub_time','status','hierarchy','parentCol','promote',)  
     fieldsets = (
         (None, {
             'fields': ('title','pub_time','status','cover','add_content')
         },),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('hierarchy','parentColumn','content',),
+            'fields': ('hierarchy','parentCol','content',),
         },),
     ) 
     
