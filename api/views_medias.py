@@ -7,8 +7,8 @@ from payment.models import *
 from .utill import CICUtill
 from urllib.parse import unquote
 
-from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
-from drf_yasg.utils import swagger_auto_schema
+# from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
+# from drf_yasg.utils import swagger_auto_schema
 from django.db.models.fields import CharField
 from churchs.models import Media
 from rest_framework import serializers,viewsets

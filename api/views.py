@@ -325,8 +325,8 @@ from payment.models import *
 from .utill import CICUtill
 from urllib.parse import unquote
 
-from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
-from drf_yasg.utils import swagger_auto_schema
+# from drf_yasg.openapi import Schema, TYPE_OBJECT, TYPE_STRING, TYPE_ARRAY
+# from drf_yasg.utils import swagger_auto_schema
 from django.db.models.fields import CharField
 
 @api_view(['GET'])
