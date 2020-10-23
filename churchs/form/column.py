@@ -23,6 +23,10 @@ class ColChangeListForm(forms.ModelForm):
         super(ColChangeListForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.id:
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=self.instance.church).filter(~Q(id=self.instance.id))
+        elif kwargs.__contains__('initial'):
+            self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=kwargs['initial']['church'].id)
+        elif args[0]['parentCol']:
+            self.fields['parentCol'].queryset = ContentColumn.objects.filter(id=int(args[0]['parentCol']))
             
         # self.fields['parentCol'].empty_values = list((None, '', [], (), {},0))
 
