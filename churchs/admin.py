@@ -303,8 +303,7 @@ from churchs.admins.admin_Content import MediaVideoAdmin
 admin.site.register(churchs_models.Media, MediaVideoAdmin)
 
 
-from churchs.admins.admin_ContentColumn import ContentColumnAdmin
-admin.site.register(churchs_models.ContentColumn,ContentColumnAdmin)
+
 
 from churchs.admins.admin_Sermon import SermonAdmin
 admin.site.register(churchs_models.Sermon, SermonAdmin)

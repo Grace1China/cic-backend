@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load admin_urls static admin_list simpletags %}
-<div class="actions qqqqq11333333333333333333333333333">
+<div id="actions" class="actions">
 
     <input type="hidden" name="action" value=""/>
 
@@ -17,7 +17,7 @@
 
             {% if field.0 == 'delete_selected' %}
                 <el-button type="danger" data-name="{{ field.0 }}"
-                           icon="el-icon-delete" @click="delSelected('{{ field.0 }}')">{% trans 'Delete' %}</el-button>
+                           icon="el-icon-delete" @click="delSelected('{{ field.0 }}')" onclick="_action.delSelected('{{ field.0 }}')">{% trans 'Delete' %}</el-button>
             {% else %}
                 <input type="hidden" name="select_across" v-model="select_across" value="0" class="select-across">
                 <input type="hidden" name="file_format" v-model="file_format">
@@ -100,7 +100,7 @@
 
 
     var _action = new Vue({
-        el: '.actions',
+        el: '#actions',
         data: {
             select_across: 0,
             file_format: 1,
@@ -192,7 +192,7 @@
                 $("#changelist-form").submit();
             },
             delSelected: function (name) {
-
+                console.log(name);
                 $("#changelist-form input[name='action']").val(name);
 
                 $("#changelist-form [name='_save']").removeAttr('name');

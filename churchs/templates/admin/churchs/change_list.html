@@ -86,7 +86,7 @@
             {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 
             <form id="changelist-form" method="post"{% if cl.formset.is_multipart %}
-                  enctype="multipart/form-data"{% endif %} novalidate class="xx">{% csrf_token %}
+                  enctype="multipart/form-data"{% endif %} novalidate class="xx1">{% csrf_token %}
                 {% if cl.formset %}
                     <div>{{ cl.formset.management_form }}</div>
                 {% endif %}
@@ -104,6 +104,12 @@
             </form>
         </div>
     </div>
+    <script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
+    
+    <script type="text/javascript" src="{% static "church/js/store.js" %}"></script>
+
+    <script type="text/javascript" src="{% static "churchs/js/change_list.js" %}"></script>
+    
     <script type="text/javascript">
         $(".object-tools").hide().find('li a').each(function () {
             _action.exts.push({
@@ -111,6 +117,8 @@
                 url:$(this).attr('href')
             })
         })
-
+    </script>
+    <script type="text/javascript">
+        
     </script>
 {% endblock %}
