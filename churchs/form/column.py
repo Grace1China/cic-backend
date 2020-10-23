@@ -21,7 +21,7 @@ class ColChangeListForm(forms.ModelForm):
         loger.info(kwargs)
         super(ColChangeListForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.id:
-            loger.info(self.instance)
+            loger.info(self.instance.__dict__)
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=self.instance.church).filter(~Q(id=self.instance.id))
         elif kwargs.__contains__('initial'):
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=kwargs['initial']['church'].id)
