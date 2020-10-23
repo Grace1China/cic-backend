@@ -243,7 +243,7 @@ class ColAdmin(admin.ModelAdmin):
         obj.church = request.user.church
         obj.user = request.user
         loger.info('-------save_model----------')
-        loger.info(obj)
+        loger.info(obj.__dict__)
         obj.save()
 
     def get_queryset(self, request):
