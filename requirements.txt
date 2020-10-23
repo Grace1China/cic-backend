@@ -35,3 +35,4 @@ pyyaml
 jsonpickle
 pytz
 tzlocal
+wheel
