@@ -189,7 +189,7 @@ class ColChangeList(ChangeList):
         self.list_display = ['action_checkbox', 'title', 'cover', 'pub_time',
                              'status', 'parentCol', ]
         self.list_display_links = ['title']
-        self.list_editable = ['cover', 'parentCol']
+        # self.list_editable = ['cover', 'parentCol']
 
 
 # class BaseColFormSet(BaseModelFormSet):

@@ -11,8 +11,7 @@ import pickle
 class ColChangeListForm(forms.ModelForm):
     parentCol = forms.ModelChoiceField(
          queryset=ContentColumn.objects.none(), required=False)
-    cover = forms.CharField(label="", widget=MediaBaseWidget(
-        label='封面', typ='images'), required=False)
+    cover = forms.CharField(widget=MediaBaseWidget( label='', typ='images'), required=False)
     
     class Meta:
         model = ContentColumn
