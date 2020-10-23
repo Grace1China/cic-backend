@@ -42,6 +42,8 @@ class ContentColumnForm(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
     #     super(ContentColumnForm, self).__init__(*args, **kwargs)
     def __init__(self, *args, **kwargs):
+        loger.info('-----ContentColumnForm-----------')
+        loger.info(kwargs)
         super(ContentColumnForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.id:
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=self.instance.church).filter(~Q(id=self.instance.id))
