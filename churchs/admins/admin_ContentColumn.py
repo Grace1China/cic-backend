@@ -242,6 +242,8 @@ class ColAdmin(admin.ModelAdmin):
             obj.parentCol = form.cleaned_data['parentCol']
         obj.church = request.user.church
         obj.user = request.user
+        loger.info('-------save_model----------')
+        loger.info(obj)
         obj.save()
 
     def get_queryset(self, request):
