@@ -265,6 +265,7 @@ class ColAdmin(admin.ModelAdmin):
     )
     
     def get_changeform_initial_data(self, request):
+        loger.info('-------get_changeform_initial_data-----------')
         return {'user': request.user.id, 'church': request.user.church,
                 'status': churchs_models.ContentColumn.STATUS_CLOSE}
 
