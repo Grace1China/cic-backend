@@ -1,5 +1,5 @@
 django
-simpleui
+django-simpleui
 django-cors-headers
 django-debug-toolbar
 djangorestframework
