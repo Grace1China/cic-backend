@@ -228,10 +228,12 @@ class ColAdmin(admin.ModelAdmin):
     #         kwargs["queryset"] = qs
     #     return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-    # def get_form(self, request, obj=None, **kwargs):
-    #     loger.info('---------get_form--------')
-    #     kwargs['form'] = ContentColumnForm
-    #     return super().get_form(request, obj, **kwargs)
+    def get_form(self, request, obj=None, **kwargs):
+        loger.info('---------get_form--------')
+        # return ContentColumnForm
+        kwargs['form'] = ContentColumnForm
+        # return ContentColumnForm(initial=self.get_changeform_initial_data(request=request))
+        return super().get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if form.cleaned_data['cover'] != obj.cover:
@@ -269,23 +271,7 @@ class ColAdmin(admin.ModelAdmin):
         return {'user': request.user.id, 'church': request.user.church,
                 'status': churchs_models.ContentColumn.STATUS_CLOSE}
 
-    # def get_fields(self, request, obj=None):
-    #     try:
-    #         # theLogger.info(obj.__dict__)
-    #         fieldsets = (
-    #             (None, {
-    #                 'fields': ('title', 'pub_time', 'status', 'cover', 'add_content',),
-    #             },),
-    #             ('Advanced options', {
-    #                 'classes': ('collapse',),
-    #                 'fields': ('parentCol', 'content',),
-    #             },),
-    #         )
-    #         return fieldsets
-    #     except Exception as e:
-    #         import traceback
-    #         loger.exception('There is and exceptin', exc_info=True, stack_info=True)
-    #         raise e
+    
     readonly_fields = ('add_content',)
     def add_content(self, instance):
         # assuming get_full_address() returns a list of strings

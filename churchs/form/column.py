@@ -47,8 +47,10 @@ class ContentColumnForm(forms.ModelForm):
         super(ContentColumnForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.id:
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=self.instance.church).filter(~Q(id=self.instance.id))
-        elif kwargs['initial']:
+        elif kwargs.__contains__('initial'):
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=kwargs['initial']['church'].id)
+        elif args[0]['parentCol']:
+            self.fields['parentCol'].queryset = ContentColumn.objects.filter(id=int(args[0]['parentCol']))
 
 # 
 # def create_model_form(request,admin_class):
