@@ -11,16 +11,17 @@ import pickle
 class ColChangeListForm(forms.ModelForm):
     parentCol = forms.ModelChoiceField(
          queryset=ContentColumn.objects.none(), required=False)
-    cover = forms.CharField(widget=MediaBaseWidget( label='', typ='images'), required=False)
+    cover = forms.CharField(widget=MediaBaseWidget(label='', typ='images'), required=False)
     
     class Meta:
-        model = ContentColumn
+        # model = ContentColumn
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
-        # loger.info(kwargs)
+        loger.info(kwargs)
         super(ColChangeListForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.id:
+            loger.info(self.instance)
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=self.instance.church).filter(~Q(id=self.instance.id))
         elif kwargs.__contains__('initial'):
             self.fields['parentCol'].queryset = ContentColumn.objects.filter(church=kwargs['initial']['church'].id)
