@@ -96,7 +96,10 @@ INSTALLED_APPS += [
 ]
 MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
-INTERNAL_IPS = ('127.0.0.1',)
+# INTERNAL_IPS = ('127.0.0.1',)
+DEBUG_TOOLBAR_CONFIG = {
+  "JQUERY_URL": '//cdn.bootcss.com/jquery/2.2.4/jquery.min.js',
+}
 
 MAINSITE_API_V1 = 'http://127.0.0.1:8200/mainsite_api_v1/mst/MakeSermon'
 APP_SERVER_IP = "localhost:8000"  # singpore 54.169.143.92  
