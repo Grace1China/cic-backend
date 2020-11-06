@@ -1,9 +1,14 @@
-FROM python:3.6-alpine3.9
-
-WORKDIR /var/www/html
+FROM python:3.6.8
+LABEL luxmundi backend
+ENV PYTHONUNBUFFERED 1
+# RUN mkdir /luxmundi
+# RUN pwd
+# RUN ls
+WORKDIR /cic-backend
+# RUN pwd
+# RUN ls
+COPY requirements.txt requirements.txt
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 COPY . .
-RUN pip install pipenv\
-    && pipenv sync
-
-EXPOSE 80 80
-CMD ["python", "manage.py", "runserver"]
+EXPOSE 8000
+CMD [ "python", "manage.py","runserver"]

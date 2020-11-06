@@ -44,21 +44,21 @@
         window.location.reload()
     }
 
-    var fontConfig = new Vue({
-        el: '#dynamicCss',
-        data: {
-            fontSize: 14
-        },
-        created: function () {
-            var val = getCookie('fontSize');
-            if (val) {
-                this.fontSize = parseInt(val);
-            } else {
-                this.fontSize = 0;
-            }
-        },
-        methods: {}
-    });
+//    var fontConfig = new Vue({
+//        el: '#dynamicCss',
+//        data: {
+//            fontSize: 14
+//        },
+//        created: function () {
+//            var val = getCookie('fontSize');
+//            if (val) {
+//                this.fontSize = parseInt(val);
+//            } else {
+//                this.fontSize = 0;
+//            }
+//        },
+//        methods: {}
+//    });
 
     // Waves.init();
 

@@ -102,7 +102,7 @@ MEDIA_BROWSE_API_SERVER_ENV = {
 
 
 import os
-save_dir = "/data/log/django/l3prod/"
+save_dir = "data/log/django/l3prod/"
 if os.path.exists(save_dir) is False:
     os.makedirs(save_dir)
 
@@ -216,3 +216,4 @@ LOGGING = {
         }
     }
 }
+#123

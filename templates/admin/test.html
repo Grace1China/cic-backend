@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="pagination" class="daniel">
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="40"
+            @currentChange="window.pageVue.handleCurrentChange(3)"
+        >
+        </el-pagination>
+</div>
+<script type="application/javascript">
+    $(function () {
+        window.pageVue = new Vue({
+            el: "#pagination",
+            data: {},
+            methods: {
+                handleCurrentChange:function (page) {
+                    page_go(page-1);
+                },
+                pageChange:function(page){
+                    console.log(`--------pageChange(${page})----------------`)
+                },
+            }
+        })
+
+        function page_go(p) {
+            $("#changelist-search input[name='p']").val(p);
+            $("#changelist-search").submit();
+        }  
+
+    });
+        
+</script>
+
+
+
+</bodyi>
+</html>

@@ -90,13 +90,12 @@
                 {% if cl.formset %}
                     <div>{{ cl.formset.management_form }}</div>
                 {% endif %}
-
+                
                 {% block result_list %}
-
+{{ "text" }}
 {#                    {% if action_form %}#}
                         {% admin_actions %}
 {#                    {% endif %}#}
-
                     {% result_list cl %}
 
                 {% endblock %}
@@ -105,21 +104,18 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="{% static "church/js/vuex.js" %}"></script>
+    <script type="application/javascript" src="{% static "church/js/vuex.js" %}"></script>
 
-    <script type="text/javascript" src="{% static "church/js/store.js" %}"></script>
+    <script type="application/javascript" src="{% static "church/js/store.js" %}"></script>
 
-    <script type="text/javascript" src="{% static "churchs/js/change_list.js" %}"></script>
+    <script type="application/javascript" src="{% static "churchs/js/change_list.js" %}"></script>
     
-    <script type="text/javascript">
+    <script type="application/javascript">
         $(".object-tools").hide().find('li a').each(function () {
             _action.exts.push({
                 name:$(this).text(),
                 url:$(this).attr('href')
             })
         })
-    </script>
-    <script type="text/javascript">
-        
     </script>
 {% endblock %}

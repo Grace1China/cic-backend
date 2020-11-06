@@ -268,6 +268,12 @@ def debug_object_dump(var):
     # serialized = jsonpickle.encode(var)
     # return json.dumps(json.loads(serialized), indent=2)
 
+@register.simple_tag()
+def dumpthings(var):
+    return vars(var)
+    # serialized = jsonpickle.encode(var)
+    # return json.dumps(json.loads(serialized), indent=2)
+
 
     
 register.filter('str2varname', str2varname)

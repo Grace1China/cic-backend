@@ -1,11 +1,11 @@
-django==2.2.7
+django==2.2.16
 django-simpleui
 django-cors-headers
 django-debug-toolbar
 djangorestframework
 django-rest-auth
 django-allauth
-mysqlclient 
+# mysqlclient 
 pymysql
 Pillow
 django-storages
@@ -36,3 +36,4 @@ jsonpickle
 pytz
 tzlocal
 wheel
+django-redis

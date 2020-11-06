@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from churchs.admin import MediaInline1
 from . import models
 from churchs import models as churchs_md
 from church import models as church_md
@@ -90,7 +91,7 @@ class ChurchAdmin(admin.ModelAdmin):
 
 
 
-from churchs.admin import MediaInline1
+# from churchs.admin import MediaInline1
 class CourseAdmin(ParsleyAdminMixin,admin.ModelAdmin):
     inlines = [
         MediaInline1,
