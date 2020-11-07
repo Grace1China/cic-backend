@@ -371,7 +371,7 @@ class AliOssCallBack_V2(APIView):
 
             auth = request.META.get('Authorization')
             theLogger.info(auth)
-            theLogger.info(request.__dict__)
+            # theLogger.info(request.__dict__)
             theLogger.info(request.headers)
             theLogger.info(request.POST)
             data = request.data
@@ -393,11 +393,11 @@ class AliOssCallBack_V2(APIView):
             # if key:
             #     arrkey = key.split('/',1)
             
-            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=data.get('church',''),series_prefix=data.get('seriesrespath', ''),origin_name=data.get('originname',''), mime_type=data.get('mimeType',''),endpoint=get_ALIOSS_DESTINATIONS(data.get('dest', ''))['endpoint'],bucket=get_ALIOSS_DESTINATIONS(data.get('dest', ''))['bucket'],video_file_status=MediaFile.STATUS_UPLOADED)
+            mfile = MediaFile.objects.update_or_create(name=data.get('filename', ''),church_prefix=data.get('church',''),series_prefix=data.get('seriesrespath', ''),origin_name=data.get('originname',''), mime_type=data.get('mimeType',''),endpoint=get_ALIOSS_DESTINATIONS(data.get('dest', 'source'))['endpoint'],bucket=get_ALIOSS_DESTINATIONS(data.get('dest', 'source'))['bucket'],video_file_status=MediaFile.STATUS_UPLOADED)
             theLogger.info(mfile)
 
             auth = oss2.Auth(settings.ALIOSS_ACCESS_KEY_ID, settings.ALIOSS_SECRET_ACCESS_KEY)
-            bucket = oss2.Bucket(auth, get_ALIOSS_DESTINATIONS(data.get('dest', ''))['endpoint'], get_ALIOSS_DESTINATIONS(data.get('dest', ''))['bucket'])
+            bucket = oss2.Bucket(auth, get_ALIOSS_DESTINATIONS(data.get('dest', 'source'))['endpoint'], get_ALIOSS_DESTINATIONS(data.get('dest', 'source'))['bucket'])
 
             rule = TaggingRule()
             rule.add('originname', data.get('originname',''))
