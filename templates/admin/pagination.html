@@ -2,38 +2,30 @@
 {% load i18n %}
 {% load simpletags %}
 <div id="pagination" class="daniel">
-    {{ cl.page_num }}
+<!--    {{ cl.page_num }}-->
     {% if pagination_required %}
         <el-pagination
             background
             layout="prev, pager, next"
-            :total="40"
-            @currentChange="formVue.handleCurrentChange(cl.page_num)"
+            :total="{{ cl.result_count }}"
+            @current-change="handleCurrentChange"
+            :current-page="{{ cl.page_num|add:1 }}"
         >
         </el-pagination>
     {% endif %}
 </div>
-<!--<script type="application/javascript">-->
-<!--    $(function () {-->
-<!--        window.pageVue = new Vue({-->
-<!--            el: "#pagination",-->
-<!--            data: {},-->
-<!--            methods: {-->
-<!--                handleCurrentChange:function (page) {-->
-<!--                    page_go(page-1);-->
-<!--                },-->
-<!--                pageChange:function(page){-->
-<!--                    console.log(`&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;pageChange(${page})&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;`)-->
-<!--                },-->
-<!--            }-->
-<!--        })-->
-
-<!--        function page_go(p) {-->
-<!--            $("#changelist-search input[name='p']").val(p);-->
-<!--            $("#changelist-search").submit();-->
-<!--        }  -->
-
-<!--    });-->
-<!--        -->
-<!--</script>-->
+<script type="application/javascript">
+    $(function () {
+        window.pageVue = new Vue({
+            el: "#pagination",
+            data: {},
+            methods: {
+                handleCurrentChange: function (page) {
+                    document.querySelector("#changelist-search input[name='p']").value = page - 1
+                    document.querySelector("#changelist-search").submit();
+                },
+            }
+        })
+    });
+</script>
 

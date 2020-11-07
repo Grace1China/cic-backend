@@ -33,7 +33,7 @@ class ColChangeList(ChangeList):
 
         # these need to be defined here, and not in MovieAdmin
         self.list_display = ['action_checkbox', 'title', 'cover', 'pub_time',
-                             'status', 'parentCol', 'hierarchy','user']
+                             'status', 'parentCol', 'hierarchy']
         self.list_display_links = ['title']
         self.list_editable = ['cover', 'parentCol','user']
         self.sortable_by = ['title', 'cover', 'pub_time', 'status', 'parentCol', 'hierarchy']

@@ -92,15 +92,15 @@
                 {% endif %}
                 
                 {% block result_list %}
-{{ "text" }}
 {#                    {% if action_form %}#}
                         {% admin_actions %}
 {#                    {% endif %}#}
                     {% result_list cl %}
 
                 {% endblock %}
-                {% block pagination %}{% pagination cl %}{% endblock %}
+                
             </form>
+            {% block pagination %}{% pagination cl %}{% endblock %}
         </div>
     </div>
 

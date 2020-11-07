@@ -1181,7 +1181,7 @@
                                     'uploader':params
                                 }
 
-                                if(thefile.size / 1024 / 1024  >= 5) {
+                                if(thefile.size / 1024 / 1024 / 1024 >= 5) {
                                     callopt = {
                                         'callback':res.data.token['callback'],
                                         'key':`${thisV.church}/${thisV.curdir}/${thisV.guid()}`,//这个是oss中的key,随机 不用这个前缀方式了L3${(this.curdir||'').length>1?'/'+this.curdir:''}/
