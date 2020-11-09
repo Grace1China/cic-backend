@@ -1084,6 +1084,25 @@
                             thisVue = this
                             // 定义上传方法。
                             async function multipartUpload (param,callopt) {
+                                acallback = {
+                                    url: JSON.parse(atob(callopt.callback)).callbackUrl,
+                                    host: 'oss-cn-beijing.aliyuncs.com',
+                                    /* eslint no-template-curly-in-string: [0] */
+                                    body: 'bucket=${bucket}&object=${object}&etag=${etag}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}&dest=${x:dest}&seriesrespath=${x:seriesrespath}&church=${x:church}',
+                                    // "filename=${object}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}&dest=${x:dest}&seriesrespath=${x:seriesrespath}&church=${x:church}"
+                                    contentType: 'application/x-www-form-urlencoded',
+                                    customValue: {
+                                        'x:originname': callopt.originname,
+                                        'x:dest' : callopt.dest,
+                                        'x:seriesrespath': callopt.seriesrespath,
+                                        'x:church': callopt.church,
+                                        'originname': callopt.originname,
+                                        'dest' : callopt.dest,
+                                        'seriesrespath': callopt.seriesrespath,
+                                        'church': callopt.church,
+                                    },
+                                }
+                                console.log(acallback)
                                 try {
                                     // object-key可以自定义为文件名（例如file.txt）或目录（例如abc/test/file.txt）的形式，实现将文件上传至当前Bucket或Bucket下的指定目录。
                                     let result = await client.multipartUpload(callopt.key, param.file, { 
@@ -1097,20 +1116,7 @@
                                         },
                                         meta: { year: 2020, people: 'test' },
                                         mime: '*',
-                                        callback: {
-                                            url: JSON.parse(atob(callopt.callback)).callbackUrl,
-                                            host: 'oss-cn-beijing.aliyuncs.com',
-                                            /* eslint no-template-curly-in-string: [0] */
-                                            body: 'bucket=${bucket}&object=${object}&filename=${object}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}&dest=${x:dest}&seriesrespath=${x:seriesrespath}&church=${x:church}',
-                                            // "filename=${object}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}&originname=${x:originname}&dest=${x:dest}&seriesrespath=${x:seriesrespath}&church=${x:church}"
-                                            contentType: 'application/x-www-form-urlencoded',
-                                            customValue: {
-                                                originname: callopt.originname,
-                                                dest: callopt.dest,
-                                                seriesrespath: callopt.seriesrespath,
-                                                church: callopt.church,
-                                            },
-                                        },
+                                        callback: acallback,
                                     })
                                 } catch(e){
                                     console.log(e);
@@ -1181,7 +1187,7 @@
                                     'uploader':params
                                 }
 
-                                if(thefile.size / 1024 / 1024 / 1024 >= 5) {
+                                if(thefile.size / 1024 / 1024 >= 5) {
                                     callopt = {
                                         'callback':res.data.token['callback'],
                                         'key':`${thisV.church}/${thisV.curdir}/${thisV.guid()}`,//这个是oss中的key,随机 不用这个前缀方式了L3${(this.curdir||'').length>1?'/'+this.curdir:''}/
